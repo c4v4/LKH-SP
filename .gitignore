@@ -1,4 +1,5 @@
 *.o
+*.opp
 LKH
 
 .vscode
@@ -7,3 +8,8 @@ LKH
 *.log
 *.log.job.e*
 *.par
+
+libLKHAsym.a
+libLKHSym.a
+CVRP/cvrp
+CVRPTW/cvrptw

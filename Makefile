@@ -1,8 +1,14 @@
 all:
-	make -C SRC
+	make -C CVRP 			
+	make -C CVRPTW
 
-one-level:
-	make -C SRC one-level
+libLKHSym.a:
+	$(MAKE) -C SRC libLKHSym.a TREE_TYPE=TWO_LEVEL_TREE 
+
+libLKHAsym.a:
+	$(MAKE) -C SRC libLKHAsym.a TREE_TYPE=ONE_LEVEL_TREE
 
 clean:
 	make -C SRC clean
+	make -C CVRP clean		
+	make -C CVRPTW clean

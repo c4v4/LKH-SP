@@ -395,13 +395,13 @@ public:
         M_star.assign(nrows, 0);
     }
 
-    template<typename Collection>
+    template <typename Collection>
     inline void reset_covered(const Collection& cols, idx_t nrows) {
         reset_uncovered(nrows);
         for (auto& j_col : cols) { cover_rows(j_col); }
     }
 
-    template<typename Collection>
+    template <typename Collection>
     inline void reset_covered(const Collection& cols, const std::vector<idx_t>& indexes, idx_t nrows) {
         reset_uncovered(nrows);
         for (auto& j : indexes) { cover_rows(cols[j]); }
@@ -415,7 +415,7 @@ public:
         return true;
     }
 
-    template<typename IterableList>
+    template <typename IterableList>
     inline void cover_rows(const IterableList& rows) {
         for (auto i : rows) {
             assert(i < M_star.size());
@@ -423,7 +423,7 @@ public:
         }
     }
 
-    template<typename IterableList>
+    template <typename IterableList>
     inline void uncover_rows(const IterableList& rows) {
         for (auto i : rows) {
             assert(i < M_star.size());
@@ -907,7 +907,7 @@ private:
 class UniqueColSet {
 private:
     struct Hash {
-        size_t operator()(const UniqueCol &column) const {
+        size_t operator()(const UniqueCol& column) const {
             return column.get_disp_hash1() ^ column.get_disp_hash2() ^ column.get_comb_hash1() ^ column.get_comb_hash2();
         }
     };
@@ -921,7 +921,7 @@ public:
     void reserve(idx_t size) { vec_set.reserve(size); }
 
     template <typename... _Args>
-    bool add_column(_Args &&...args) {
+    bool add_column(_Args&&... args) {
         UniqueCol candidate_elem(std::forward<_Args>(args)...);
         auto [set_elem, inserted] = vec_set.emplace_back(candidate_elem);
 
@@ -943,8 +943,8 @@ public:
     [[nodiscard]] inline auto end() { return vec_set.end(); }
     [[nodiscard]] inline auto begin() const { return vec_set.begin(); }
     [[nodiscard]] inline auto end() const { return vec_set.end(); }
-    [[nodiscard]] inline UniqueCol &operator[](size_t i) { return vec_set[i]; }
-    [[nodiscard]] inline const UniqueCol &operator[](size_t i) const { return vec_set[i]; }
+    [[nodiscard]] inline UniqueCol& operator[](size_t i) { return vec_set[i]; }
+    [[nodiscard]] inline const UniqueCol& operator[](size_t i) const { return vec_set[i]; }
 
 private:
     cav::VectorSet<UniqueCol, Hash> vec_set;
@@ -988,22 +988,22 @@ public:
     [[nodiscard]] inline idx_t get_nrows() const { return nrows; }
     [[nodiscard]] inline idx_t get_active_rows_size() const { return nactive_rows; }
 
-    [[nodiscard]] inline auto &get_active_cols() { return active_cols; }
-    [[nodiscard]] inline auto &get_fixed_cols() { return fixed_cols; }
-    [[nodiscard]] inline auto &get_cols() { return cols; }
-    [[nodiscard]] inline Column &get_col(idx_t idx) { return cols[idx]; }
-    [[nodiscard]] inline const Column &get_col(idx_t idx) const { return cols[idx]; }
+    [[nodiscard]] inline auto& get_active_cols() { return active_cols; }
+    [[nodiscard]] inline auto& get_fixed_cols() { return fixed_cols; }
+    [[nodiscard]] inline auto& get_cols() { return cols; }
+    [[nodiscard]] inline Column& get_col(idx_t idx) { return cols[idx]; }
+    [[nodiscard]] inline const Column& get_col(idx_t idx) const { return cols[idx]; }
     [[nodiscard]] inline real_t get_fixed_cost() { return fixed_cost; }
 
     inline void set_timelimit(double seconds) { timelimit = Timer(seconds); }
-    [[nodiscard]] inline Timer &get_timelimit() { return timelimit; }
+    [[nodiscard]] inline Timer& get_timelimit() { return timelimit; }
 
     [[nodiscard]] inline bool is_row_active(idx_t gi) {
         assert(gi < nrows);
         return active_rows[gi];
     }
 
-    void inline fix_columns(const std::vector<idx_t> &idxs) {
+    void inline fix_columns(const std::vector<idx_t>& idxs) {
         for (idx_t j : idxs) {
             for (idx_t i : cols[j]) { active_rows[i] = false; }
         }
@@ -1025,7 +1025,7 @@ public:
         fixed_cost = 0.0;
     }
 
-    void fix_columns(const std::vector<idx_t> &idxs, const MStar &M_star) {
+    void fix_columns(const std::vector<idx_t>& idxs, const MStar& M_star) {
         assert(fixed_cols.empty());
         assert(active_rows.size() == nrows);
         assert(M_star.size() == nrows);
@@ -1037,7 +1037,7 @@ public:
     }
 
     template <typename... _Args>
-    idx_t add_column(_Args &&...args) {
+    idx_t add_column(_Args&&... args) {
         if (cols.add_column(std::forward<_Args>(args)...)) {
             active_cols.emplace_back(cols.size() - 1);
             return cols.size() - 1;
@@ -1046,12 +1046,12 @@ public:
     }
 
     template <typename ColContainer>
-    std::vector<idx_t> add_columns(const ColContainer &new_cols) {
+    std::vector<idx_t> add_columns(const ColContainer& new_cols) {
 
         std::vector<idx_t> inserted_cols_idxs;
         inserted_cols_idxs.reserve(new_cols.size());
 
-        for (auto &new_col : new_cols) {
+        for (auto& new_col : new_cols) {
             idx_t inserted_idx = add_column(new_col);
             if (inserted_idx != REMOVED_INDEX) { inserted_cols_idxs.emplace_back(inserted_idx); }
         }
@@ -1060,12 +1060,12 @@ public:
     }
 
     template <typename ColContainer>
-    std::vector<idx_t> add_columns(ColContainer &&new_cols) {
+    std::vector<idx_t> add_columns(ColContainer&& new_cols) {
 
         std::vector<idx_t> inserted_cols_idxs;
         inserted_cols_idxs.reserve(new_cols.size());
 
-        for (auto &new_col : new_cols) {
+        for (auto& new_col : new_cols) {
             idx_t inserted_idx = add_column(std::move(new_col));
             if (inserted_idx != REMOVED_INDEX) { inserted_cols_idxs.emplace_back(inserted_idx); }
         }
@@ -1074,7 +1074,7 @@ public:
     }
 
     template <typename CostVec, typename SolCostVec, typename MatBegVec, typename MatValVec>
-    std::vector<idx_t> add_columns(const CostVec &costs, const SolCostVec &sol_costs, const MatBegVec &matbeg, const MatValVec &matval) {
+    std::vector<idx_t> add_columns(const CostVec& costs, const SolCostVec& sol_costs, const MatBegVec& matbeg, const MatValVec& matval) {
         assert(costs.size() == sol_costs.size() && costs.size() <= matbeg.size());
 
         idx_t ncols = costs.size();
@@ -1095,21 +1095,21 @@ public:
         return inserted_cols_idxs;
     }
 
-    void fill_with_best_columns(std::vector<idx_t> &global_idxs) {
+    void fill_with_best_columns(std::vector<idx_t>& global_idxs) {
         _init_priced_cols(priced_cols);
         covering_times.reset_uncovered(nrows);
-        std::sort(priced_cols.begin(), priced_cols.end(), [](const Priced_Col &c1, const Priced_Col &c2) { return c1.c_u < c2.c_u; });
+        std::sort(priced_cols.begin(), priced_cols.end(), [](const Priced_Col& c1, const Priced_Col& c2) { return c1.c_u < c2.c_u; });
 
         _select_C2_cols(priced_cols, covering_times, global_idxs);
         _select_C3_cols(priced_cols, global_idxs);
     }
 
-    real_t fill_with_best_columns(std::vector<idx_t> &global_idxs, const std::vector<real_t> &u_k) {
+    real_t fill_with_best_columns(std::vector<idx_t>& global_idxs, const std::vector<real_t>& u_k) {
 
         real_t global_LB = _price_active_cols(u_k, priced_cols);
 
         covering_times.reset_uncovered(nrows);  // reset convered_rows to consider only reduced costs covering for C2
-        std::sort(priced_cols.begin(), priced_cols.end(), [](const Priced_Col &c1, const Priced_Col &c2) { return c1.c_u < c2.c_u; });
+        std::sort(priced_cols.begin(), priced_cols.end(), [](const Priced_Col& c1, const Priced_Col& c2) { return c1.c_u < c2.c_u; });
 
         _select_C1_cols(priced_cols, covering_times, global_idxs);
         _select_C2_cols(priced_cols, covering_times, global_idxs);
@@ -1127,7 +1127,7 @@ public:
      *          REMOVED_INDEX if the column has been removed.
      */
     template <unsigned long Hard_cap>
-    std::vector<idx_t> prune_instance(const std::vector<real_t> &u_k) {
+    std::vector<idx_t> prune_instance(const std::vector<real_t>& u_k) {
         if (cols.size() > 3 * Hard_cap) {
             std::vector<idx_t> idxs_to_keep;
             idxs_to_keep.reserve(Hard_cap);
@@ -1179,14 +1179,14 @@ private:
         inline bool is_selected(idx_t n) const { return (*this)[n].j == REMOVED_INDEX; }
     };
 
-    void _init_priced_cols(Priced_Columns &_priced_cols) {
+    void _init_priced_cols(Priced_Columns& _priced_cols) {
         _priced_cols.reset(active_cols.size());
 
         idx_t p_idx = 0;
         for (idx_t gj : active_cols) {
             assert(gj < cols.size());
 
-            Column &col = cols[gj];
+            Column& col = cols[gj];
             for (idx_t gi : col) {
                 if (active_rows[gi]) {
                     _priced_cols[p_idx++] = {gj, col.get_cost(), col.get_solcost()};
@@ -1197,7 +1197,7 @@ private:
         _priced_cols.resize(p_idx);
     }
 
-    real_t _price_active_cols(const std::vector<real_t> &u_k, Priced_Columns &_priced_cols) {
+    real_t _price_active_cols(const std::vector<real_t>& u_k, Priced_Columns& _priced_cols) {
 
         _priced_cols.reset(active_cols.size());
 
@@ -1208,7 +1208,7 @@ private:
         for (idx_t gj : active_cols) {
             assert(gj < cols.size());
 
-            Column &col = cols[gj];
+            Column& col = cols[gj];
             real_t c_u = col.get_cost();
 
             bool is_empty = true;
@@ -1232,12 +1232,12 @@ private:
     }
 
     template <unsigned long Min_cov = SUBINST_MIN_COV, unsigned long Hard_cap = SUBINST_HARD_CAP>
-    NO_INLINE void _select_C1_cols(Priced_Columns &_priced_cols, MStar &_covering_times, std::vector<idx_t> &global_col_idxs) {
+    NO_INLINE void _select_C1_cols(Priced_Columns& _priced_cols, MStar& _covering_times, std::vector<idx_t>& global_col_idxs) {
 
         idx_t fivem = std::min<idx_t>(Hard_cap, std::min<idx_t>(Min_cov * nactive_rows, _priced_cols.size()));
         global_col_idxs.reserve(fivem);
 
-        std::sort(_priced_cols.begin(), _priced_cols.end(), [](const Priced_Col &c1, const Priced_Col &c2) { return c1.c_u < c2.c_u; });
+        std::sort(_priced_cols.begin(), _priced_cols.end(), [](const Priced_Col& c1, const Priced_Col& c2) { return c1.c_u < c2.c_u; });
 
         for (idx_t n = 0; n < fivem; n++) {
             assert(n < _priced_cols.size());
@@ -1260,10 +1260,10 @@ private:
     }
 
     template <unsigned long Min_cov = SUBINST_MIN_COV, unsigned long Hard_cap = SUBINST_HARD_CAP>
-    NO_INLINE void _select_C2_cols(Priced_Columns &_priced_cols, MStar &_covering_times, std::vector<idx_t> &global_col_idxs) {
+    NO_INLINE void _select_C2_cols(Priced_Columns& _priced_cols, MStar& _covering_times, std::vector<idx_t>& global_col_idxs) {
 
         assert(std::is_sorted(_priced_cols.begin() + global_col_idxs.size(), _priced_cols.end(),
-                              [](const Priced_Col &c1, const Priced_Col &c2) { return c1.c_u < c2.c_u; }));
+                              [](const Priced_Col& c1, const Priced_Col& c2) { return c1.c_u < c2.c_u; }));
 
         if (nactive_rows == 0) { }
 
@@ -1285,7 +1285,7 @@ private:
         for (idx_t n = global_col_idxs.size(); n < _priced_cols.size(); ++n) {
             assert(!_priced_cols.is_selected(n));
 
-            Column &col = cols[_priced_cols[n].j];
+            Column& col = cols[_priced_cols[n].j];
             for (idx_t gi : col) {
                 if (_covering_times[gi] == 0) { continue; }
 
@@ -1315,12 +1315,12 @@ private:
     }
 
     template <unsigned long Min_cov = SUBINST_MIN_SOLCOST_COV, unsigned long Hard_cap = SUBINST_HARD_CAP>
-    NO_INLINE void _select_C3_cols(Priced_Columns &_priced_cols, std::vector<idx_t> &global_col_idxs) {
+    NO_INLINE void _select_C3_cols(Priced_Columns& _priced_cols, std::vector<idx_t>& global_col_idxs) {
         idx_t fivem = std::min<idx_t>(Hard_cap, std::min<idx_t>(Min_cov * nactive_rows, _priced_cols.size()));
         global_col_idxs.reserve(fivem);
 
         std::nth_element(_priced_cols.begin(), _priced_cols.begin() + fivem, _priced_cols.end(),
-                         [](const Priced_Col &c1, const Priced_Col &c2) { return c1.sol_cost < c2.sol_cost; });
+                         [](const Priced_Col& c1, const Priced_Col& c2) { return c1.sol_cost < c2.sol_cost; });
 
         if (_priced_cols[0].sol_cost == REAL_MAX) { return; }
 
@@ -1343,10 +1343,10 @@ private:
         }
     }
 
-    void _fix_columns(const std::vector<idx_t> &idxs) {
+    void _fix_columns(const std::vector<idx_t>& idxs) {
         idx_t iok = 0;
         for (idx_t j = 0; j < cols.size(); ++j) {
-            auto &col = cols[j];
+            auto& col = cols[j];
             for (idx_t i : col) {
                 if (active_rows[i]) {
                     active_cols[iok++] = j;
@@ -1404,7 +1404,7 @@ private:
 class SubInstance {
 
 public:
-    explicit SubInstance(Instance &inst_) : inst(inst_), fixed_cost(inst_.get_fixed_cost()) { }
+    explicit SubInstance(Instance& inst_) : inst(inst_), fixed_cost(inst_.get_fixed_cost()) { }
 
     [[nodiscard]] inline auto get_ncols() const { return cols.size(); }
     [[nodiscard]] inline auto get_nrows() const { return rows.size(); }
@@ -1413,30 +1413,30 @@ public:
     [[nodiscard]] inline auto get_global_row_idx(idx_t local_i) const { return local_to_global_row_idxs[local_i]; }
     [[nodiscard]] inline auto get_local_row_idx(idx_t global_i) const { return global_to_local_row_idxs[global_i]; }
 
-    [[nodiscard]] inline auto &get_cols() { return cols; }
-    [[nodiscard]] inline auto &get_rows() { return rows; }
+    [[nodiscard]] inline auto& get_cols() { return cols; }
+    [[nodiscard]] inline auto& get_rows() { return rows; }
 
-    [[nodiscard]] inline const auto &get_cols() const { return cols; }
-    [[nodiscard]] inline const auto &get_rows() const { return rows; }
+    [[nodiscard]] inline const auto& get_cols() const { return cols; }
+    [[nodiscard]] inline const auto& get_rows() const { return rows; }
 
-    [[nodiscard]] inline auto &get_col(idx_t idx) { return cols[idx]; }
-    [[nodiscard]] inline auto &get_row(idx_t idx) { return rows[idx]; }
+    [[nodiscard]] inline auto& get_col(idx_t idx) { return cols[idx]; }
+    [[nodiscard]] inline auto& get_row(idx_t idx) { return rows[idx]; }
 
-    [[nodiscard]] inline const auto &get_col(idx_t idx) const { return cols[idx]; }
-    [[nodiscard]] inline const auto &get_row(idx_t idx) const { return rows[idx]; }
+    [[nodiscard]] inline const auto& get_col(idx_t idx) const { return cols[idx]; }
+    [[nodiscard]] inline const auto& get_row(idx_t idx) const { return rows[idx]; }
 
-    [[nodiscard]] inline auto &get_fixed_cols() { return fixed_cols_global_idxs; }
+    [[nodiscard]] inline auto& get_fixed_cols() { return fixed_cols_global_idxs; }
     [[nodiscard]] inline auto get_fixed_cost() const { return fixed_cost; }
-    [[nodiscard]] inline auto &get_instance() { return inst; }
+    [[nodiscard]] inline auto& get_instance() { return inst; }
 
-    [[nodiscard]] Timer &get_timelimit() { return inst.get_timelimit(); }
+    [[nodiscard]] Timer& get_timelimit() { return inst.get_timelimit(); }
 
     [[nodiscard]] bool is_corrupted() const {
         idx_t j_counter = 0;
-        for (auto &col : cols) {
+        for (auto& col : cols) {
             if (std::addressof(col) != std::addressof(cols[j_counter])) {
-                fmt::print("Subinstance cols iterator corrupted at {}: {} != {}\n", j_counter, (void *)std::addressof(col),
-                           (void *)std::addressof(cols[j_counter]));
+                fmt::print("Subinstance cols iterator corrupted at {}: {} != {}\n", j_counter, (void*)std::addressof(col),
+                           (void*)std::addressof(cols[j_counter]));
                 return true;
             }
             ++j_counter;
@@ -1481,12 +1481,12 @@ public:
         return false;
     }
 
-    [[nodiscard]] real_t get_global_LB(const std::vector<real_t> &u_k) {
+    [[nodiscard]] real_t get_global_LB(const std::vector<real_t>& u_k) {
         real_t global_LB = std::reduce(u_k.begin(), u_k.end(), static_cast<real_t>(0.0));
 
         // price all active columns and add their contribution to the LB
         for (idx_t gj : inst.get_active_cols()) {
-            const auto &col = inst.get_col(gj);
+            const auto& col = inst.get_col(gj);
             real_t c_u = col.get_cost();
 
             for (idx_t gi : col) {
@@ -1514,7 +1514,7 @@ public:
         }
         return REMOVED_INDEX;
     }
-    [[nodiscard]] std::vector<idx_t> get_localized_solution(const std::vector<idx_t> &glob_sol) {
+    [[nodiscard]] std::vector<idx_t> get_localized_solution(const std::vector<idx_t>& glob_sol) {
         assert(glob_sol.size() >= fixed_cols_global_idxs.size());
 
         std::vector<idx_t> local_sol;
@@ -1525,8 +1525,8 @@ public:
         }
 
         IF_DEBUG {
-            auto &sifc = fixed_cols_global_idxs;
-            auto &ifc = inst.get_fixed_cols();
+            auto& sifc = fixed_cols_global_idxs;
+            auto& ifc = inst.get_fixed_cols();
             for ([[maybe_unused]] idx_t lj : local_sol) { assert(std::find(glob_sol.begin(), glob_sol.end(), local_to_global_col_idxs[lj]) != glob_sol.end()); }
             for ([[maybe_unused]] idx_t gj : sifc) { assert(std::find(glob_sol.begin(), glob_sol.end(), gj) != glob_sol.end()); }
             for ([[maybe_unused]] idx_t gj : ifc) { assert(std::find(glob_sol.begin(), glob_sol.end(), gj) != glob_sol.end()); }
@@ -1549,7 +1549,7 @@ public:
     }
 
     template <typename ColContainer>
-    std::vector<idx_t> add_columns(const ColContainer &new_cols) {
+    std::vector<idx_t> add_columns(const ColContainer& new_cols) {
 
         std::vector<idx_t> inserted_cols_idxs = inst.add_columns(new_cols);
         assert(!inserted_cols_idxs.empty());
@@ -1561,11 +1561,11 @@ public:
         local_to_global_col_idxs.resize(new_ncols);
 
         idx_t lj = old_ncols;
-        for (idx_t &gj : inserted_cols_idxs) {
+        for (idx_t& gj : inserted_cols_idxs) {
 
             local_to_global_col_idxs[lj] = gj;
 
-            Column &gcol = inst.get_col(gj);
+            Column& gcol = inst.get_col(gj);
             cols.new_col_create(gcol.get_cost());
             for (idx_t gi : gcol) {
                 assert(_is_global_row_active(gi));
@@ -1583,16 +1583,16 @@ public:
         return inserted_cols_idxs;
     }
 
-    inline void update_sol_cost(const std::vector<idx_t> &local_sol) {
+    inline void update_sol_cost(const std::vector<idx_t>& local_sol) {
         real_t sol_cost = std::accumulate(local_sol.begin(), local_sol.end(), 0.0, [&](real_t sum, idx_t lj) { return sum + cols[lj].get_cost(); });
         sol_cost += get_fixed_cost();
         update_sol_costs(local_sol, sol_cost);
     }
 
-    void update_sol_costs(const std::vector<idx_t> &local_sol, real_t sol_cost) {
+    void update_sol_costs(const std::vector<idx_t>& local_sol, real_t sol_cost) {
 
         for (idx_t lj : local_sol) {
-            Column &gcol = inst.get_col(local_to_global_col_idxs[lj]);
+            Column& gcol = inst.get_col(local_to_global_col_idxs[lj]);
             if (gcol.get_solcost() > sol_cost) { gcol.set_solcost(sol_cost); }
         }
 
@@ -1633,7 +1633,7 @@ public:
         assert(!is_corrupted());
     }
 
-    NO_INLINE real_t price(const std::vector<real_t> &u_k) {
+    NO_INLINE real_t price(const std::vector<real_t>& u_k) {
 
         global_u_k.assign(inst.get_nrows(), 0);
         for (idx_t i = 0; i < u_k.size(); ++i) { global_u_k[local_to_global_row_idxs[i]] = u_k[i]; }
@@ -1646,7 +1646,7 @@ public:
         return global_LB;
     }
 
-    idx_t fix_columns(std::vector<idx_t> &local_idxs_to_fix, std::vector<real_t> &u_star) {
+    idx_t fix_columns(std::vector<idx_t>& local_idxs_to_fix, std::vector<real_t>& u_star) {
 
         if (local_idxs_to_fix.empty()) { return rows.size(); }
 
@@ -1659,7 +1659,7 @@ public:
             assert(std::find(fixed_cols_global_idxs.begin(), fixed_cols_global_idxs.end(), gj) == fixed_cols_global_idxs.end());
 
             fixed_cols_global_idxs.emplace_back(gj);
-            const auto &col = cols[lj];
+            const auto& col = cols[lj];
             for (idx_t li : col) {
                 if (local_to_global_row_idxs[li] == REMOVED_INDEX) { continue; }
 
@@ -1720,11 +1720,11 @@ public:
         return rows_left;
     }
 
-    void replace_columns(const std::vector<idx_t> &glob_cols_idxs) {
+    void replace_columns(const std::vector<idx_t>& glob_cols_idxs) {
         assert(!glob_cols_idxs.empty());
 
         rows.resize(local_to_global_row_idxs.size());
-        for (auto &row : rows) { row.clear(); }
+        for (auto& row : rows) { row.clear(); }
 
         idx_t ncols = glob_cols_idxs.size();
 
@@ -1737,7 +1737,7 @@ public:
             assert(std::find(fixed_cols_global_idxs.begin(), fixed_cols_global_idxs.end(), gj) == fixed_cols_global_idxs.end());
             assert(!inst.get_col(gj).empty());
 
-            const auto &gcol = inst.get_col(gj);
+            const auto& gcol = inst.get_col(gj);
 
             cols.new_col_create(gcol.get_cost());
             for (idx_t gi : gcol) {
@@ -1760,7 +1760,7 @@ private:
     }
 
 private:
-    Instance &inst;
+    Instance& inst;
     SubInstCols cols;
     std::vector<Row> rows;
     std::vector<idx_t> local_to_global_col_idxs;  // map local to original indexes
@@ -1867,7 +1867,7 @@ public:
     explicit GlobalSolution(idx_t size) : BaseSolution(size), cost(REAL_MAX) { }
     GlobalSolution(idx_t size, real_t val) : BaseSolution(size, val), cost(REAL_MAX) { }
     GlobalSolution(const GlobalSolution& other) : BaseSolution(other), cost(other.cost) { }
-    GlobalSolution(GlobalSolution&& other)  noexcept : BaseSolution(std::move(other)), cost(other.cost) { }
+    GlobalSolution(GlobalSolution&& other) noexcept : BaseSolution(std::move(other)), cost(other.cost) { }
 
     GlobalSolution& operator=(const GlobalSolution& other) = default;
     GlobalSolution& operator=(GlobalSolution&& other) = default;
@@ -1906,13 +1906,33 @@ private:
 /* #include "SubInstance.hpp" */
 /* #include "cft.hpp" */
 
-#define RESIZE_UP(vec, sz) ;    if (vec.size() < sz) { vec.resize(sz); }
+#define RESIZE_UP(vec, sz) \
+    ;                      \
+    if (vec.size() < sz) { vec.resize(sz); }
 
-#define ASSIGN_UP(vec, sz, val) ;    if (vec.size() < sz) { vec.assign(sz, val); }
+#define ASSIGN_UP(vec, sz, val) \
+    ;                           \
+    if (vec.size() < sz) { vec.assign(sz, val); }
 
-#define SET_INT(P, VAL)                                                            ;    if (int res = 0; (res = CPXsetintparam(env, P, VAL))) {                        ;        fmt::print(stderr, "Error while setting " #P " parameter at  {} \n", VAL); ;        return res;                                                                ;    }
+#define SET_INT(P, VAL)                                                            \
+    ;                                                                              \
+    if (int res = 0; (res = CPXsetintparam(env, P, VAL))) {                        \
+        ;                                                                          \
+        fmt::print(stderr, "Error while setting " #P " parameter at  {} \n", VAL); \
+        ;                                                                          \
+        return res;                                                                \
+        ;                                                                          \
+    }
 
-#define SET_DBL(P, VAL)                                                           ;    if (int res = 0; (res = CPXsetdblparam(env, P, VAL))) {                       ;        fmt::print(stderr, "Error while setting " #P " parameter at {} \n", VAL); ;        return res;                                                               ;    }
+#define SET_DBL(P, VAL)                                                           \
+    ;                                                                             \
+    if (int res = 0; (res = CPXsetdblparam(env, P, VAL))) {                       \
+        ;                                                                         \
+        fmt::print(stderr, "Error while setting " #P " parameter at {} \n", VAL); \
+        ;                                                                         \
+        return res;                                                               \
+        ;                                                                         \
+    }
 
 class ExactSolver {
 public:
@@ -2387,38 +2407,23 @@ private:
 class Counter {
 
 public:
-
     explicit Counter(idx_t max) : m(max), i(0) { }
 
-    inline void inc() {
-        i++;
-    }
+    inline void inc() { i++; }
 
-    [[nodiscard]] inline auto reached() const {
-        return i >= m;
-    }
+    [[nodiscard]] inline auto reached() const { return i >= m; }
 
-    inline void restart() {
-        i = 0;
-    }
+    inline void restart() { i = 0; }
 
-    inline void set_max(idx_t new_max) {
-        m = new_max;
-    }
+    inline void set_max(idx_t new_max) { m = new_max; }
 
-    [[nodiscard]] inline idx_t get_max() const {
-        return m;
-    }
+    [[nodiscard]] inline idx_t get_max() const { return m; }
 
-    [[nodiscard]] inline auto get() const {
-        return i;
-    }
+    [[nodiscard]] inline auto get() const { return i; }
 
 private:
-
-    idx_t m; // max value
-    idx_t i; // current value
-
+    idx_t m;  // max value
+    idx_t i;  // current value
 };
 
 
@@ -2437,21 +2442,16 @@ private:
 /* #include "cft.hpp" */
 class StepSizeFactor {
 public:
-    StepSizeFactor(real_t initial_value_ = 0.1, idx_t period = 20) : p(period), lambda(initial_value_),
-                                                                     wrst_LB(REAL_MAX), best_LB(REAL_LOWEST) { }
+    StepSizeFactor(real_t initial_value_ = 0.1, idx_t period = 20) : p(period), lambda(initial_value_), wrst_LB(REAL_MAX), best_LB(REAL_LOWEST) { }
 
     inline void update(real_t current_LB) {
-        if (current_LB < wrst_LB) {
-            wrst_LB = current_LB;
-        }
-        if (current_LB > best_LB) {
-            best_LB = current_LB;
-        }
+        if (current_LB < wrst_LB) { wrst_LB = current_LB; }
+        if (current_LB > best_LB) { best_LB = current_LB; }
 
         p.inc();
         if (p.reached()) {
             const auto perc_diff = (best_LB - wrst_LB) / best_LB;
-            //assert(perc_diff > 0.0);
+            // assert(perc_diff > 0.0);
 
             if (perc_diff > 0.01) {
                 lambda /= 2.0;
@@ -3063,26 +3063,26 @@ public:
 
     [[nodiscard]] inline idx_t get_ncols() const { return inst.get_ncols(); }
     [[nodiscard]] inline idx_t get_nrows() const { return inst.get_nrows(); }
-    [[nodiscard]] inline UniqueColSet &get_cols() { return inst.get_cols(); }
-    [[nodiscard]] inline Column &get_col(idx_t idx) { return inst.get_col(idx); }
-    [[nodiscard]] inline const Column &get_col(idx_t idx) const { return inst.get_col(idx); }
+    [[nodiscard]] inline UniqueColSet& get_cols() { return inst.get_cols(); }
+    [[nodiscard]] inline Column& get_col(idx_t idx) { return inst.get_col(idx); }
+    [[nodiscard]] inline const Column& get_col(idx_t idx) const { return inst.get_col(idx); }
 
     void inline set_timelimit(double seconds) { inst.set_timelimit(seconds); }
 
-    [[nodiscard]] inline Timer &get_timelimit() { return inst.get_timelimit(); }
+    [[nodiscard]] inline Timer& get_timelimit() { return inst.get_timelimit(); }
 
     template <typename UniqueColContainer>
-    std::vector<idx_t> inline add_columns(const UniqueColContainer &new_cols) {
+    std::vector<idx_t> inline add_columns(const UniqueColContainer& new_cols) {
         return inst.add_columns(new_cols);
     }
 
-    std::vector<idx_t> inline add_columns(const std::vector<real_t> &costs, const std::vector<real_t> &sol_costs, const std::vector<idx_t> &matbeg,
-                                          const std::vector<idx_t> &matval) {
+    std::vector<idx_t> inline add_columns(const std::vector<real_t>& costs, const std::vector<real_t>& sol_costs, const std::vector<idx_t>& matbeg,
+                                          const std::vector<idx_t>& matval) {
         return inst.add_columns(costs, sol_costs, matbeg, matval);
     }
 
     template <unsigned long ROUTES_HARD_CAP = INST_HARD_CAP>
-    std::vector<idx_t> inline solve([[maybe_unused]] const std::vector<idx_t> &S_init) {
+    std::vector<idx_t> inline solve([[maybe_unused]] const std::vector<idx_t>& S_init) {
         return refinement.solve<ROUTES_HARD_CAP>(S_init);
     }
 
