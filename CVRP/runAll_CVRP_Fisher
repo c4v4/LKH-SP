@@ -1,3 +1,0 @@
-run_CVRP Fisher F-n45-k4 1000 10 1 724
-run_CVRP Fisher F-n72-k4 1000 10 1 237
-run_CVRP Fisher F-n135-k7 1000 10 1 1162
