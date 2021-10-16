@@ -1,12 +1,12 @@
+#include "extract_routes.hpp"
+
 extern "C" {
 #include "LKH.h"
 #include "Segment.h"
-
-const enum Types ProblemType = CVRP;
 };
 
 
-class ConstraintChecker {
+class CVRPChecker {
 public:
     void add_node(Node *N) {
         current_demand += N->Demand;
@@ -36,6 +36,7 @@ private:
     size_t size = 0;
 };
 
+void Extract_routes(GainType Cost) { extract_routes_tmlp<CVRPChecker>(Cost); }
 
 extern "C" {
 
@@ -116,7 +117,8 @@ GainType Penalty() {
 
                     GainType tempP = P + DemandSum - Capacity;
                     if (DemandSum > Capacity && (tempP > oldPenaltySum || (tempP == oldPenaltySum && CurrentGain <= 0))) {
-                        for (SwapRecord *s = si - 1; s >= SwapStack; --s) s->t1->PFlag = s->t2->PFlag = s->t3->PFlag = s->t4->PFlag = 0;
+                        for (SwapRecord *s = si - 1; s >= SwapStack; --s)
+                            s->t1->PFlag = s->t2->PFlag = s->t3->PFlag = s->t4->PFlag = 0;
 
                         return CurrentPenalty + (CurrentGain > 0);
                     }
@@ -129,7 +131,8 @@ GainType Penalty() {
                     }
 
                     if (DemandSum > Capacity && ((P += DemandSum - Capacity) > oldPenaltySum || (P == oldPenaltySum && CurrentGain <= 0))) {
-                        for (SwapRecord *s = si - 1; s >= SwapStack; --s) s->t1->PFlag = s->t2->PFlag = s->t3->PFlag = s->t4->PFlag = 0;
+                        for (SwapRecord *s = si - 1; s >= SwapStack; --s)
+                            s->t1->PFlag = s->t2->PFlag = s->t3->PFlag = s->t4->PFlag = 0;
 
                         return CurrentPenalty + (CurrentGain > 0);
                     }
@@ -224,7 +227,8 @@ GainType Penalty_Old() {
     do {
         CurrentRoute = N;
         DemandSum = 0;
-        do DemandSum += N->Demand;
+        do
+            DemandSum += N->Demand;
         while ((N = SUCC(N))->DepotId == 0);
         if (DemandSum > Capacity && ((P += DemandSum - Capacity) > CurrentPenalty || (P == CurrentPenalty && CurrentGain <= 0))) {
             StartRoute = CurrentRoute;
