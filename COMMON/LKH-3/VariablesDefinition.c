@@ -102,46 +102,47 @@ int PatchingA;                  /* Specifies the maximum number of alternating
 int PatchingC;                  /* Specifies the maximum number of disjoint cycles to be
                                   patched (by one or more alternating cycles) */
 GainType PenaltyGain;
-int Precision;                 /* Internal precision in the representation of
-                                 transformed distances */
-int PredSucCostAvailable;      /* PredCost and SucCost are available */
-int POPMUSIC_InitialTour;      /* Specifies whether the first POPMUSIC tour
-                                 is used as initial tour for LK */
-int POPMUSIC_MaxNeighbors;     /* Maximum number of nearest neighbors used
-                                 as candidates in iterated 3-opt */
-int POPMUSIC_SampleSize;       /* The sample size */
-int POPMUSIC_Solutions;        /* Number of solutions to generate */
-int POPMUSIC_Trials;           /* Maximum trials used for iterated 3-opt */
-unsigned *Rand;                /* Table of random values */
-int Recombination;             /* IPT or GPX2 */
-int RestrictedSearch;          /* Specifies whether the choice of the first
-                                 edge to be broken is restricted */
-short Reversed;                /* Boolean used to indicate whether a tour has
-                                 been reversed */
-int Run;                       /* Current run number */
-int Runs;                      /* Total number of runs */
-int Scale;                     /* Scale factor for Euclidean and ATT instances */
-double ServiceTime;            /* Service time for a CVRP instance */
-unsigned Seed;                 /* Initial seed for random number generation */
-double StartTime;              /* Time when execution starts */
-int StopAtOptimum;             /* Specifies whether a run will be terminated if
-                                 the tour length becomes equal to Optimum */
-int Subgradient;               /* Specifies whether the Pi-values should be
-                                 determined by subgradient optimization */
-int SubproblemSize;            /* Number of nodes in a subproblem */
-int SubsequentPatching;        /* Species whether patching is used for
-                                 subsequent moves */
-SwapRecord *SwapStack;         /* Stack of SwapRecords */
-int Swaps;                     /* Number of swaps made during a tentative move */
-int OldSwaps;                  /* Saved number of swaps */
-double TimeLimit;              /* The time limit in seconds */
-int TotalDemand;               /* Sum of demands for a CVRP instance */
-int TraceLevel;                /* Specifies the level of detail of the output
-                                 given during the solution process.
-                                 The value 0 signifies a minimum amount of
-                                 output. The higher the value is the more
-                                 information is given */
-int Trial;                     /* Ordinal number of the current trial */
+int Precision;             /* Internal precision in the representation of
+                             transformed distances */
+int PredSucCostAvailable;  /* PredCost and SucCost are available */
+int POPMUSIC_InitialTour;  /* Specifies whether the first POPMUSIC tour
+                             is used as initial tour for LK */
+int POPMUSIC_MaxNeighbors; /* Maximum number of nearest neighbors used
+                             as candidates in iterated 3-opt */
+int POPMUSIC_SampleSize;   /* The sample size */
+int POPMUSIC_Solutions;    /* Number of solutions to generate */
+int POPMUSIC_Trials;       /* Maximum trials used for iterated 3-opt */
+unsigned *Rand;            /* Table of random values */
+int Recombination;         /* IPT or GPX2 */
+int RestrictedSearch;      /* Specifies whether the choice of the first
+                             edge to be broken is restricted */
+short Reversed;            /* Boolean used to indicate whether a tour has
+                             been reversed */
+int Run;                   /* Current run number */
+int Runs;                  /* Total number of runs */
+int Scale;                 /* Scale factor for Euclidean and ATT instances */
+double ServiceTime;        /* Service time for a CVRP instance */
+unsigned Seed;             /* Initial seed for random number generation */
+double StartTime;          /* Time when execution starts */
+int StopAtOptimum;         /* Specifies whether a run will be terminated if
+                             the tour length becomes equal to Optimum */
+int Subgradient;           /* Specifies whether the Pi-values should be
+                             determined by subgradient optimization */
+int SubproblemSize;        /* Number of nodes in a subproblem */
+int SubsequentPatching;    /* Species whether patching is used for
+                             subsequent moves */
+SwapRecord *SwapStack;     /* Stack of SwapRecords */
+int Swaps;                 /* Number of swaps made during a tentative move */
+int OldSwaps;              /* Saved number of swaps */
+double TimeLimit;          /* The time limit in seconds */
+double RunTimeLimit;       /* The time limit in seconds for each run*/
+int TotalDemand;           /* Sum of demands for a CVRP instance */
+int TraceLevel;            /* Specifies the level of detail of the output
+                             given during the solution process.
+                             The value 0 signifies a minimum amount of
+                             output. The higher the value is the more
+                             information is given */
+int Trial;                 /* Ordinal number of the current trial */
 GainType TSPTW_CurrentMakespanCost;
 int TSPTW_Makespan;
 

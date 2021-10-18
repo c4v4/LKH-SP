@@ -101,6 +101,11 @@ GainType LinKernighan()
     PredSucCostAvailable = 1;
     BIT_Update();
 
+    if(Trial == 1) {
+        printff("Initial Tour ");
+        StatusReport(Cost, EntryTime, "");
+    }
+
     /* Loop as long as improvements are found */
     do {
         /* Choose t1 as the first "active" node */

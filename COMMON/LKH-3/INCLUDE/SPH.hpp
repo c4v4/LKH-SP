@@ -1,9 +1,21 @@
 /* Automatically generated one-header-only library */
 
 
-/** 
- * A subset of the of the excelent fmtlib is included in this library in header-only mode.
- * Include you local version before this file if you want to use it (to decrease compile-time).
+/* 
+ * Copyright (C) 2021 Francesco Cavaliere - All Rights Reserved
+ * You may use, distribute and modify this code under the
+ * terms of the GPL-3 license.
+ *
+ * You should have received a copy of the GPL-3 license with
+ * this file. If not, please write to: f.cavaliere@unibo.it, 
+ * or try visit: https://github.com/c4v4/sph 
+ */
+
+/* 
+ * A subset of the of the excelent fmtlib is included in this 
+ * library in header-only mode.
+ * Include you local version before this file if you want to 
+ * use it (can decrease compile-time).
  */
 
 
@@ -17,21 +29,28 @@
 #include <cstdint>
 #include <limits>
 
-
+/**
+ * VERBOSE: If defined, switches on few prints.
+ * VERBOSE_LEVEL [0-3]: Define how many prints: 0 few (default); 1 some; 2 a lot; 3 all
+ */
 #ifdef VERBOSE
-#define SPH_VERBOSE
+    #ifndef VERBOSE_LEVEL
+        #define VERBOSE_LEVEL 0
+    #endif   
+
+    #define SPH_VERBOSE(A) if constexpr (VERBOSE_LEVEL > A)
 #else
-#define SPH_VERBOSE if constexpr (false)
+    #define SPH_VERBOSE(A) if constexpr (false)
 #endif
 
 #ifdef NDEBUG
 #define SPH_DEBUG if constexpr (false)
 #else
-#define SPH_DEBUG
+    #define SPH_DEBUG
 #endif
 
 namespace sph {
-    
+
     /* Types and constants */
     typedef uint32_t idx_t;
     typedef double real_t;
@@ -57,7 +76,7 @@ namespace sph {
 
 #ifndef SPH_INCLUDE_COLUMNS_HPP_
 #define SPH_INCLUDE_COLUMNS_HPP_
-#include "fmt/core.h"
+#include <fmt/core.h>
 #include <stddef.h>
 
 #include <algorithm>
@@ -82,20 +101,20 @@ namespace sph {
     }
 
     template <typename Elem>
-    class IdxList {
+    class CollectionOfElem {
     public:
         static constexpr size_t MY_SIZE = sizeof(Elem);
 
     protected:
-        IdxList(const idx_t* beg_, const idx_t* end_) : sz(end_ - beg_) { std::copy(beg_, end_, begin()); }
-        IdxList(const IdxList& other) : sz(other.sz) { std::copy(other.begin(), other.end(), begin()); }
+        CollectionOfElem(const idx_t* beg_, const idx_t* end_) : sz(end_ - beg_) { std::copy(beg_, end_, begin()); }
+        CollectionOfElem(const CollectionOfElem& other) : sz(other.sz) { std::copy(other.begin(), other.end(), begin()); }
 
     public:
-        IdxList() : sz(0U) { }
-        IdxList(IdxList&&) = delete;
-        IdxList& operator=(const IdxList&) = delete;
-        IdxList& operator=(IdxList&&) = delete;
-        ~IdxList() = default;
+        CollectionOfElem() : sz(0U) { }
+        CollectionOfElem(CollectionOfElem&&) = delete;
+        CollectionOfElem& operator=(const CollectionOfElem&) = delete;
+        CollectionOfElem& operator=(CollectionOfElem&&) = delete;
+        ~CollectionOfElem() = default;
 
         Elem& operator=(const Elem&) = delete;
         Elem& operator=(Elem&&) = delete;
@@ -106,7 +125,9 @@ namespace sph {
 
         [[nodiscard]] inline idx_t size() const { return sz; }
         [[nodiscard]] inline bool empty() const { return sz == 0; }
-        [[nodiscard]] inline const idx_t* begin() const { return reinterpret_cast<const idx_t*>(reinterpret_cast<const char*>(this) + MY_SIZE); }
+        [[nodiscard]] inline const idx_t* begin() const {
+            return reinterpret_cast<const idx_t*>(reinterpret_cast<const char*>(this) + MY_SIZE);
+        }
         [[nodiscard]] inline const idx_t* end() const { return begin() + sz; }
         [[nodiscard]] inline idx_t operator[](idx_t i) const { return begin()[i]; }
 
@@ -114,12 +135,12 @@ namespace sph {
         idx_t sz;
     };
 
-    class SubInstCol : public IdxList<SubInstCol> {
+    class SubInstCol : public CollectionOfElem<SubInstCol> {
         friend class CollectionOf<SubInstCol>;
 
     protected:
-        SubInstCol(const idx_t* beg_, const idx_t* end_, real_t c_ = 0.0) : IdxList<SubInstCol>(beg_, end_), c(c_), c_u(c_) { }
-        SubInstCol(const SubInstCol& other) : IdxList<SubInstCol>(other), c(other.c), c_u(other.c_u) { }
+        SubInstCol(const idx_t* beg_, const idx_t* end_, real_t c_ = 0.0) : CollectionOfElem<SubInstCol>(beg_, end_), c(c_), c_u(c_) { }
+        SubInstCol(const SubInstCol& other) : CollectionOfElem<SubInstCol>(other), c(other.c), c_u(other.c_u) { }
 
     public:
         SubInstCol(real_t c_ = 0.0) : c(c_), c_u(c_) { }
@@ -156,8 +177,8 @@ namespace sph {
     };
 
     static_assert(sizeof(SubInstCol) == SubInstCol::MY_SIZE);
-    static_assert(SubInstCol::MY_SIZE == IdxList<SubInstCol>::MY_SIZE);
-    static_assert(IdxList<SubInstCol>::MY_SIZE == std::max(alignof(real_t), sizeof(idx_t)) + sizeof(real_t) * 2U);
+    static_assert(SubInstCol::MY_SIZE == CollectionOfElem<SubInstCol>::MY_SIZE);
+    static_assert(CollectionOfElem<SubInstCol>::MY_SIZE == std::max(alignof(real_t), sizeof(idx_t)) + sizeof(real_t) * 2U);
 
 
     template <typename Elem>
@@ -172,14 +193,16 @@ namespace sph {
             [[nodiscard]] inline auto& operator*() { return *base; }
 
             inline auto& operator++() {
-                base = reinterpret_cast<Elem*>(align_ptr<Elem>(reinterpret_cast<char*>(base) + sizeof(Elem) + base->size() * sizeof(idx_t)));
+                base = reinterpret_cast<Elem*>(
+                    align_ptr<Elem>(reinterpret_cast<char*>(base) + sizeof(Elem) + base->size() * sizeof(idx_t)));
                 assert(align_ptr<Elem>(base) == base);
                 return *this;
             }
 
             inline auto operator++(int) {
                 Elem* old_base = base;
-                base = reinterpret_cast<Elem*>(align_ptr<Elem>(reinterpret_cast<char*>(base) + sizeof(Elem) + base->size() * sizeof(idx_t)));
+                base = reinterpret_cast<Elem*>(
+                    align_ptr<Elem>(reinterpret_cast<char*>(base) + sizeof(Elem) + base->size() * sizeof(idx_t)));
                 assert(align_ptr<Elem>(base) == base);
                 return CollectionIter(old_base);
             }
@@ -567,57 +590,8 @@ namespace sph {
 
 namespace sph {
 
-    class IndexList {
-    public:
-        IndexList() : sz(0U), data(nullptr) { }
-
-        template <typename Iter>
-        IndexList(Iter beg_, Iter end_) : sz(end_ - beg_), data(new idx_t[sz]) {
-            std::copy(beg_, end_, data);
-        }
-
-        IndexList(const IndexList& other) : IndexList(other.begin(), other.end()) { }
-        IndexList(IndexList&& other) : sz(other.sz), data(std::exchange(other.data, nullptr)) { }
-        IndexList(idx_t*& other_data, idx_t other_sz) : sz(other_sz), data(std::exchange(other_data, nullptr)) { }
-
-        IndexList& operator=(const IndexList& other) {
-            if (sz < other.sz) {
-                delete[] data;
-                data = new idx_t[other.sz];
-            }
-            sz = other.sz;
-            std::copy(other.begin(), other.end(), data);
-            return *this;
-        };
-
-        IndexList& operator=(IndexList&& other) {
-            delete[] data;
-            data = std::exchange(other.data, nullptr);
-            sz = std::exchange(other.sz, 0);
-            return *this;
-        };
-
-        ~IndexList() { delete[] data; };
-
-        [[nodiscard]] inline idx_t* begin() { return data; }
-        [[nodiscard]] inline idx_t* end() { return begin() + sz; }
-        [[nodiscard]] inline idx_t& operator[](idx_t i) { return data[i]; }
-        [[nodiscard]] inline idx_t& front() { return data[0]; }
-        [[nodiscard]] inline idx_t& back() { return data[sz - 1]; }
-
-        [[nodiscard]] inline idx_t size() const { return sz; }
-        [[nodiscard]] inline bool empty() const { return sz == 0; }
-        [[nodiscard]] inline const idx_t* begin() const { return data; }
-        [[nodiscard]] inline const idx_t* end() const { return begin() + sz; }
-        [[nodiscard]] inline idx_t operator[](idx_t i) const { return data[i]; }
-        [[nodiscard]] inline idx_t front() const { return data[0]; }
-        [[nodiscard]] inline idx_t back() const { return data[sz - 1]; }
-
-    private:
-        idx_t sz;
-        idx_t* data;
-    };
-
+    using IndexList = std::vector<idx_t>;
+    using Row = IndexList;
 
     class Column : public IndexList {
 
@@ -628,9 +602,9 @@ namespace sph {
         template <typename Iter>
         Column(Iter beg_, Iter end_, real_t c_, real_t sol_c_) : IndexList(beg_, end_), c(c_), sol_c(sol_c_) { }
 
-        Column(idx_t*& other_data, idx_t other_sz, real_t c_, real_t sol_c_) : IndexList(other_data, other_sz), c(c_), sol_c(sol_c_) { }
         Column(const Column& other) : IndexList(other.begin(), other.end()), c(other.c), sol_c(other.sol_c) { }
-        Column(Column&& other) : IndexList(std::move(other)), c(std::exchange(other.c, 0)), sol_c(std::exchange(other.sol_c, 0)) { }
+        Column(Column&& other) noexcept
+            : IndexList(std::move(other)), c(std::exchange(other.c, 0)), sol_c(std::exchange(other.sol_c, 0)) { }
 
         Column& operator=(const Column& other) {
             IndexList::operator=(other);
@@ -639,7 +613,7 @@ namespace sph {
             return *this;
         };
 
-        Column& operator=(Column&& other) {
+        Column& operator=(Column&& other) noexcept {
             IndexList::operator=(std::move(other));
             c = std::exchange(other.c, 0);
             sol_c = std::exchange(other.sol_c, 0);
@@ -673,12 +647,6 @@ namespace sph {
     private:
         real_t c = 0.0;
         real_t sol_c = 0.0;
-    };
-
-
-    class Row : public std::vector<idx_t> {
-    public:
-        using std::vector<idx_t>::vector;
     };
 
 }  // namespace sph
@@ -739,7 +707,7 @@ namespace cav {
 
         VectorSet(const VectorSet& other) : vec(other.vec), set(other.set) { vec_data = vec.data(); }
 
-        VectorSet(VectorSet&& other) : vec(std::move(other.vec)), set(std::move(other.set)) { vec_data = vec.data(); }
+        VectorSet(VectorSet&& other) noexcept : vec(std::move(other.vec)), set(std::move(other.set)) { vec_data = vec.data(); }
 
         VectorSet& operator=(const VectorSet& other) {
             vec = other.vec;
@@ -748,7 +716,7 @@ namespace cav {
             return *this;
         }
 
-        VectorSet& operator=(VectorSet&& other) {
+        VectorSet& operator=(VectorSet&& other) noexcept {
             vec = std::move(other.vec);
             set = std::move(other.set);
             vec_data = vec.data();
@@ -895,18 +863,15 @@ namespace sph {
               comb_hash1(CombHash1()(*this)),
               comb_hash2(CombHash2()(*this)) { }
 
-        bool operator<(const UniqueCol& other) {
-            return get_cost() < other.get_cost() && size() == other.size() && comb_hash1 == other.comb_hash1 && comb_hash2 == other.comb_hash2;
-        }
+        bool operator<(const UniqueCol& other) { return get_cost() < other.get_cost() && elem_wise_equal(other); }
 
-        bool operator>(const UniqueCol& other) {
-            return get_cost() > other.get_cost() && size() == other.size() && comb_hash1 == other.comb_hash1 && comb_hash2 == other.comb_hash2;
-        }
+        bool operator>(const UniqueCol& other) { return get_cost() > other.get_cost() && elem_wise_equal(other); }
 
         bool operator==(const UniqueCol& other) {
-            return get_cost() == other.get_cost() && size() == other.size() && disp_hash1 == other.disp_hash1 && disp_hash2 == other.disp_hash2 &&
-                   comb_hash1 == other.comb_hash1 && comb_hash2 == other.comb_hash2;
+            return size() == other.size() && comb_hash1 == other.comb_hash1 && comb_hash2 == other.comb_hash2;
         }
+
+        bool elem_wise_equal(const UniqueCol& other) { return std::equal(begin(), end(), other.begin(), other.end()); }
 
         [[nodiscard]] inline size_t get_disp_hash1() const { return disp_hash1; }
         [[nodiscard]] inline size_t get_disp_hash2() const { return disp_hash2; }
@@ -955,21 +920,27 @@ namespace sph {
         void reserve(idx_t size) { vec_set.reserve(size); }
 
         template <typename... _Args>
-        bool add_column(_Args &&...args) {
+        std::pair<idx_t, bool> add_column(_Args &&...args) {
+
             UniqueCol candidate_elem(std::forward<_Args>(args)...);
-            auto [set_elem, inserted] = vec_set.emplace_back(candidate_elem);
 
-            if (!inserted && candidate_elem < *set_elem) {
-                *set_elem = std::move(candidate_elem);
-                return false;
+            auto [set_elem, inserted_new] = vec_set.emplace_back(candidate_elem);
+            assert(inserted_new ||
+                   (candidate_elem.size() == set_elem->size() && candidate_elem.get_comb_hash1() == set_elem->get_comb_hash1() &&
+                    candidate_elem.get_comb_hash2() == set_elem->get_comb_hash2()));
+
+            if (!inserted_new) {  // ==> same combination and size
+                if (candidate_elem.get_solcost() < set_elem->get_solcost() ||  // Keep the one belonging to the best sol ...
+                    candidate_elem < *set_elem) {                              // ... or the dominant one
+                    *set_elem = std::move(candidate_elem);
+                }
             }
-
-            return true;
+            return std::make_pair(set_elem - vec_set.begin(), inserted_new);
         }
 
         template <typename Iter>
         size_t insert(Iter beg, Iter end) {
-            return std::accumulate(beg, end, 0, [this](size_t sum, auto it) { return sum + add_column(UniqueCol(*it)); });
+            return std::accumulate(beg, end, 0, [this](size_t sum, auto it) { return sum + add_column(UniqueCol(*it)).second; });
         }
 
         [[nodiscard]] inline size_t size() const { return vec_set.size(); }
@@ -1073,11 +1044,9 @@ namespace sph {
 
         template <typename... _Args>
         idx_t add_column(_Args &&...args) {
-            if (cols.add_column(std::forward<_Args>(args)...)) {
-                active_cols.emplace_back(cols.size() - 1);
-                return cols.size() - 1;
-            }
-            return NOT_AN_INDEX;
+            auto [j, inserted_new] = cols.add_column(std::forward<_Args>(args)...);
+            assert(!inserted_new || j == cols.size() - 1);
+            return j;
         }
 
         template <typename ColContainer>
@@ -1357,7 +1326,10 @@ namespace sph {
             std::nth_element(_priced_cols.begin(), _priced_cols.begin() + fivem, _priced_cols.end(),
                              [](const Priced_Col &c1, const Priced_Col &c2) { return c1.sol_cost < c2.sol_cost; });
 
-            if (_priced_cols[0].sol_cost == REAL_MAX) { return; }
+            auto min_e = std::min_element(_priced_cols.begin(), _priced_cols.begin() + fivem,
+                                          [](const Priced_Col &c1, const Priced_Col &c2) { return c1.sol_cost < c2.sol_cost; });
+
+            if (min_e->sol_cost == REAL_MAX) { return; }
 
             for (idx_t n = 0; n < fivem; ++n) {
                 assert(n < _priced_cols.size());
@@ -1487,13 +1459,13 @@ namespace sph {
                     return true;
                 }
                 if (j > get_ncols()) {
-                    SPH_DEBUG { fmt::print("Col {} does not exist. \n Col: ", j, fmt::join(cols[j], ", ")); }
+                    SPH_DEBUG { fmt::print("Col {} does not exist. \n Col: {}", j, fmt::join(cols[j], ", ")); }
                     return true;
                 }
 
                 for (idx_t i : cols[j]) {
                     if (std::find(rows[i].begin(), rows[i].end(), j) == rows[i].end()) {
-                        SPH_DEBUG { fmt::print("Col {} not found in row {}. \n Row: ", j, i, fmt::join(rows[i], ", ")); }
+                        SPH_DEBUG { fmt::print("Col {} not found in row {}. \n Row: {}", j, i, fmt::join(rows[i], ", ")); }
                         return true;
                     }
                 }
@@ -1505,13 +1477,13 @@ namespace sph {
                     return true;
                 }
                 if (i > get_nrows()) {
-                    SPH_DEBUG { fmt::print("Row {} does not exist. \n Row: ", i, fmt::join(rows[i], ", ")); }
+                    SPH_DEBUG { fmt::print("Row {} does not exist. \n Row: {}", i, fmt::join(rows[i], ", ")); }
                     return true;
                 }
 
                 for (idx_t j : rows[i]) {
                     if (std::find(cols[j].begin(), cols[j].end(), i) == cols[j].end()) {
-                        SPH_DEBUG { fmt::print("Row {} not found in col {}. \n Col: ", i, j, fmt::join(cols[j], ", ")); }
+                        SPH_DEBUG { fmt::print("Row {} not found in col {}. \n Col: {}", i, j, fmt::join(cols[j], ", ")); }
                         return true;
                     }
                 }
@@ -1669,7 +1641,7 @@ namespace sph {
             inst.fill_with_best_columns(local_to_global_col_idxs);
             replace_columns(local_to_global_col_idxs);
 
-            SPH_VERBOSE { fmt::print("Sub-instance size = {}x{}.\n", rows.size(), cols.size()); }
+            SPH_VERBOSE(2) { fmt::print("Sub-instance size = {}x{}.\n", rows.size(), cols.size()); }
 
             assert(!is_corrupted());
         }
@@ -1858,7 +1830,7 @@ namespace sph {
         }
 
         inline void remove(std::vector<idx_t>& col_idxs) {
-            // n: sol size, n': cols to remove, assuming n >> n'
+            //  assuming n >> n', n: sol size, n': cols to remove
 
             std::sort(col_idxs.begin(), col_idxs.end());  // O(n' log(n'))
             idx_t removed_counter = col_idxs.size();
@@ -1944,13 +1916,13 @@ namespace sph {
 #ifndef SPH_INCLUDE_EXACTSOLVER_HPP_
 #define SPH_INCLUDE_EXACTSOLVER_HPP_
 
-#include "fmt/core.h"
-#include "fmt/ranges.h"
 #include <ilcplex/cplex.h>
 
 /* #include "Solution.hpp" */
 /* #include "SubInstance.hpp" */
 /* #include "cft.hpp" */
+#include "fmt/core.h"
+#include "fmt/ranges.h"
 
 namespace sph {
 
@@ -1958,11 +1930,14 @@ namespace sph {
 
 #define ASSIGN_UP(vec, sz, val) ;    if (vec.size() < sz) { vec.assign(sz, val); }
 
-#define SET_INT(P, VAL)                                                            ;    if (int res = 0; (res = CPXsetintparam(env, P, VAL))) {                        ;        fmt::print(stderr, "Error while setting " #P " parameter at  {} \n", VAL); ;        return res;                                                                ;    }
+#define SET_INT(P, VAL)                                                           ;    if (int res = 0; (res = CPXsetintparam(env, P, VAL))) {                       ;        fmt::print(stderr, "Error while setting " #P " parameter at {} \n", VAL); ;        return res;                                                               ;    }
 
 #define SET_DBL(P, VAL)                                                           ;    if (int res = 0; (res = CPXsetdblparam(env, P, VAL))) {                       ;        fmt::print(stderr, "Error while setting " #P " parameter at {} \n", VAL); ;        return res;                                                               ;    }
 
     class ExactSolver {
+
+        ////////// PUBLIC METHODS //////////
+
     public:
         ExactSolver() : env(CPXopenCPLEX(nullptr)) { }
 
@@ -2019,6 +1994,9 @@ namespace sph {
 
             return sol;
         }
+
+
+        ////////// PRIVATE METHODS //////////
 
     private:
         int build_model(SubInstance& subinst) {
@@ -2103,20 +2081,20 @@ namespace sph {
             SET_INT(CPXPARAM_ScreenOutput, CPX_OFF);
             SET_INT(CPXPARAM_MIP_Display, 2);
             SET_INT(CPXPARAM_Threads, 1);
-            SET_INT(CPXPARAM_Parallel, CPX_PARALLEL_OPPORTUNISTIC);
+            SET_INT(CPXPARAM_Emphasis_MIP, CPX_MIPEMPHASIS_OPTIMALITY);
+            tlim = std::min(tlim, 0.1);
             SET_DBL(CPXPARAM_MIP_PolishAfter_Time, tlim * 0.5);
             SET_DBL(CPXPARAM_TimeLimit, tlim);
-            SET_INT(CPXPARAM_Emphasis_MIP, CPX_MIPEMPHASIS_OPTIMALITY);
 
-            SPH_VERBOSE {
-                SPH_DEBUG { SET_INT(CPXPARAM_ScreenOutput, CPX_ON); }
-            }
+            SPH_VERBOSE(3) { SET_INT(CPXPARAM_ScreenOutput, CPX_ON); }
 
             return 0;
         }
 
+
         ////////// PRIVATE FIELDS //////////
 
+    private:
         CPXENVptr env;
         CPXLPptr lp;
 
@@ -2662,7 +2640,7 @@ namespace sph {
                         }
                     }
                 } else {
-                    SPH_VERBOSE { fmt::print(" WARNING: s2sum == 0\n"); }
+                    SPH_VERBOSE(3) { fmt::print(" WARNING: s2sum == 0\n"); }
                     return u_star;
                 }
 
@@ -2677,7 +2655,7 @@ namespace sph {
                 // S.compute_cost(subinst));
 
                 if (real_LB > UB - HAS_INTEGRAL_COSTS) {
-                    SPH_VERBOSE { fmt::print(" WARNING: real_LB({}) > UB({}) - {}\n", real_LB, UB, HAS_INTEGRAL_COSTS); }
+                    SPH_VERBOSE(3) { fmt::print(" WARNING: real_LB({}) > UB({}) - {}\n", real_LB, UB, HAS_INTEGRAL_COSTS); }
                     u_star = u;
                     return u_star;
                 }
@@ -2783,7 +2761,7 @@ namespace sph {
 
             real_t fixed_cost = subinst.get_fixed_cost();
             real_t S_init_cost = S_init.compute_cost(subinst);
-            SPH_VERBOSE { fmt::print("│ Initial solution value {} (global: {})\n", S_init_cost, S_init_cost + fixed_cost); }
+            SPH_VERBOSE(3) { fmt::print("│ Initial solution value {} (global: {})\n", S_init_cost, S_init_cost + fixed_cost); }
 
             LocalSolution S = exact.build_and_opt(subinst, S_init, exact_time_limit);
 
@@ -2798,14 +2776,14 @@ namespace sph {
 
                     glb_UB_star = gS_cost;
                     S_star = GlobalSolution(subinst, S);
-                    SPH_VERBOSE { fmt::print("│ ══> CPLEX improved global UB: {} (fixed {} + local-cost {})\n", S_star.get_cost(), fixed_cost, S_cost); }
+                    SPH_VERBOSE(3) { fmt::print("│ ══> CPLEX improved global UB: {} (fixed {} + local-cost {})\n", S_star.get_cost(), fixed_cost, S_cost); }
 
                 } else {
-                    SPH_VERBOSE { fmt::print("│ ──> CPLEX Improved local UB: {} (global value {}, best is {})\n", S_cost, S_cost + fixed_cost, glb_UB_star); }
+                    SPH_VERBOSE(3) { fmt::print("│ ──> CPLEX Improved local UB: {} (global value {}, best is {})\n", S_cost, S_cost + fixed_cost, glb_UB_star); }
                 }
             }
 
-            SPH_VERBOSE { fmt::print("└───────────────────────────────────────────────────────────────────────────────────\n\n"); }
+            SPH_VERBOSE(3) { fmt::print("└───────────────────────────────────────────────────────────────────────────────────\n\n"); }
         }
 
 
@@ -2843,6 +2821,7 @@ namespace sph {
     constexpr unsigned POST_OPT_TRIALS = 100;
 
     constexpr double SHORT_T_LIM = 10.0;
+
 #define LONG_T_LIM(TOTAL_TIME) (std::min(TOTAL_TIME / 2.0, 100.0))
 
     class Refinement {
@@ -2851,17 +2830,25 @@ namespace sph {
 
         // S_init must be a global complete solution
         template <unsigned long ROUTES_HARD_CAP>
-        std::vector<idx_t> solve([[maybe_unused]] const std::vector<idx_t>& S_init) {
+        GlobalSolution solve([[maybe_unused]] const std::vector<idx_t>& S_init) {
 
-            // 1.
+            inst.reset_fixing();
+
             GlobalSolution S_star;
-
             if (!S_init.empty()) {
                 real_t cost = 0.0;
                 for (idx_t j : S_init) { cost += inst.get_col(j).get_cost(); }
                 for (auto j : S_init) { S_star.push_back(j); }
                 S_star.set_cost(cost);
-                SPH_VERBOSE { fmt::print("Found warm start with cost {}.\n", cost); }
+                SPH_VERBOSE(1) {
+                    fmt::print("Found warm start of cost {}.\n", cost);
+                    SPH_VERBOSE(2) {
+                        for (idx_t gj : S_star) {
+                            Column col = inst.get_col(gj);
+                            fmt::print("idx: {}, cost: {}, sol cost: {}\n", gj, col.get_cost(), col.get_solcost());
+                        }
+                    }
+                }
             }
 
             GlobalMultipliers u_star;
@@ -2894,7 +2881,7 @@ namespace sph {
                     if (S_star.get_cost() - 1.0 <= BETA * u_star.get_lb() || pi > PI_MAX || inst.get_active_rows_size() <= 0) {
 
                         if (post_optimization_trials <= 0) {
-                            SPH_VERBOSE {
+                            SPH_VERBOSE(2) {
                                 fmt::print("╔═ REFINEMENT: iter {:2} ═════════════════════════════════════════════════════════════\n", iter);
                                 fmt::print("║ Early Exit: β(={:.1f}) * LB(={:.1f}) > UB(={:.1f}) - 1\n", BETA, u_star.get_lb(), S_star.get_cost());
                                 fmt::print("║ Active rows {}, active cols {}, pi {:.3f}\n", inst.get_active_rows_size(), inst.get_active_cols().size(), pi);
@@ -2905,7 +2892,7 @@ namespace sph {
                         }
 
                         --post_optimization_trials;
-                        fmt::print("   POST-OPTIMIZATION REFINEMENT: iter {:2}\n", POST_OPT_TRIALS - post_optimization_trials);
+                        SPH_VERBOSE(1) { fmt::print("  Iteration: {:2}; Best: {:.1f} \n", POST_OPT_TRIALS - post_optimization_trials, S_star.get_cost()); }
 
                         pi = last_improving_pi;
                         last_improving_pi = std::max(PI_MIN, last_improving_pi / ALPHA);
@@ -2916,7 +2903,7 @@ namespace sph {
                     u_star = two_phase.get_global_u();
                     std::vector<idx_t> old_to_new_idx_map = inst.prune_instance<ROUTES_HARD_CAP>(u_star);
 
-                    SPH_VERBOSE { fmt::print("Instance size: {}x{}\n", inst.get_nrows(), inst.get_ncols()); }
+                    SPH_VERBOSE(1) { fmt::print("Instance size: {}x{}\n", inst.get_nrows(), inst.get_ncols()); }
 
                     if (!old_to_new_idx_map.empty()) {
                         for (idx_t& gj : S_star) {
@@ -2929,7 +2916,7 @@ namespace sph {
                 inst.reset_fixing();
 
                 if (global_time_limit.exceeded_tlim()) {
-                    SPH_VERBOSE {
+                    SPH_VERBOSE(2) {
                         fmt::print("╔═ REFINEMENT: iter {:2} ═════════════════════════════════════════════════════════════\n", iter);
                         fmt::print("║ Timelimit exceeded\n");
                         fmt::print("╚═══════════════════════════════════════════════════════════════════════════════════\n\n");
@@ -2947,7 +2934,7 @@ namespace sph {
                 std::sort(cols_to_fix.begin(), cols_to_fix.end());
                 inst.fix_columns(cols_to_fix, covered_rows);
 
-                SPH_VERBOSE {
+                SPH_VERBOSE(2) {
                     fmt::print("╔═ REFINEMENT: iter {:2} ═════════════════════════════════════════════════════════════\n", iter);
                     fmt::print("║ Active rows {}, active cols {}, pi {:.3f}\n", inst.get_active_rows_size(), inst.get_active_cols().size(), pi);
                     fmt::print("║ LB {:.1f}, UB {:.1f}, UB size {}\n", u_star.get_lb(), S_star.get_cost(), S_star.size());
@@ -3138,7 +3125,13 @@ namespace sph {
 
         template <unsigned long ROUTES_HARD_CAP = SPH_INST_HARD_CAP>
         std::vector<idx_t> inline solve([[maybe_unused]] const std::vector<idx_t> &S_init) {
-            return refinement.solve<ROUTES_HARD_CAP>(S_init);
+            SPH_VERBOSE(0) { fmt::print(" Set Partitioning Heuristic: \n"); }
+            SPH_VERBOSE(0) { fmt::print(" SP Instance size: {}x{}\n", inst.get_nrows(), inst.get_ncols()); }
+            
+            GlobalSolution sol = refinement.solve<ROUTES_HARD_CAP>(S_init);
+            
+            SPH_VERBOSE(0) { fmt::print(" Final solution value: {}\n", sol.get_cost()); }
+            return sol;
         }
 
     private:

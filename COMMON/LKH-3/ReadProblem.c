@@ -701,6 +701,12 @@ void ReadProblem()
         for (i = 0; i < MergeTourFiles; i++)
             ReadTour(MergeTourFileName[i], &MergeTourFile[i]);
     }
+
+    if (Dim > 2000){
+        InitialPeriod = 1000;
+        POPMUSIC_Solutions = 100;
+    }
+    
     free(LastLine);
     LastLine = 0;
 }

@@ -8,17 +8,22 @@ CUSTOM=-DCAVA_CUSTOM # Uncomment to activate all changes
 #TREE_TYPE = ONE_LEVEL_TREE
 
 CC = gcc
+CXX = g++
 AR = gcc-ar
 IDIR = INCLUDE
+CPLEX_IDIR = ${CPLEX_ROOT_DIR}/cplex/include/
 ODIR_SYM = OBJ_SYM
 ODIR_ASYM = OBJ_ASYM
 OPTIONS=$(CUSTOM) $(CUSTOM_PENALTY) $(CUSTOM_CACHE) $(CUSTOM_FLIP)
-CFLAGS = -O3 -Wall -I$(IDIR) -D$(TREE_TYPE) -g -flto -fno-fat-lto-objects $(OPTIONS) -fno-omit-frame-pointer
+#DEBUG = -g -O0 -fno-omit-frame-pointer -DNDEBUG
+CFLAGS = -O3 -Wall -I$(IDIR) -D$(TREE_TYPE) -flto -fno-fat-lto-objects $(OPTIONS) $(DEBUG)
+CXXFLAGS = $(CFLAGS) -I$(CPLEX_IDIR) -fno-exceptions
 
-_DEPS = Delaunay.h GainType.h Genetic.h GeoConversion.h Hashing.h      \
-        Heap.h LKH.h Segment.h Sequence.h BIT.h gpx.h
+_DEPS = Delaunay.h GainType.h Genetic.h GeoConversion.h Hashing.h Heap.h   \
+       LKH.h Segment.h Sequence.h BIT.h gpx.h extract_routes.hpp SPH.hpp   \
+	   SimulatedAnnealing.h
 
-DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
+DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS)) Makefile
 
 _OBJ = Activate.o AddCandidate.o AddExtraCandidates.o                  \
        AddTourCandidates.o AdjustCandidateSet.o AdjustClusters.o       \
@@ -47,17 +52,20 @@ _OBJ = Activate.o AddCandidate.o AddExtraCandidates.o                  \
        NormalizeNodeList.o NormalizeSegmentList.o                      \
        OrderCandidateSet.o PatchCycles.o                               \
        PDPTW_Reduce.o printff.o PrintParameters.o                      \
-       Random.o ReadProblem.o ReadLine.o RecordBestTour.o 				           \
+       Random.o ReadProblem.o ReadLine.o RecordBestTour.o 			   \
        RecordBetterTour.o RemoveFirstActive.o                          \
        ResetCandidateSet.o RestoreTour.o                               \
-       SegmentSize.o Sequence.o SFCTour.o  							   \
+       SegmentSize.o Sequence.o SetInitialTour.o SFCTour.o  		   \
        SINTEF_WriteSolution.o SOP_RepairTour.o STTSP2TSP.o             \
+	   SimulatedAnnealing.o											   \
        SOP_InitialTour.o SOP_Report.o StatusReport.o                   \
        Statistics.o StoreTour.o SymmetrizeCandidateSet.o               \
        TrimCandidateSet.o TSPDL_InitialTour.o TSPTW_MakespanCost.o     \
-	   TSPTW_Reduce.o VariablesDefinition.o VRPB_Reduce.o BIT.o        \
+	   TSPTW_Reduce.o ValidateTour.o VariablesDefinition.o 			   \
+	   VRPB_Reduce.o BIT.o        									   \
        WriteCandidates.o WritePenalties.o WriteTour.o                  \
-       MergeWithTourGPX2.o gpx.o
+       MergeWithTourGPX2.o gpx.o									   \
+	   main.opp
 
 OBJ_SYM = $(patsubst %,$(ODIR_SYM)/%,$(_OBJ))
 OBJ_ASYM = $(patsubst %,$(ODIR_ASYM)/%,$(_OBJ))
@@ -74,10 +82,10 @@ libLKHSym.a: $(OBJ_SYM) $(DEPS)
 libLKHAsym.a: $(OBJ_ASYM) $(DEPS)
 	$(AR) rcs ../$@ $(OBJ_ASYM)
 
-$(ODIR_SYM)/%.o: %.c $(DEPS) | $(ODIR_SYM)
-	$(CC) -c -o $@ $< $(CFLAGS)
+$(ODIR_SYM)/main.opp $(ODIR_ASYM)/main.opp: main.cpp $(DEPS) | $(ODIR)
+	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
-$(ODIR_ASYM)/%.o: %.c $(DEPS) | $(ODIR_ASYM)
+$(ODIR_SYM)/%.o $(ODIR_ASYM)/%.o: %.c $(DEPS) | $(ODIR_SYM) $(ODIR_ASYM)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 $(ODIR_SYM) $(ODIR_ASYM):
@@ -85,4 +93,6 @@ $(ODIR_SYM) $(ODIR_ASYM):
 
 clean:
 	/bin/rm -f $(ODIR_SYM)/*.o $(ODIR_ASYM)/*.o ../libLKH*.a *~ ._* $(IDIR)/*~ $(IDIR)/._* 
+
+
 

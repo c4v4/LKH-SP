@@ -2,8 +2,8 @@
 #include "LKH.h"
 
 
-#define MAX_TRIALS 10000
-#define RUNS 5
+#define MAX_TRIALS 50000
+#define RUNS 10000
 
 /**
  * To help linking-time optimizations (with -flto), some of the variables and functions that
@@ -12,8 +12,8 @@
  * The search trajectory is different though, and I'm not really sure why.
  */
 
-const enum Types ProblemType = CVRP;
-const int Asymmetric = 0;
+const enum Types ProblemType = CVRPTW;
+const int Asymmetric = 1;
 const int MoveType = 5;
 const int MoveTypeSpecial = 1;
 const int SubsequentMoveType = MoveType;
@@ -39,7 +39,7 @@ void SetParameters() {
     GridSize = 1000000.0;
     InitialPeriod = -1;
     InitialStepSize = 0;
-    InitialTourAlgorithm = CVRP_ALG;
+    InitialTourAlgorithm = WALK;
     InitialTourFraction = 1.0;
     Kicks = 1;
     KickType = 4;
@@ -74,6 +74,6 @@ void SetParameters() {
     SubproblemSize = 0;
     SubsequentPatching = 1;
     TimeLimit = DBL_MAX;
-    RunTimeLimit = 100.0;
-    TraceLevel = 0;
+    RunTimeLimit = DBL_MAX;
+    TraceLevel = 1;
 }

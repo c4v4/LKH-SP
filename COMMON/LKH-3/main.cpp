@@ -1,13 +1,27 @@
 
 extern "C" {
+
 #include "BIT.h"
 #include "Genetic.h"
 #include "LKH.h"
 }
 
-#include "SPH.hpp"
+#include <vector>
 
-sph::SPHeuristic *sph_ptr; /* SPHeuristc pointer */
+#define VERBOSE
+#define VERBOSE_LEVEL 1
+
+#undef NDEBUG
+#include "SPH.hpp"
+#define NDEBUG
+
+#define SPH_PERIOD 4
+#define SPH_TLIM 120.0
+
+
+sph::SPHeuristic *sph_ptr;          /* SPHeuristc pointer */
+std::vector<sph::idx_t> BestRoutes; /* Vector containing routes indexes of BestTour */
+int *warmstart;
 
 int main(int argc, char *argv[]) {
     GainType Cost, OldOptimum;
@@ -25,11 +39,13 @@ int main(int argc, char *argv[]) {
     CreateCandidateSet();
     InitializeStatistics();
 
+    assert(warmstart = (int *)malloc((Dimension + 1) * sizeof(int)));
+
     Norm = 9999;
     BestCost = PLUS_INFINITY;
     BestPenalty = CurrentPenalty = PLUS_INFINITY;
 
-    sph::SPHeuristic sph(Dimension - 1);
+    sph::SPHeuristic sph(Dim - 1);
     sph_ptr = &sph;
 
     /* Find a specified number (Runs) of local optima */
@@ -115,7 +131,28 @@ int main(int argc, char *argv[]) {
         }
         SRandom(++Seed);
 
-        /* SPH Phase here!! */
+        /* Set Partitioning Heuristic phase */
+        if (Run % SPH_PERIOD == 0) {
+            sph.set_timelimit(SPH_TLIM);
+            BestRoutes = sph.solve(BestRoutes);
+
+            /* transform back SP sol to tour*/
+            int *ws = warmstart;
+            int c = 0;
+            for (int j : BestRoutes) {
+                sph::Column col = sph.get_col(j);
+                *ws++ = 0;
+                fmt::print("\nRoute {}: ", ++c);
+                for (int i : col) {
+                    *ws++ = i + 1;
+                    fmt::print("{} ", i);
+                }
+            }
+            fmt::print("\n\n");
+            *ws++ = 0;
+            assert(ws - warmstart == DimensionSaved + 1);
+            SetInitialTour(warmstart);
+        }
     }
     PrintStatistics();
     if (Salesmen > 1) {

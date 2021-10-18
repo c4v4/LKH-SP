@@ -425,6 +425,7 @@ extern int SubsequentPatching;              /* Species whether patching is used 
 extern SwapRecord *SwapStack;               /* Stack of SwapRecords */
 extern int Swaps;                           /* Number of swaps made during a tentative move */
 extern int OldSwaps;                        /* Saved number of swaps */
+extern double RunTimeLimit;                 /* The time limit in seconds of a single Run */
 extern double TimeLimit;                    /* The time limit in seconds */
 extern int TotalDemand;                     /* Sum of demands for a CVRP instance */
 extern int TraceLevel;                      /* Specifies the level of detail of the output
@@ -678,4 +679,6 @@ void cava_FlipAsym_Update();
 extern const enum Types ProblemType;
 GainType Penalty(void);
 int Forbidden(Node *Na, Node *Nb);
-void Extract_routes(void);
+void ExtractRoutes(GainType Cost);
+void SetInitialTour(int *tour);
+void ValidateTour(int *tour);

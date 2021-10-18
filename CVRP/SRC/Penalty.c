@@ -1,45 +1,5 @@
-#include "extract_routes.hpp"
-
-extern "C" {
 #include "LKH.h"
 #include "Segment.h"
-};
-
-
-class CVRPChecker {
-public:
-    void add_node(Node *N) {
-        current_demand += N->Demand;
-        dist = OldDistance(prev, N + (DimensionSaved * Asymmetric));
-        current_length += dist;
-        prev = N;
-        ++size;
-    };
-
-    void clear_route(Node *Prev) {
-        current_demand = current_length = 0;
-        size = 0;
-        prev = Prev;
-    };
-
-    int is_feasible() const { return current_demand <= Capacity && size > 1UL; }
-    inline GainType get_length() const { return current_length; };
-    inline GainType get_demand() const { return current_demand; };
-    inline size_t get_size() const { return size; };
-    inline int get_dist() const { return dist; };
-
-private:
-    int dist = 0;
-    Node *prev = Depot;
-    GainType current_demand = 0;
-    GainType current_length = 0;
-    size_t size = 0;
-};
-
-void Extract_routes(GainType Cost) { extract_routes_tmlp<CVRPChecker>(Cost); }
-
-extern "C" {
-
 
 /**
  * Modified Penalty function for CVRP instances.
@@ -248,26 +208,4 @@ GainType Penalty_Old() {
         }
     } while (N != StartRoute);
     return P;
-}
-
-
-/*
- * The Forbidden function is used to test if an edge, (Na,Nb),
- * is not allowed to belong to a tour.
- * If the edge is forbidden, the function returns 1; otherwise 0.
- */
-int Forbidden(Node *Na, Node *Nb) {
-    if (Na == Nb) return 1;
-    if (InInitialTour(Na, Nb) || Na->Id == 0 || Nb->Id == 0) return 0;
-    if (Na->Head && !FixedOrCommon(Na, Nb) && (Na->Head == Nb->Head || (Na->Head != Na && Na->Tail != Na) || (Nb->Head != Nb && Nb->Tail != Nb))) return 1;
-    if (Salesmen > 1 && Dimension == DimensionSaved) {
-        if (Na->DepotId) {
-            if (Nb->DepotId || (Nb->Special && Nb->Special != Na->DepotId && Nb->Special != Na->DepotId % Salesmen + 1)) return 1;
-        }
-        if (Nb->DepotId) {
-            if (Na->DepotId || (Na->Special && Na->Special != Nb->DepotId && Na->Special != Nb->DepotId % Salesmen + 1)) return 1;
-        }
-    }
-    return 0;
-}
 }

@@ -1,8 +1,6 @@
 #include "LKH.h"
 #include "Segment.h"
 
-const enum Types ProblemType = CVRPTW;
-
 /**
  * Modified Penlaty function for CVRPTW instances.
  * The basic idea behind this optimization is to exploit the fact
@@ -59,7 +57,7 @@ const enum Types ProblemType = CVRPTW;
  * Node::prevPenalty fileds of each node of the route need to be updated.
  */
 
-GainType Penalty_Old();
+static GainType Penalty_Old();
 static GainType oldPenaltySum;
 static int setup_Penalty();
 static Node *setup_node_CVRPTW(Node *N);
@@ -215,7 +213,7 @@ void update_Penalty() {
 }
 
 GainType Penalty_Old() {
-    static _Thread_local Node *StartRoute = 0;
+    static Node *StartRoute = 0;
     Node *N, *NextN, *CurrentRoute;
     GainType CostSum, DemandSum, P = 0, petalP;
     int Forward = SUCC(Depot)->Id != Depot->Id + DimensionSaved;
@@ -251,17 +249,4 @@ GainType Penalty_Old() {
     } while (N != StartRoute);
 
     return P;
-}
-
-
-/*
- * The Forbidden function is used to test if an edge, (Na,Nb),
- * is not allowed to belong to a tour.
- * If the edge is forbidden, the function returns 1; otherwise 0.
- */
-int Forbidden(Node *Na, Node *Nb) {
-    if (Na == Nb) return 1;
-    if (Asymmetric && (Na->Id <= DimensionSaved) == (Nb->Id <= DimensionSaved)) return 1;
-    if (Na->Head && !FixedOrCommon(Na, Nb) && (Na->Head == Nb->Head || (Na->Head != Na && Na->Tail != Na) || (Nb->Head != Nb && Nb->Tail != Nb))) return 1;
-    return 0;
 }
