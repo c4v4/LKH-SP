@@ -11,7 +11,7 @@ IDIR = $(PROJECT_HOME)/LKH-3/INCLUDE
 CCFLAGS = -O3 -Wall -I$(IDIR) -g -flto -fno-fat-lto-objects $(DEBUG)
 CXXFLAGS = $(CCFLAGS) -I$(CPLEX_IDIR) -fno-exceptions
 ODIR = OBJ
-LIBS = -L$(CPLEX_LIB) -L$(PROJECT_HOME) -lcplex -lLKHSym -lm -lpthread -ldl
+LIBS = -L$(CPLEX_LIB) -L$(PROJECT_HOME) -lcplex $(LKH_LIB_FLAG) -lm -lpthread -ldl
 
 # C 
 
