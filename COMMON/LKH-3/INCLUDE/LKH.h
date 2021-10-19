@@ -124,9 +124,33 @@ enum EdgeWeightTypes {
     XRAY2,
     SPECIAL
 };
-enum EdgeWeightFormats { FUNCTION, FULL_MATRIX, UPPER_ROW, LOWER_ROW, UPPER_DIAG_ROW, LOWER_DIAG_ROW, UPPER_COL, LOWER_COL, UPPER_DIAG_COL, LOWER_DIAG_COL };
+enum EdgeWeightFormats {
+    FUNCTION,
+    FULL_MATRIX,
+    UPPER_ROW,
+    LOWER_ROW,
+    UPPER_DIAG_ROW,
+    LOWER_DIAG_ROW,
+    UPPER_COL,
+    LOWER_COL,
+    UPPER_DIAG_COL,
+    LOWER_DIAG_COL
+};
 enum CandidateSetTypes { ALPHA, DELAUNAY, NN, POPMUSIC, QUADRANT };
-enum InitialTourAlgorithms { BORUVKA, CTSP_ALG, CVRP_ALG, GREEDY, MOORE, MTSP_ALG, NEAREST_NEIGHBOR, QUICK_BORUVKA, SIERPINSKI, SOP_ALG, TSPDL_ALG, WALK };
+enum InitialTourAlgorithms {
+    BORUVKA,
+    CTSP_ALG,
+    CVRP_ALG,
+    GREEDY,
+    MOORE,
+    MTSP_ALG,
+    NEAREST_NEIGHBOR,
+    QUICK_BORUVKA,
+    SIERPINSKI,
+    SOP_ALG,
+    TSPDL_ALG,
+    WALK
+};
 enum Objectives { MINMAX, MINMAX_SIZE, MINSUM };
 enum RecombinationTypes { IPT, GPX2 };
 
@@ -440,13 +464,14 @@ extern int TSPTW_Makespan;
 /* The following variables are read by the functions ReadParameters and
    ReadProblem: */
 
-extern char *ParameterFileName, *ProblemFileName, *PiFileName, *TourFileName, *OutputTourFileName, *InputTourFileName, **CandidateFileName, **EdgeFileName,
-    *InitialTourFileName, *SubproblemTourFileName, **MergeTourFileName, *MTSPSolutionFileName, *SINTEFSolutionFileName;
+extern char *ParameterFileName, *ProblemFileName, *PiFileName, *TourFileName, *OutputTourFileName, *InputTourFileName, **CandidateFileName,
+    **EdgeFileName, *InitialTourFileName, *SubproblemTourFileName, **MergeTourFileName, *MTSPSolutionFileName, *SINTEFSolutionFileName;
 extern char *Name, *Type, *EdgeWeightType, *EdgeWeightFormat, *EdgeDataFormat, *NodeCoordType, *DisplayDataType;
-extern int CandidateSetSymmetric, CandidateSetType, Capacity, CoordType, DelaunayPartitioning, DelaunayPure, ExternalSalesmen, ExtraCandidateSetSymmetric,
-    ExtraCandidateSetType, InitialTourAlgorithm, KarpPartitioning, KCenterPartitioning, KMeansPartitioning, MTSPDepot, MTSPMinSize, MTSPMaxSize, MTSPObjective,
-    MoorePartitioning, PatchingAExtended, PatchingARestricted, PatchingCExtended, PatchingCRestricted, RiskThreshold, RohePartitioning, Salesmen,
-    SierpinskiPartitioning, SubproblemBorders, SubproblemsCompressed, WeightType, WeightFormat;
+extern int CandidateSetSymmetric, CandidateSetType, Capacity, CoordType, DelaunayPartitioning, DelaunayPure, ExternalSalesmen,
+    ExtraCandidateSetSymmetric, ExtraCandidateSetType, InitialTourAlgorithm, KarpPartitioning, KCenterPartitioning, KMeansPartitioning,
+    MTSPDepot, MTSPMinSize, MTSPMaxSize, MTSPObjective, MoorePartitioning, PatchingAExtended, PatchingARestricted, PatchingCExtended,
+    PatchingCRestricted, RiskThreshold, RohePartitioning, Salesmen, SierpinskiPartitioning, SubproblemBorders, SubproblemsCompressed,
+    WeightType, WeightFormat;
 
 extern FILE *ParameterFile, *ProblemFile, *PiFile, *InputTourFile, *InitialTourFile, *SubproblemTourFile, **MergeTourFile;
 extern CostFunction Distance, D, c, OldDistance;
@@ -641,7 +666,8 @@ static inline int C(Node *Na, Node *Nb) {
             j = k;
         }
         Index = ((i << 8) + i + j) & CacheMask;
-        if (CacheSig[Index * 2] == i) return CacheSig[Index * 2 + 1];
+        if (CacheSig[Index * 2] == i)
+            return CacheSig[Index * 2 + 1];
         CacheSig[Index * 2] = i;
         return (CacheSig[Index * 2 + 1] = _C(Na, Nb));
     }

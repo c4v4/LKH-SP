@@ -71,16 +71,23 @@ void extract_routes_tmlp(GainType Cost) {
     sph::SPHeuristic &sph = *((sph::SPHeuristic *)sph_ptr);
     ConstrChecker check;
 
-    if (CurrentPenalty && ProblemType != CCVRP) Cost = INT_MAX;
+    if (CurrentPenalty && ProblemType != CCVRP)
+        Cost = INT_MAX;
 
     int count_infeas = 0;
     check.clear_route(Depot);
 
+    auto next_N = [](Node *N) {
+        if (!Asymmetric)
+            return N->Suc;
+        if (N->Suc->Id != DimensionSaved + N->Id)
+            return N->Suc->Suc;
+        return N->Pred->Pred;
+    };
+
     Node *N = Depot;
     do {
-        N = N->Suc;
-        if (N->Id > DimensionSaved) continue;
-
+        N = next_N(N);
         check.add_node(N);
         if (N->DepotId) {
             if (check.is_feasible()) {
@@ -95,7 +102,7 @@ void extract_routes_tmlp(GainType Cost) {
             current_route.clear();
             check.clear_route(N);
         } else
-            current_route.push_back(N->Id - 2);  // ########## HERE, if something is wrong check this first!!
+            current_route.push_back(N->Id - 2);
 
     } while (N != Depot);
 

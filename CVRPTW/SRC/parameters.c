@@ -73,7 +73,7 @@ void SetParameters() {
     Subgradient = 1;
     SubproblemSize = 0;
     SubsequentPatching = 1;
-    TimeLimit = DBL_MAX;
-    RunTimeLimit = DBL_MAX;
-    TraceLevel = 1;
+    TimeLimit = 7200;
+    RunTimeLimit = 600;
+    TraceLevel = 0;
 }

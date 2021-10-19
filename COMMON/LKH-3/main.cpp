@@ -11,9 +11,9 @@ extern "C" {
 #define VERBOSE
 #define VERBOSE_LEVEL 1
 
-#undef NDEBUG
-#include "SPH.hpp"
 #define NDEBUG
+#include "SPH.hpp"
+#undef NDEBUG
 
 #define SPH_PERIOD 4
 #define SPH_TLIM 120.0
@@ -21,7 +21,6 @@ extern "C" {
 
 sph::SPHeuristic *sph_ptr;          /* SPHeuristc pointer */
 std::vector<sph::idx_t> BestRoutes; /* Vector containing routes indexes of BestTour */
-int *warmstart;
 
 int main(int argc, char *argv[]) {
     GainType Cost, OldOptimum;
@@ -30,7 +29,8 @@ int main(int argc, char *argv[]) {
     int i;
 
     /* Read the specification of the problem */
-    if (argc >= 2) ProblemFileName = argv[1];
+    if (argc >= 2)
+        ProblemFileName = argv[1];
     StartTime = LastTime = GetTime();
     MergeWithTour = Recombination == IPT ? MergeWithTourIPT : MergeWithTourGPX2;
     SetParameters();
@@ -39,7 +39,8 @@ int main(int argc, char *argv[]) {
     CreateCandidateSet();
     InitializeStatistics();
 
-    assert(warmstart = (int *)malloc((Dimension + 1) * sizeof(int)));
+    int *warmstart = (int *)malloc((DimensionSaved + 1) * sizeof(int));
+    assert(warmstart);
 
     Norm = 9999;
     BestCost = PLUS_INFINITY;
@@ -53,7 +54,8 @@ int main(int argc, char *argv[]) {
     for (Run = 1; Run <= Runs; Run++) {
         LastTime = GetTime();
         if (LastTime - StartTime >= TimeLimit) {
-            if (TraceLevel >= 1) printff("*** Time limit exceeded ***\n");
+            if (TraceLevel >= 1)
+                printff("*** Time limit exceeded ***\n");
             break;
         }
         Cost = FindTour(); /* using the Lin-Kernighan heuristic */
@@ -65,7 +67,8 @@ int main(int argc, char *argv[]) {
                 GainType OldCost = Cost;
                 Cost = MergeTourWithIndividual(i);
                 if (TraceLevel >= 1 && (CurrentPenalty < OldPenalty || (CurrentPenalty == OldPenalty && Cost < OldCost))) {
-                    if (CurrentPenalty) printff("  Merged with %d: Cost = " GainFormat, i + 1, Cost);
+                    if (CurrentPenalty)
+                        printff("  Merged with %d: Cost = " GainFormat, i + 1, Cost);
                     else
                         printff("  Merged with %d: Cost = " GainFormat "_" GainFormat, i + 1, CurrentPenalty, Cost);
                     if (Optimum != MINUS_INFINITY && Optimum != 0) {
@@ -77,11 +80,13 @@ int main(int argc, char *argv[]) {
             if (!HasFitness(CurrentPenalty, Cost)) {
                 if (PopulationSize < MaxPopulationSize) {
                     AddToPopulation(CurrentPenalty, Cost);
-                    if (TraceLevel >= 1) PrintPopulation();
+                    if (TraceLevel >= 1)
+                        PrintPopulation();
                 } else if (SmallerFitness(CurrentPenalty, Cost, PopulationSize - 1)) {
                     i = ReplacementIndividual(CurrentPenalty, Cost);
                     ReplaceIndividualWithTour(i, CurrentPenalty, Cost);
-                    if (TraceLevel >= 1) PrintPopulation();
+                    if (TraceLevel >= 1)
+                        PrintPopulation();
                 }
             }
         } else if (Run > 1 && !TSPTW_Makespan)
@@ -95,7 +100,8 @@ int main(int argc, char *argv[]) {
         }
         OldOptimum = Optimum;
         if (MTSPObjective != MINMAX && MTSPObjective != MINMAX_SIZE) {
-            if (CurrentPenalty == 0 && Cost < Optimum) Optimum = Cost;
+            if (CurrentPenalty == 0 && Cost < Optimum)
+                Optimum = Cost;
         } else if (CurrentPenalty < Optimum)
             Optimum = CurrentPenalty;
         if (Optimum < OldOptimum) {
@@ -134,23 +140,26 @@ int main(int argc, char *argv[]) {
         /* Set Partitioning Heuristic phase */
         if (Run % SPH_PERIOD == 0) {
             sph.set_timelimit(SPH_TLIM);
-            BestRoutes = sph.solve(BestRoutes);
+            BestRoutes = sph.solve<>(BestRoutes);
 
-            /* transform back SP sol to tour*/
+            /* Transform back SP sol to tour*/
             int *ws = warmstart;
-            int c = 0;
-            for (int j : BestRoutes) {
-                sph::Column col = sph.get_col(j);
+            int route = 0;
+            for (sph::idx_t j : BestRoutes) {
+                sph::Column &col = sph.get_col(j);
                 *ws++ = 0;
-                fmt::print("\nRoute {}: ", ++c);
-                for (int i : col) {
+                for (sph::idx_t i : col) {
+                    if (ws - warmstart > DimensionSaved + 1) {
+                        fmt::print(stderr, "Error: SPH has returned a solution with overlaps, are you sure to have set it right?");
+                        abort();
+                    }
                     *ws++ = i + 1;
-                    fmt::print("{} ", i);
                 }
+
+                if (TraceLevel >= 1)
+                    fmt::print("Route {}: {}\n", ++route, fmt::join(col, ", "));
             }
-            fmt::print("\n\n");
             *ws++ = 0;
-            assert(ws - warmstart == DimensionSaved + 1);
             SetInitialTour(warmstart);
         }
     }
