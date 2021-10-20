@@ -85,6 +85,7 @@ void extract_routes_tmlp(GainType Cost) {
         return N->Pred->Pred;
     };
 
+    GainType CostCheck = 0;
     Node *N = Depot;
     do {
         N = next_N(N);
@@ -100,11 +101,13 @@ void extract_routes_tmlp(GainType Cost) {
                 assert(CurrentPenalty > 0);
             }
             current_route.clear();
+            CostCheck += check.get_length();
             check.clear_route(N);
         } else
             current_route.push_back(N->Id - 2);
 
     } while (N != Depot);
 
+    assert(CostCheck == Cost);
     assert((count_infeas > 0) == (CurrentPenalty > 0) || ProblemType == CCVRP);
 }
