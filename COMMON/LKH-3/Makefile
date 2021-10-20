@@ -65,7 +65,7 @@ _OBJ = Activate.o AddCandidate.o AddExtraCandidates.o                  \
 	   VRPB_Reduce.o BIT.o        									   \
        WriteCandidates.o WritePenalties.o WriteTour.o                  \
        MergeWithTourGPX2.o gpx.o									   \
-	   main.opp
+	   main.opp ReadInitialTourSol.opp
 
 OBJ_SYM = $(patsubst %,$(ODIR_SYM)/%,$(_OBJ))
 OBJ_ASYM = $(patsubst %,$(ODIR_ASYM)/%,$(_OBJ))
@@ -82,7 +82,7 @@ libLKHSym.a: $(OBJ_SYM) $(DEPS)
 libLKHAsym.a: $(OBJ_ASYM) $(DEPS)
 	$(AR) rcs ../$@ $(OBJ_ASYM)
 
-$(ODIR_SYM)/main.opp $(ODIR_ASYM)/main.opp: main.cpp $(DEPS) | $(ODIR)
+$(ODIR_SYM)/%.opp $(ODIR_ASYM)/%.opp: %.cpp $(DEPS) | $(ODIR)
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
 $(ODIR_SYM)/%.o $(ODIR_ASYM)/%.o: %.c $(DEPS) | $(ODIR_SYM) $(ODIR_ASYM)

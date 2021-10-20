@@ -31,6 +31,9 @@ int main(int argc, char *argv[]) {
     /* Read the specification of the problem */
     if (argc >= 2)
         ProblemFileName = argv[1];
+    if (argc >= 3)
+        Read_InitialTour_Sol(argv[2]);
+        
     StartTime = LastTime = GetTime();
     MergeWithTour = Recombination == IPT ? MergeWithTourIPT : MergeWithTourGPX2;
     SetParameters();
