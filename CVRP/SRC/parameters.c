@@ -68,12 +68,14 @@ void SetParameters() {
     Runs = RUNS;
     Salesmen = 1;
     Scale = -1;
-    Seed = 1;
+    // Seed = 0;
     StopAtOptimum = 1;
     Subgradient = 1;
     SubproblemSize = 0;
     SubsequentPatching = 1;
-    TimeLimit = DBL_MAX;
-    RunTimeLimit = 100.0;
-    TraceLevel = 0;
+    // TimeLimit = 7200ill;
+    // RunTimeLimit = 600;
+    TimeLimit = INT_MAX;
+    RunTimeLimit = INT_MAX;
+    TraceLevel = 1;
 }

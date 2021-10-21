@@ -2,10 +2,13 @@ extern "C" {
 #include "LKH.h"
 }
 
-#include <iostream>
+#include <fstream>
+#include <sstream>
 #include <vector>
 
 extern "C" void Read_InitialTour_Sol(const char *FileName) {
+    assert(NodeSet);
+
     std::vector<int> tour;
     std::ifstream rfile;
     std::string line;
@@ -21,7 +24,7 @@ extern "C" void Read_InitialTour_Sol(const char *FileName) {
                 int value;
                 tour.push_back(0);
                 while (lineStream >> value)
-                    tour.push_back(value);
+                    tour.push_back(value+1);
             } else if (line.find("Instance ") == std::string::npos)  // CVRPTW: file_type = 0, but with some intro lines
             {
                 file_type = 1;
@@ -36,21 +39,21 @@ extern "C" void Read_InitialTour_Sol(const char *FileName) {
                     int value;
                     tour.push_back(0);
                     while (lineStream >> value)
-                        tour.push_back(value);
+                        tour.push_back(value+1);
                 } else if (file_type) {
                     std::stringstream lineStream(line);
                     int value;
                     for (int i = 0; i < 7; ++i)
                         lineStream >> value;  // ignore first 7 integers
                     while (lineStream >> value)
-                        tour.push_back(value);
+                        tour.push_back(value+1);
                 }
                 // else ignore line
             }
         }
     }
 
-    if (!vector.empty()) {
+    if (!tour.empty()) {
         SetInitialTour(tour.data());
     }
 }

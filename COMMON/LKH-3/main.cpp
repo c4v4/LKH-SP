@@ -16,7 +16,9 @@ extern "C" {
 #undef NDEBUG
 
 #define SPH_PERIOD 4
-#define SPH_TLIM 120.0
+#define SPH_TLIM 300.0
+
+#define DEFAULT_SEED 1  // 0 ==> time(NULL)
 
 
 sph::SPHeuristic *sph_ptr;          /* SPHeuristc pointer */
@@ -31,9 +33,9 @@ int main(int argc, char *argv[]) {
     /* Read the specification of the problem */
     if (argc >= 2)
         ProblemFileName = argv[1];
-    if (argc >= 3)
-        Read_InitialTour_Sol(argv[2]);
-        
+
+    Seed = argc >= 4 ? atoi(argv[3]) : DEFAULT_SEED;
+
     StartTime = LastTime = GetTime();
     MergeWithTour = Recombination == IPT ? MergeWithTourIPT : MergeWithTourGPX2;
     SetParameters();
@@ -41,6 +43,10 @@ int main(int argc, char *argv[]) {
     AllocateStructures();
     CreateCandidateSet();
     InitializeStatistics();
+
+    if (argc >= 3)
+        Read_InitialTour_Sol(argv[2]);
+
 
     int *warmstart = (int *)malloc((DimensionSaved + 1) * sizeof(int));
     assert(warmstart);
@@ -100,6 +106,7 @@ int main(int argc, char *argv[]) {
             RecordBetterTour();
             RecordBestTour();
             WriteTour(TourFileName, BestTour, BestCost);
+            WriteSolFile(BestTour, BestCost);
         }
         OldOptimum = Optimum;
         if (MTSPObjective != MINMAX && MTSPObjective != MINMAX_SIZE) {
@@ -144,24 +151,28 @@ int main(int argc, char *argv[]) {
         if (Run % SPH_PERIOD == 0) {
             sph.set_timelimit(SPH_TLIM);
             BestRoutes = sph.solve<>(BestRoutes);
-
+            GainType Cost = 0;
             /* Transform back SP sol to tour*/
             int *ws = warmstart;
             int route = 0;
             for (sph::idx_t j : BestRoutes) {
                 sph::Column &col = sph.get_col(j);
+                Cost += col.get_cost();
                 *ws++ = 0;
-                for (sph::idx_t i : col) {
+                for (sph::idx_t &i : col) {
                     if (ws - warmstart > DimensionSaved + 1) {
                         fmt::print(stderr, "Error: SPH has returned a solution with overlaps, are you sure to have set it right?");
                         abort();
                     }
-                    *ws++ = i + 1;
+                    *ws++ = ++i;
                 }
 
                 if (TraceLevel >= 1)
-                    fmt::print("Route {}: {}\n", ++route, fmt::join(col, ", "));
+                    fmt::print("Route #{}: {}\n", ++route, fmt::join(col, " "));
             }
+            if (TraceLevel >= 1)
+                fmt::print("Cost {}\n", Cost);
+
             *ws++ = 0;
             SetInitialTour(warmstart);
         }

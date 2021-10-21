@@ -13,3 +13,5 @@ libLKHAsym.a
 libLKHSym.a
 CVRP/cvrp
 CVRPTW/cvrptw
+*.sol
+out*.txt

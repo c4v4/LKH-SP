@@ -17,7 +17,7 @@ ODIR_ASYM = OBJ_ASYM
 OPTIONS=$(CUSTOM) $(CUSTOM_PENALTY) $(CUSTOM_CACHE) $(CUSTOM_FLIP)
 #DEBUG = -g -O0 -fno-omit-frame-pointer -DNDEBUG
 CFLAGS = -O3 -Wall -I$(IDIR) -D$(TREE_TYPE) -flto -fno-fat-lto-objects $(OPTIONS) $(DEBUG)
-CXXFLAGS = $(CFLAGS) -I$(CPLEX_IDIR) -fno-exceptions
+CXXFLAGS = $(CFLAGS) -std=c++17 -I$(CPLEX_IDIR) -fno-exceptions
 
 _DEPS = Delaunay.h GainType.h Genetic.h GeoConversion.h Hashing.h Heap.h   \
        LKH.h Segment.h Sequence.h BIT.h gpx.h extract_routes.hpp SPH.hpp   \
@@ -63,7 +63,7 @@ _OBJ = Activate.o AddCandidate.o AddExtraCandidates.o                  \
        TrimCandidateSet.o TSPDL_InitialTour.o TSPTW_MakespanCost.o     \
 	   TSPTW_Reduce.o ValidateTour.o VariablesDefinition.o 			   \
 	   VRPB_Reduce.o BIT.o        									   \
-       WriteCandidates.o WritePenalties.o WriteTour.o                  \
+       WriteCandidates.o WritePenalties.o WriteTour.o WriteSolFile.o   \
        MergeWithTourGPX2.o gpx.o									   \
 	   main.opp ReadInitialTourSol.opp
 

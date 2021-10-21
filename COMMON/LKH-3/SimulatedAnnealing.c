@@ -32,10 +32,12 @@ void SA_setup(double EntryTime, double TimeLimit) {
 
 void SA_start() {
 
-    if (FirstNode->InitialSuc) {
-        T = T_trials = T_time = SA_WARM_FACTOR * SA_SCALING_FACTOR;
-    } else {
-        T = T_trials = T_time = SA_ZERO_FACTOR * SA_SCALING_FACTOR;
+    if (Dim <= 10000) {
+        if (FirstNode->InitialSuc) {
+            T = T_trials = T_time = SA_WARM_FACTOR * SA_SCALING_FACTOR;
+        } else {
+            T = T_trials = T_time = SA_ZERO_FACTOR * SA_SCALING_FACTOR;
+        }
     }
     cost_delta = T * BetterCost;
     pnlt_delta = T * BetterPenalty;

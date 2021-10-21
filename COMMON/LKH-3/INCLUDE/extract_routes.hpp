@@ -23,7 +23,9 @@ extern std::vector<sph::idx_t> BestRoutes; /* Vector containing routes indexes o
 class ConstraintChecker {
 public:
     void add_node(Node *N) {
-        dist = OldDistance(prev, N + (DimensionSaved * Asymmetric));
+        // dist = OldDistance(prev, N + (DimensionSaved * Asymmetric));
+        Node *realN = N + (DimensionSaved * Asymmetric);
+        dist = (C(prev, realN) - prev->Pi - realN->Pi) / Precision;
         current_length += dist;
         prev = N;
         ++size;
@@ -74,21 +76,19 @@ void extract_routes_tmlp(GainType Cost) {
     if (CurrentPenalty && ProblemType != CCVRP)
         Cost = INT_MAX;
 
+
     int count_infeas = 0;
-    check.clear_route(Depot);
-
-    auto next_N = [](Node *N) {
-        if (!Asymmetric)
-            return N->Suc;
-        if (N->Suc->Id != DimensionSaved + N->Id)
-            return N->Suc->Suc;
-        return N->Pred->Pred;
-    };
-
     GainType CostCheck = 0;
     Node *N = Depot;
+    check.clear_route(Depot);
+
+    auto next_N = (!Asymmetric                    ? [](Node *N) { return N->Suc; }
+                   : N->Suc != N + DimensionSaved ? [](Node *N) { return N->Suc->Suc; }
+                                                  : [](Node *N) { return N->Pred->Pred; });
     do {
         N = next_N(N);
+        assert(N->Id <= DimensionSaved);
+
         check.add_node(N);
         if (N->DepotId) {
             if (check.is_feasible()) {
@@ -108,6 +108,27 @@ void extract_routes_tmlp(GainType Cost) {
 
     } while (N != Depot);
 
-    assert(CostCheck == Cost);
+    /* if (CurrentPenalty == 0 && CostCheck != Cost) {
+        GainType CostCheck2 = 0;
+        N = Depot;
+        if (!Asymmetric) {
+            do
+                CostCheck2 += (C(N, N->Suc) - N->Pi - N->Suc->Pi) / Precision;
+            while ((N = N->Suc) != Depot);
+        } else if (N->Suc->Id != DimensionSaved + N->Id) {
+            do
+                if (N->Id <= DimensionSaved)
+                    CostCheck2 += (C(N, N->Suc) - N->Pi - N->Suc->Pi) / Precision;
+            while ((N = N->Suc) != Depot);
+        } else {
+            do
+                if (N->Id <= DimensionSaved)
+                    CostCheck2 += (C(N, N->Pred) - N->Pi - N->Suc->Pi) / Precision;
+            while ((N = N->Pred) != Depot);
+        }
+
+        assert(CostCheck2 == CostCheck);
+    } */
+    assert(CurrentPenalty > 0 || CostCheck == Cost);
     assert((count_infeas > 0) == (CurrentPenalty > 0) || ProblemType == CCVRP);
 }

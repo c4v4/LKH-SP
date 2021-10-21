@@ -12,7 +12,7 @@ public:
         current_demand += N->Demand;
         auto real_cost = current_cost + get_length();
         if (real_cost < N->Earliest)
-            current_cost = static_cast<GainType>(N->Earliest) - get_length();
+            current_cost = N->Earliest - get_length();
         if (real_cost > N->Latest)
             current_cost = INT_MAX;
         current_cost += N->ServiceTime;
