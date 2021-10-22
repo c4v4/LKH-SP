@@ -23,4 +23,5 @@ Both CVRP and CVRPTW contain:
 
 ## Run:
 From the CVRP or CVRPTW folder, build with make and launch as:
-		./cvrp <instance> [<sol-file>] [<seed>]
+
+        $ ./cvrp <instance> [<sol-file>] [<seed>]
