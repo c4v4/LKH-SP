@@ -17,7 +17,7 @@ ODIR_ASYM = OBJ_ASYM
 OPTIONS=$(CUSTOM) $(CUSTOM_PENALTY) $(CUSTOM_CACHE) $(CUSTOM_FLIP)
 #DEBUG = -g -O0 -fno-omit-frame-pointer -DNDEBUG
 CFLAGS = -O3 -Wall -I$(IDIR) -D$(TREE_TYPE) -flto -fno-fat-lto-objects $(OPTIONS) $(DEBUG)
-CXXFLAGS = $(CFLAGS) -std=c++17 -I$(CPLEX_IDIR) -fno-exceptions
+CXXFLAGS = $(CFLAGS) -std=c++17 -I$(CPLEX_IDIR) -fno-exceptions -fno-rtti
 
 _DEPS = Delaunay.h GainType.h Genetic.h GeoConversion.h Hashing.h Heap.h   \
        LKH.h Segment.h Sequence.h BIT.h gpx.h extract_routes.hpp SPH.hpp   \
