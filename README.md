@@ -20,3 +20,7 @@ Both CVRP and CVRPTW contain:
   - Forbidden.c: LKH-3 variant-specialized Forbidden function 
   - parameters.c: compile-time parameters (to help LTO)
   - Penalty.c: Variant Penalty implementation
+
+## Run:
+From the CVRP or CVRPTW folder, build with make and launch as:
+		./cvrp <instance> [<sol-file>] [<seed>]
