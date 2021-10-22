@@ -45,7 +45,7 @@ all:
 	$(MAKE) $(EXE)
 
 $(LKH_LIB):
-	$(MAKE) -C $(dir $@) $(notdir $@) DEBUG=$(DEBUG)
+	$(MAKE) -C $(dir $@) $(notdir $@) DEBUG="$(DEBUG)"
 
 $(ODIR):
 	mkdir -p $@

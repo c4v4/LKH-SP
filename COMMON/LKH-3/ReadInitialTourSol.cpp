@@ -6,6 +6,7 @@ extern "C" {
 #include <sstream>
 #include <vector>
 
+/* TODO: convert it to C code */
 extern "C" void Read_InitialTour_Sol(const char *FileName) {
     assert(NodeSet);
 
@@ -24,7 +25,7 @@ extern "C" void Read_InitialTour_Sol(const char *FileName) {
                 int value;
                 tour.push_back(0);
                 while (lineStream >> value)
-                    tour.push_back(value+1);
+                    tour.push_back(value);
             } else if (line.find("Instance ") == std::string::npos)  // CVRPTW: file_type = 0, but with some intro lines
             {
                 file_type = 1;
@@ -39,14 +40,14 @@ extern "C" void Read_InitialTour_Sol(const char *FileName) {
                     int value;
                     tour.push_back(0);
                     while (lineStream >> value)
-                        tour.push_back(value+1);
+                        tour.push_back(value);
                 } else if (file_type) {
                     std::stringstream lineStream(line);
                     int value;
                     for (int i = 0; i < 7; ++i)
                         lineStream >> value;  // ignore first 7 integers
                     while (lineStream >> value)
-                        tour.push_back(value+1);
+                        tour.push_back(value);
                 }
                 // else ignore line
             }

@@ -650,6 +650,10 @@ void VRPB_Reduce(void);
 void WriteCandidates(void);
 void WritePenalties(void);
 void WriteTour(char *FileName, int *Tour, GainType Cost);
+void WriteSolFile(int *tour, GainType Cost);
+void SetInitialTour(int *tour);
+void ValidateTour(int *tour);
+void Read_InitialTour_Sol(const char *FileName);
 
 #ifdef CAVA_CACHE
 
@@ -706,5 +710,3 @@ extern const enum Types ProblemType;
 GainType Penalty(void);
 int Forbidden(Node *Na, Node *Nb);
 void ExtractRoutes(GainType Cost);
-void SetInitialTour(int *tour);
-void ValidateTour(int *tour);
