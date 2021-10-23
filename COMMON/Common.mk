@@ -5,13 +5,6 @@
 #  - EXE: the name of the binary created (e.g. "cvrp" or "cvrptw")
 #  - DEBUG: debug flags
 
-#CC = gcc
-#CXX = g++
-#AR = gcc-ar
-
-CC = clang
-CXX = clang++
-
 UNAME_S := $(shell uname -s)
 
 ifeq ($(UNAME_S),Linux)
