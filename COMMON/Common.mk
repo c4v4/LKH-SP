@@ -12,8 +12,17 @@
 CC = clang
 CXX = clang++
 
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+	CPLEX_LIB_TYPE = linux
+endif
+ifeq ($(UNAME_S),Darwin)
+	CPLEX_LIB_TYPE = osx
+endif
+
+
 CPLEX_IDIR = ${CPLEX_ROOT_DIR}/cplex/include/
-CPLEX_LIB = ${CPLEX_ROOT_DIR}/cplex/lib/x86-64_linux/static_pic/
+CPLEX_LIB = ${CPLEX_ROOT_DIR}/cplex/lib/x86-64_$(CPLEX_LIB_TYPE)/static_pic/
 IDIR = $(PROJECT_HOME)/LKH-3/INCLUDE
 #FLTO = -flto
 CCFLAGS = -O3 -Wall -I$(IDIR)$(DEBUG) $(FLTO)
