@@ -9,10 +9,15 @@ CUSTOM=-DCAVA_CUSTOM # Uncomment to activate all changes
 
 #CC = gcc
 #CXX = g++
-#AR = gcc-ar
+#AR = gcc-ar rcs
 
 CC = clang
 CXX = clang++
+
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+        AR = libtool -c -static -o
+endif
 
 IDIR = INCLUDE
 CPLEX_IDIR = ${CPLEX_ROOT_DIR}/cplex/include/
@@ -20,7 +25,7 @@ ODIR_SYM = OBJ_SYM
 ODIR_ASYM = OBJ_ASYM
 OPTIONS=$(CUSTOM) $(CUSTOM_PENALTY) $(CUSTOM_CACHE) $(CUSTOM_FLIP)
 #DEBUG = -g -O0 -fno-omit-frame-pointer -DNDEBUG
-#FLTO = -flto
+FLTO = -flto
 CFLAGS = -O3 -Wall -I$(IDIR) -D$(TREE_TYPE) $(FLTO) $(OPTIONS) $(DEBUG)
 CXXFLAGS = $(CFLAGS) -std=c++17 -I$(CPLEX_IDIR) -fno-exceptions
 
@@ -83,10 +88,10 @@ all:
 	$(MAKE) libLKHSym.a libLKHAsym.a
 
 libLKHSym.a: $(OBJ_SYM) $(DEPS) 
-	$(AR) rcs ../$@ $(OBJ_SYM)
+	$(AR) ../$@ $(OBJ_SYM)
 	
 libLKHAsym.a: $(OBJ_ASYM) $(DEPS)
-	$(AR) rcs ../$@ $(OBJ_ASYM)
+	$(AR) ../$@ $(OBJ_ASYM)
 
 $(ODIR_SYM)/%.opp $(ODIR_ASYM)/%.opp: %.cpp $(DEPS) | $(ODIR)
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
