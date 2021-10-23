@@ -119,17 +119,17 @@ namespace sph {
         Elem& operator=(const Elem&) = delete;
         Elem& operator=(Elem&&) = delete;
 
-        [[nodiscard]] inline idx_t* begin() { return reinterpret_cast<idx_t*>(reinterpret_cast<char*>(this) + MY_SIZE); }
-        [[nodiscard]] inline idx_t* end() { return begin() + sz; }
-        [[nodiscard]] inline idx_t& operator[](idx_t i) { return begin()[i]; }
+        inline idx_t* begin() { return reinterpret_cast<idx_t*>(reinterpret_cast<char*>(this) + MY_SIZE); }
+        inline idx_t* end() { return begin() + sz; }
+        inline idx_t& operator[](idx_t i) { return begin()[i]; }
 
-        [[nodiscard]] inline idx_t size() const { return sz; }
-        [[nodiscard]] inline bool empty() const { return sz == 0; }
-        [[nodiscard]] inline const idx_t* begin() const {
+        inline idx_t size() const { return sz; }
+        inline bool empty() const { return sz == 0; }
+        inline const idx_t* begin() const {
             return reinterpret_cast<const idx_t*>(reinterpret_cast<const char*>(this) + MY_SIZE);
         }
-        [[nodiscard]] inline const idx_t* end() const { return begin() + sz; }
-        [[nodiscard]] inline idx_t operator[](idx_t i) const { return begin()[i]; }
+        inline const idx_t* end() const { return begin() + sz; }
+        inline idx_t operator[](idx_t i) const { return begin()[i]; }
 
     protected:
         idx_t sz;
@@ -145,15 +145,15 @@ namespace sph {
     public:
         SubInstCol(real_t c_ = 0.0) : c(c_), c_u(c_) { }
 
-        [[nodiscard]] inline real_t get_cost() const { return c; }
+        inline real_t get_cost() const { return c; }
         inline void set_cost(real_t new_c) { c_u = c = new_c; }
 
-        [[nodiscard]] inline real_t get_cu() const { return c_u; }
+        inline real_t get_cu() const { return c_u; }
         inline void set_cu(real_t new_c) { c_u = new_c; }
         inline real_t update_cu(const real_t delta_u) { return c_u -= delta_u; }
 
 
-        [[nodiscard]] inline real_t compute_lagr_cost(const std::vector<real_t>& u) const {
+        inline real_t compute_lagr_cost(const std::vector<real_t>& u) const {
             real_t local_c_u = c;
             for (idx_t i : *this) {
                 assert(i < u.size());
@@ -190,7 +190,7 @@ namespace sph {
                 assert(reinterpret_cast<uintptr_t>(reinterpret_cast<const void*>(base)) % alignof(Elem) == 0);
             }
 
-            [[nodiscard]] inline auto& operator*() { return *base; }
+            inline auto& operator*() { return *base; }
 
             inline auto& operator++() {
                 base = reinterpret_cast<Elem*>(
@@ -207,11 +207,11 @@ namespace sph {
                 return CollectionIter(old_base);
             }
 
-            [[nodiscard]] inline bool operator!=(CollectionIter& it2) const { return base != it2.base; }
+            inline bool operator!=(CollectionIter& it2) const { return base != it2.base; }
 
-            [[nodiscard]] inline bool operator==(CollectionIter& it2) const { return base == it2.base; }
+            inline bool operator==(CollectionIter& it2) const { return base == it2.base; }
 
-            [[nodiscard]] Elem* data() const { return base; }
+            Elem* data() const { return base; }
 
         private:
             Elem* base;
@@ -229,19 +229,19 @@ namespace sph {
             start = finish = end_of_storage = nullptr;
         }
 
-        [[nodiscard]] inline CollectionIter begin() { return CollectionIter(reinterpret_cast<Elem*>(start)); }
-        [[nodiscard]] inline CollectionIter end() { return CollectionIter(reinterpret_cast<Elem*>(finish)); }
-        [[nodiscard]] inline Elem& operator[](idx_t j) { return *reinterpret_cast<Elem*>(start + offsets[j]); }
-        [[nodiscard]] inline Elem& back() { return *reinterpret_cast<Elem*>(start + offsets.back()); }
-        [[nodiscard]] inline Elem* data() { return reinterpret_cast<Elem*>(start + offsets[0]); }
+        inline CollectionIter begin() { return CollectionIter(reinterpret_cast<Elem*>(start)); }
+        inline CollectionIter end() { return CollectionIter(reinterpret_cast<Elem*>(finish)); }
+        inline Elem& operator[](idx_t j) { return *reinterpret_cast<Elem*>(start + offsets[j]); }
+        inline Elem& back() { return *reinterpret_cast<Elem*>(start + offsets.back()); }
+        inline Elem* data() { return reinterpret_cast<Elem*>(start + offsets[0]); }
 
-        [[nodiscard]] inline idx_t size() const { return offsets.size(); }
-        [[nodiscard]] inline bool empty() const { return offsets.empty(); }
-        [[nodiscard]] inline const CollectionIter begin() const { return CollectionIter(reinterpret_cast<Elem*>(start)); }
-        [[nodiscard]] inline const CollectionIter end() const { return CollectionIter(reinterpret_cast<Elem*>(finish)); }
-        [[nodiscard]] inline const Elem& operator[](idx_t j) const { return *reinterpret_cast<Elem*>(start + offsets[j]); }
-        [[nodiscard]] inline const Elem& back() const { return *reinterpret_cast<Elem*>(start + offsets.back()); }
-        [[nodiscard]] inline const Elem* data() const { return reinterpret_cast<Elem*>(align_ptr<Elem>(start)); }
+        inline idx_t size() const { return offsets.size(); }
+        inline bool empty() const { return offsets.empty(); }
+        inline const CollectionIter begin() const { return CollectionIter(reinterpret_cast<Elem*>(start)); }
+        inline const CollectionIter end() const { return CollectionIter(reinterpret_cast<Elem*>(finish)); }
+        inline const Elem& operator[](idx_t j) const { return *reinterpret_cast<Elem*>(start + offsets[j]); }
+        inline const Elem& back() const { return *reinterpret_cast<Elem*>(start + offsets.back()); }
+        inline const Elem* data() const { return reinterpret_cast<Elem*>(align_ptr<Elem>(start)); }
 
         inline void clear() {
             finish = start;
@@ -478,19 +478,19 @@ namespace sph {
             --M_star[row];
         }
 
-        [[nodiscard]] idx_t get(idx_t idx) const { return M_star[idx]; }
+        idx_t get(idx_t idx) const { return M_star[idx]; }
         idx_t operator[](idx_t idx) const { return M_star[idx]; }
         idx_t& operator[](idx_t idx) { return M_star[idx]; }
 
-        [[nodiscard]] inline auto begin() const { return M_star.begin(); }
-        [[nodiscard]] inline auto end() const { return M_star.end(); }
+        inline auto begin() const { return M_star.begin(); }
+        inline auto end() const { return M_star.end(); }
         inline auto begin() { return M_star.begin(); }
         inline auto end() { return M_star.end(); }
 
-        [[nodiscard]] idx_t get_uncovered() const { return zeros; }
-        [[nodiscard]] idx_t get_covered() const { return M_star.size() - zeros; }
+        idx_t get_uncovered() const { return zeros; }
+        idx_t get_covered() const { return M_star.size() - zeros; }
 
-        [[nodiscard]] idx_t size() const { return M_star.size(); }
+        idx_t size() const { return M_star.size(); }
 
 
     private:
@@ -620,14 +620,14 @@ namespace sph {
             return *this;
         };
 
-        [[nodiscard]] inline auto get_cost() const { return c; }
+        inline auto get_cost() const { return c; }
 
-        [[nodiscard]] inline auto get_solcost() const { return sol_c; }
+        inline auto get_solcost() const { return sol_c; }
         inline void set_solcost(real_t new_c) { sol_c = new_c; }
 
 
         template <typename Multipliers>
-        [[nodiscard]] inline auto compute_lagr_cost(const Multipliers& u) const {
+        inline auto compute_lagr_cost(const Multipliers& u) const {
             real_t local_c_u = c;
             for (idx_t i : *this) {
                 assert(i < u.size());
@@ -702,7 +702,9 @@ namespace cav {
         template <typename Iter>
         VectorSet(Iter beg, Iter end) {
             reserve(end - beg);
-            for (auto it = beg; it != end; ++it) { emplace_back(*it); }
+            for (auto it = beg; it != end; ++it) {
+                emplace_back(*it);
+            }
         }
 
         VectorSet(const VectorSet& other) : vec(other.vec), set(other.set) { vec_data = vec.data(); }
@@ -732,13 +734,15 @@ namespace cav {
 
             auto set_elem_iter = set.find(wrapped_elem);
             if (set_elem_iter == set.end()) {
-                T& inserted = vec.emplace_back(std::move(elem));
+                vec.emplace_back(std::move(elem));
                 vec_data = vec.data();
-                set.emplace(vec_data, vec.size() - 1);
-                return std::make_pair<viter, bool>(viter(std::addressof(inserted)), true);
+                size_t elem_position = vec.size() - 1;
+                set.emplace(vec_data, elem_position);
+                return std::make_pair<viter, bool>(vec.begin() + elem_position, true);
             }
 
-            return std::make_pair<viter, bool>(viter(set_elem_iter->data()), false);
+            ptrdiff_t elem_position = set_elem_iter->data() - vec.data();
+            return std::make_pair<viter, bool>(vec.begin() + elem_position, false);
         }
 
         template <typename Tt>
@@ -773,7 +777,8 @@ namespace cav {
             auto wrapped_elem = TPtrWrap(elem_ptr, 0);
 
             const_siter found = set.find(wrapped_elem);
-            if (found != set.cend()) return const_viter(found->data());
+            if (found != set.cend())
+                return const_viter(found->data());
             return vec.cend();
         }
 
@@ -782,7 +787,8 @@ namespace cav {
             TPtrWrap wrapped_elem(elem_ptr, 0);
 
             siter found = set.find(wrapped_elem);
-            if (found != set.end()) return viter(found->data());
+            if (found != set.end())
+                return viter(found->data());
             return vec.end();
         }
 
@@ -869,8 +875,8 @@ namespace sph {
 
         bool elem_wise_equal(const UniqueCol& other) { return std::equal(begin(), end(), other.begin(), other.end()); }
 
-        [[nodiscard]] inline size_t get_comb_hash1() const { return comb_hash1; }
-        [[nodiscard]] inline size_t get_comb_hash2() const { return comb_hash2; }
+        inline size_t get_comb_hash1() const { return comb_hash1; }
+        inline size_t get_comb_hash2() const { return comb_hash2; }
 
     private:
         size_t comb_hash1;
@@ -933,13 +939,13 @@ namespace sph {
             return std::accumulate(beg, end, 0, [this](size_t sum, auto it) { return sum + add_column(UniqueCol(*it)).second; });
         }
 
-        [[nodiscard]] inline size_t size() const { return vec_set.size(); }
-        [[nodiscard]] inline auto begin() { return vec_set.begin(); }
-        [[nodiscard]] inline auto end() { return vec_set.end(); }
-        [[nodiscard]] inline auto begin() const { return vec_set.begin(); }
-        [[nodiscard]] inline auto end() const { return vec_set.end(); }
-        [[nodiscard]] inline UniqueCol &operator[](size_t i) { return vec_set[i]; }
-        [[nodiscard]] inline const UniqueCol &operator[](size_t i) const { return vec_set[i]; }
+        inline size_t size() const { return vec_set.size(); }
+        inline auto begin() { return vec_set.begin(); }
+        inline auto end() { return vec_set.end(); }
+        inline auto begin() const { return vec_set.begin(); }
+        inline auto end() const { return vec_set.end(); }
+        inline UniqueCol &operator[](size_t i) { return vec_set[i]; }
+        inline const UniqueCol &operator[](size_t i) const { return vec_set[i]; }
 
     private:
         cav::VectorSet<UniqueCol, Hash> vec_set;
@@ -1013,23 +1019,23 @@ namespace sph {
         explicit Instance(const idx_t nrows_)
             : nrows(nrows_), active_rows(nrows, true), nactive_rows(nrows), fixed_cost(0.0), ncols_constr(0) { }
 
-        [[nodiscard]] inline idx_t get_ncols() const { return cols.size(); }
-        [[nodiscard]] inline idx_t get_nrows() const { return nrows; }
-        [[nodiscard]] inline idx_t get_active_rows_size() const { return nactive_rows; }
+        inline idx_t get_ncols() const { return cols.size(); }
+        inline idx_t get_nrows() const { return nrows; }
+        inline idx_t get_active_rows_size() const { return nactive_rows; }
 
-        [[nodiscard]] inline std::vector<idx_t> &get_active_cols() { return active_cols; }
-        [[nodiscard]] inline std::vector<idx_t> &get_fixed_cols() { return fixed_cols; }
-        [[nodiscard]] inline UniqueColSet &get_cols() { return cols; }
-        [[nodiscard]] inline Column &get_col(idx_t idx) { return cols[idx]; }
-        [[nodiscard]] inline const Column &get_col(idx_t idx) const { return cols[idx]; }
-        [[nodiscard]] inline real_t get_fixed_cost() const { return fixed_cost; }
-        [[nodiscard]] inline idx_t get_ncols_constr() const { return std::max<idx_t>(0, ncols_constr - fixed_cols.size()); }
+        inline std::vector<idx_t> &get_active_cols() { return active_cols; }
+        inline std::vector<idx_t> &get_fixed_cols() { return fixed_cols; }
+        inline UniqueColSet &get_cols() { return cols; }
+        inline Column &get_col(idx_t idx) { return cols[idx]; }
+        inline const Column &get_col(idx_t idx) const { return cols[idx]; }
+        inline real_t get_fixed_cost() const { return fixed_cost; }
+        inline idx_t get_ncols_constr() const { return std::max<idx_t>(0, ncols_constr - fixed_cols.size()); }
         inline void set_ncols_constr(idx_t ncols_constr_) { ncols_constr = ncols_constr_; }
 
         inline void set_timelimit(double seconds) { timelimit = Timer(seconds); }
-        [[nodiscard]] inline Timer &get_timelimit() { return timelimit; }
+        inline Timer &get_timelimit() { return timelimit; }
 
-        [[nodiscard]] inline bool is_row_active(idx_t gi) {
+        inline bool is_row_active(idx_t gi) {
             assert(gi < nrows);
             return active_rows[gi];
         }
@@ -1441,33 +1447,33 @@ namespace sph {
     public:
         explicit SubInstance(Instance &inst_) : inst(inst_), fixed_cost(inst_.get_fixed_cost()) { }
 
-        [[nodiscard]] inline idx_t get_ncols() const { return cols.size(); }
-        [[nodiscard]] inline idx_t get_nrows() const { return rows.size(); }
+        inline idx_t get_ncols() const { return cols.size(); }
+        inline idx_t get_nrows() const { return rows.size(); }
 
-        [[nodiscard]] inline idx_t get_global_col_idx(idx_t local_j) const { return local_to_global_col_idxs[local_j]; }
-        [[nodiscard]] inline idx_t get_global_row_idx(idx_t local_i) const { return local_to_global_row_idxs[local_i]; }
-        [[nodiscard]] inline idx_t get_local_row_idx(idx_t global_i) const { return global_to_local_row_idxs[global_i]; }
+        inline idx_t get_global_col_idx(idx_t local_j) const { return local_to_global_col_idxs[local_j]; }
+        inline idx_t get_global_row_idx(idx_t local_i) const { return local_to_global_row_idxs[local_i]; }
+        inline idx_t get_local_row_idx(idx_t global_i) const { return global_to_local_row_idxs[global_i]; }
 
-        [[nodiscard]] inline SubInstCols &get_cols() { return cols; }
-        [[nodiscard]] inline std::vector<Row> &get_rows() { return rows; }
+        inline SubInstCols &get_cols() { return cols; }
+        inline std::vector<Row> &get_rows() { return rows; }
 
-        [[nodiscard]] inline const SubInstCols &get_cols() const { return cols; }
-        [[nodiscard]] inline const std::vector<Row> &get_rows() const { return rows; }
+        inline const SubInstCols &get_cols() const { return cols; }
+        inline const std::vector<Row> &get_rows() const { return rows; }
 
-        [[nodiscard]] inline SubInstCol &get_col(idx_t idx) { return cols[idx]; }
-        [[nodiscard]] inline Row &get_row(idx_t idx) { return rows[idx]; }
+        inline SubInstCol &get_col(idx_t idx) { return cols[idx]; }
+        inline Row &get_row(idx_t idx) { return rows[idx]; }
 
-        [[nodiscard]] inline const SubInstCol &get_col(idx_t idx) const { return cols[idx]; }
-        [[nodiscard]] inline const Row &get_row(idx_t idx) const { return rows[idx]; }
+        inline const SubInstCol &get_col(idx_t idx) const { return cols[idx]; }
+        inline const Row &get_row(idx_t idx) const { return rows[idx]; }
 
-        [[nodiscard]] inline std::vector<idx_t> &get_fixed_cols() { return fixed_cols_global_idxs; }
-        [[nodiscard]] inline real_t get_fixed_cost() const { return fixed_cost; }
-        [[nodiscard]] inline idx_t get_ncols_constr() const { return ncols_constr; }
-        [[nodiscard]] inline Instance &get_instance() { return inst; }
+        inline std::vector<idx_t> &get_fixed_cols() { return fixed_cols_global_idxs; }
+        inline real_t get_fixed_cost() const { return fixed_cost; }
+        inline idx_t get_ncols_constr() const { return ncols_constr; }
+        inline Instance &get_instance() { return inst; }
 
-        [[nodiscard]] Timer &get_timelimit() { return inst.get_timelimit(); }
+        Timer &get_timelimit() { return inst.get_timelimit(); }
 
-        [[nodiscard]] bool is_corrupted() const {
+        bool is_corrupted() const {
             idx_t j_counter = 0;
             for (auto &col : cols) {
                 if (std::addressof(col) != std::addressof(cols[j_counter])) {
@@ -1517,7 +1523,7 @@ namespace sph {
             return false;
         }
 
-        [[nodiscard]] real_t get_global_LB(const std::vector<real_t> &u_k) {
+        real_t get_global_LB(const std::vector<real_t> &u_k) {
             real_t global_LB = std::reduce(u_k.begin(), u_k.end(), static_cast<real_t>(0.0));
 
             // price all active columns and add their contribution to the LB
@@ -1537,7 +1543,7 @@ namespace sph {
 
             return global_LB;
         }
-        [[nodiscard]] idx_t find_local_col_idx(idx_t gj) {
+        idx_t find_local_col_idx(idx_t gj) {
 
             for (idx_t gi : inst.get_col(gj)) {
                 if (_is_global_row_active(gi)) {
@@ -1550,7 +1556,7 @@ namespace sph {
             }
             return NOT_AN_INDEX;
         }
-        [[nodiscard]] std::vector<idx_t> get_localized_solution(const std::vector<idx_t> &glob_sol) {
+        std::vector<idx_t> get_localized_solution(const std::vector<idx_t> &glob_sol) {
             assert(glob_sol.size() >= fixed_cols_global_idxs.size());
 
             std::vector<idx_t> local_sol;
@@ -1796,7 +1802,7 @@ namespace sph {
 
 
     private:
-        [[nodiscard]] inline bool _is_global_row_active(const idx_t gbl_idx) {
+        inline bool _is_global_row_active(const idx_t gbl_idx) {
             assert(gbl_idx < global_to_local_row_idxs.size());
             return global_to_local_row_idxs[gbl_idx] != NOT_AN_INDEX;
         }
@@ -1880,7 +1886,7 @@ namespace sph {
 
     protected:
         template <typename Inst>
-        [[nodiscard]] inline real_t compute_cost(Inst& inst) const {
+        inline real_t compute_cost(Inst& inst) const {
             real_t cost = 0.0;
             for (auto j : *this) { cost += inst.get_col(j).get_cost(); }
             return cost;
@@ -1897,7 +1903,7 @@ namespace sph {
         template <typename... Args>
         explicit LocalSolution(Args&&... _args) : BaseSolution(std::forward<Args>(_args)...) { }
 
-        [[nodiscard]] inline real_t compute_cost(SubInstance& subinst) const { return BaseSolution::compute_cost(subinst); }
+        inline real_t compute_cost(SubInstance& subinst) const { return BaseSolution::compute_cost(subinst); }
     };
 
 
@@ -1924,7 +1930,7 @@ namespace sph {
             cost = BaseSolution::compute_cost(subinst.get_instance());
         }
 
-        [[nodiscard]] inline real_t get_cost() const { return cost; }
+        inline real_t get_cost() const { return cost; }
 
         void set_cost(real_t cost_) { cost = cost_; }
 
@@ -2188,7 +2194,7 @@ namespace sph {
     public:
         using std::vector<real_t>::vector;
 
-        [[nodiscard]] inline real_t compute_lb(SubInstance& subinst) const {
+        inline real_t compute_lb(SubInstance& subinst) const {
             auto& cols = subinst.get_cols();
             real_t LB = std::reduce(begin(), end(), 0.0);
             for (auto& col : cols) {
@@ -2242,7 +2248,7 @@ namespace sph {
             // fmt::print("fixed {}, u {}, c_u {} = lb {}\n", lb1, lb2, lb3, lb);
         }
 
-        [[nodiscard]] inline real_t get_lb() const { return lb; }
+        inline real_t get_lb() const { return lb; }
 
 
     private:
@@ -2484,11 +2490,11 @@ namespace sph {
     public:
         explicit Counter(idx_t max) : m(max), i(0) { }
         inline void inc() { i++; }
-        [[nodiscard]] inline auto reached() const { return i >= m; }
+        inline auto reached() const { return i >= m; }
         inline void restart() { i = 0; }
         inline void set_max(idx_t new_max) { m = new_max; }
-        [[nodiscard]] inline idx_t get_max() const { return m; }
-        [[nodiscard]] inline auto get() const { return i; }
+        inline idx_t get_max() const { return m; }
+        inline auto get() const { return i; }
 
     private:
         idx_t m;  // max value
@@ -2537,7 +2543,7 @@ namespace sph {
             }
         }
 
-        [[nodiscard]] inline real_t get() const { return lambda; }
+        inline real_t get() const { return lambda; }
 
         inline void reset() {
             p.restart();
@@ -3017,11 +3023,12 @@ namespace sph {
                 ++iter;
             } while (true);
 
+            SPH_VERBOSE(0) { fmt::print(" Final solution value: {}\n", S_star.get_cost()); }
             return S_star;
         }
 
     private:
-        [[nodiscard]] std::vector<idx_t> refinement_fix(GlobalSolution S_star, GlobalMultipliers u_star, real_t pi) {
+        std::vector<idx_t> refinement_fix(GlobalSolution S_star, GlobalMultipliers u_star, real_t pi) {
             UniqueColSet& cols = inst.get_cols();
 
             covered_rows.reset_covered(cols, S_star, inst.get_nrows());
@@ -3049,7 +3056,7 @@ namespace sph {
             return cols_to_fix;
         }
 
-        [[nodiscard]] std::vector<idx_t> random_fix(GlobalSolution S_star, real_t pi) {
+        std::vector<idx_t> random_fix(GlobalSolution S_star, real_t pi) {
             UniqueColSet& cols = inst.get_cols();
 
             std::shuffle(S_star.begin(), S_star.end(), rnd);
@@ -3067,7 +3074,7 @@ namespace sph {
             return cols_to_fix;
         }
 
-        [[nodiscard]] std::vector<idx_t> binary_tournament_fix(GlobalSolution S_star, GlobalMultipliers u_star, real_t pi) {
+        std::vector<idx_t> binary_tournament_fix(GlobalSolution S_star, GlobalMultipliers u_star, real_t pi) {
             UniqueColSet& cols = inst.get_cols();
 
             covered_rows.reset_covered(cols, S_star, inst.get_nrows());
@@ -3103,7 +3110,7 @@ namespace sph {
             return cols_to_fix;
         }
 
-        [[nodiscard]] std::vector<idx_t> random_fix2(GlobalSolution S_star, GlobalMultipliers u_star, real_t pi) {
+        std::vector<idx_t> random_fix2(GlobalSolution S_star, GlobalMultipliers u_star, real_t pi) {
             UniqueColSet& cols = inst.get_cols();
             std::uniform_real_distribution<real_t> dist(0.5, 1.5);
 
@@ -3170,11 +3177,11 @@ namespace sph {
         explicit SPHeuristic(const idx_t nrows_) : inst(nrows_), rnd(std::mt19937()), refinement(inst, rnd) { }
         SPHeuristic(const idx_t nrows_, int seed) : inst(nrows_), rnd(std::mt19937(seed)), refinement(inst, rnd) { }
 
-        [[nodiscard]] inline idx_t get_ncols() const { return inst.get_ncols(); }
-        [[nodiscard]] inline idx_t get_nrows() const { return inst.get_nrows(); }
-        [[nodiscard]] inline UniqueColSet &get_cols() { return inst.get_cols(); }
-        [[nodiscard]] inline Column &get_col(idx_t idx) { return inst.get_col(idx); }
-        [[nodiscard]] inline const Column &get_col(idx_t idx) const { return inst.get_col(idx); }
+        inline idx_t get_ncols() const { return inst.get_ncols(); }
+        inline idx_t get_nrows() const { return inst.get_nrows(); }
+        inline UniqueColSet &get_cols() { return inst.get_cols(); }
+        inline Column &get_col(idx_t idx) { return inst.get_col(idx); }
+        inline const Column &get_col(idx_t idx) const { return inst.get_col(idx); }
 
         /**
          * @brief Set the ncols constr constraint rhs
@@ -3197,7 +3204,7 @@ namespace sph {
          *
          * @return Timer&
          */
-        [[nodiscard]] inline Timer &get_timelimit() { return inst.get_timelimit(); }
+        inline Timer &get_timelimit() { return inst.get_timelimit(); }
 
         /**
          * @brief Call add_column for each one of the column in new_cols.
@@ -3283,10 +3290,7 @@ namespace sph {
             SPH_DEBUG { fmt::print(" Warning: running in debug mode\n"); }
             SPH_VERBOSE(0) { fmt::print(" SP Instance size: {}x{}\n", inst.get_nrows(), inst.get_ncols()); }
 
-            GlobalSolution sol = refinement.solve<ROUTES_HARD_CAP, KeepColStrategy>(S_init);
-
-            SPH_VERBOSE(0) { fmt::print(" Final solution value: {}\n", sol.get_cost()); }
-            return sol;
+            return refinement.solve<ROUTES_HARD_CAP, KeepColStrategy>(S_init);
         }
 
     private:

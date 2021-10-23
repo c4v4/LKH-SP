@@ -4,6 +4,8 @@
 
 #define MAX_TRIALS 50000
 #define RUNS 10000
+#define SPH_PERIOD 10 
+#define SPH_TLIM 180.0
 
 /**
  * To help linking-time optimizations (with -flto), some of the variables and functions that
@@ -73,7 +75,9 @@ void SetParameters() {
     Subgradient = 1;
     SubproblemSize = 0;
     SubsequentPatching = 1;
-    TimeLimit = 7200;
-    RunTimeLimit = 600;
-    TraceLevel = 0;
+    TimeLimit = INT_MAX;
+    RunTimeLimit = INT_MAX;
+    TraceLevel = 1;
+    SphPeriod = SPH_PERIOD;
+    SphTimeLimit = SPH_TLIM;
 }

@@ -1890,7 +1890,7 @@ static void Read_TOUR_SECTION(FILE ** File)
 static void Read_TYPE()
 {
     unsigned int i;
-    enum Types prob_type;
+    enum Types prob_type = TSP;
 
     if (!(Type = Copy(strtok(0, Delimiters))))
         eprintf("TYPE: string expected");

@@ -15,3 +15,4 @@ CVRP/cvrp
 CVRPTW/cvrptw
 *.sol
 out*.txt
+*.out

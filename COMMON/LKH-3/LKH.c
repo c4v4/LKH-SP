@@ -1,5 +1,6 @@
-#include "Genetic.h"
 #include "LKH.h"
+
+#include "Genetic.h"
 #include "Sequence.h"
 #include "gpx.h"
 
@@ -148,13 +149,14 @@ int TSPTW_Makespan;
 
 /* The following variables are read by the function ReadProblem: */
 
-char *ParameterFileName, *ProblemFileName, *PiFileName, *TourFileName, *OutputTourFileName, *InputTourFileName, **CandidateFileName, **EdgeFileName,
-    *InitialTourFileName, *SubproblemTourFileName, **MergeTourFileName, *MTSPSolutionFileName, *SINTEFSolutionFileName;
+char *ParameterFileName, *ProblemFileName, *PiFileName, *TourFileName, *OutputTourFileName, *InputTourFileName, **CandidateFileName,
+    **EdgeFileName, *InitialTourFileName, *SubproblemTourFileName, **MergeTourFileName, *MTSPSolutionFileName, *SINTEFSolutionFileName;
 char *Name, *Type, *EdgeWeightType, *EdgeWeightFormat, *EdgeDataFormat, *NodeCoordType, *DisplayDataType;
-int CandidateSetSymmetric, CandidateSetType, Capacity, CoordType, DelaunayPartitioning, DelaunayPure, ExternalSalesmen, ExtraCandidateSetSymmetric,
-    ExtraCandidateSetType, InitialTourAlgorithm, KarpPartitioning, KCenterPartitioning, KMeansPartitioning, MTSPDepot, MTSPMinSize, MTSPMaxSize, MTSPObjective,
-    MoorePartitioning, PatchingAExtended, PatchingARestricted, PatchingCExtended, PatchingCRestricted, RiskThreshold, RohePartitioning, Salesmen,
-    SierpinskiPartitioning, SubproblemBorders, SubproblemsCompressed, WeightType, WeightFormat;
+int CandidateSetSymmetric, CandidateSetType, Capacity, CoordType, DelaunayPartitioning, DelaunayPure, ExternalSalesmen,
+    ExtraCandidateSetSymmetric, ExtraCandidateSetType, InitialTourAlgorithm, KarpPartitioning, KCenterPartitioning, KMeansPartitioning,
+    MTSPDepot, MTSPMinSize, MTSPMaxSize, MTSPObjective, MoorePartitioning, PatchingAExtended, PatchingARestricted, PatchingCExtended,
+    PatchingCRestricted, RiskThreshold, RohePartitioning, Salesmen, SierpinskiPartitioning, SubproblemBorders, SubproblemsCompressed,
+    WeightType, WeightFormat;
 
 FILE *ParameterFile, *ProblemFile, *PiFile, *InputTourFile, *InitialTourFile, *SubproblemTourFile, **MergeTourFile;
 CostFunction Distance, D, /* C, moved at the end*/ c, OldDistance;
@@ -167,6 +169,9 @@ CostFunction _C;
 
 RouteData *cava_PetalsData;
 Node **cava_NodeCache;
+
+int SphPeriod;
+double SphTimeLimit;
 
 /////// Sequence.h ///////
 Node **t;      /* The sequence of nodes to be used in a move */

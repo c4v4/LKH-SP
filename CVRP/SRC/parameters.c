@@ -2,8 +2,10 @@
 #include "LKH.h"
 
 
-#define MAX_TRIALS 200
-#define RUNS 2
+#define MAX_TRIALS 20000
+#define RUNS 4
+#define SPH_PERIOD 2
+#define SPH_TLIM 60.0
 
 /**
  * To help linking-time optimizations (with -flto), some of the variables and functions that
@@ -78,4 +80,6 @@ void SetParameters() {
     TimeLimit = INT_MAX;
     RunTimeLimit = INT_MAX;
     TraceLevel = 1;
+    SphPeriod = SPH_PERIOD;
+    SphTimeLimit = SPH_TLIM;
 }

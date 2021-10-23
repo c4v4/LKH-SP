@@ -7,16 +7,20 @@ CUSTOM=-DCAVA_CUSTOM # Uncomment to activate all changes
 #TREE_TYPE = THREE_LEVEL_TREE
 #TREE_TYPE = ONE_LEVEL_TREE
 
-CC = gcc
-CXX = g++
-AR = gcc-ar
+#CC = gcc
+#CXX = g++
+#AR = gcc-ar
+
+CC = clang
+CXX = clang++
+
 IDIR = INCLUDE
 CPLEX_IDIR = ${CPLEX_ROOT_DIR}/cplex/include/
 ODIR_SYM = OBJ_SYM
 ODIR_ASYM = OBJ_ASYM
 OPTIONS=$(CUSTOM) $(CUSTOM_PENALTY) $(CUSTOM_CACHE) $(CUSTOM_FLIP)
 #DEBUG = -g -O0 -fno-omit-frame-pointer -DNDEBUG
-CFLAGS = -O3 -Wall -I$(IDIR) -D$(TREE_TYPE) -flto -fno-fat-lto-objects $(OPTIONS) $(DEBUG)
+CFLAGS = -O3 -Wall -I$(IDIR) -D$(TREE_TYPE) -flto $(OPTIONS) $(DEBUG)
 CXXFLAGS = $(CFLAGS) -std=c++17 -I$(CPLEX_IDIR) -fno-exceptions -fno-rtti
 
 _DEPS = Delaunay.h GainType.h Genetic.h GeoConversion.h Hashing.h Heap.h   \
@@ -44,6 +48,7 @@ _OBJ = Activate.o AddCandidate.o AddExtraCandidates.o                  \
        GeoConversion.o GetTime.o GreedyTour.o Hashing.o Heap.o         \
        Improvement.o IsBackboneCandidate.o IsCandidate.o               \
        IsCommonEdge.o IsPossibleCandidate.o KSwapKick.o LinKernighan.o \
+	   LKH.o 														   \
        Make2OptMove.o Make3OptMove.o Make4OptMove.o Make5OptMove.o     \
        MakeKOptMove.o MergeTourWithBestTour.o MergeWithTourIPT.o       \
        Minimum1TreeCost.o MinimumSpanningTree.o                        \
@@ -61,7 +66,7 @@ _OBJ = Activate.o AddCandidate.o AddExtraCandidates.o                  \
        SOP_InitialTour.o SOP_Report.o StatusReport.o                   \
        Statistics.o StoreTour.o SymmetrizeCandidateSet.o               \
        TrimCandidateSet.o TSPDL_InitialTour.o TSPTW_MakespanCost.o     \
-	   TSPTW_Reduce.o ValidateTour.o VariablesDefinition.o 			   \
+	   TSPTW_Reduce.o ValidateTour.o 								   \
 	   VRPB_Reduce.o BIT.o        									   \
        WriteCandidates.o WritePenalties.o WriteTour.o WriteSolFile.o   \
        MergeWithTourGPX2.o gpx.o									   \

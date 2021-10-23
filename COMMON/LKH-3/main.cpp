@@ -15,9 +15,6 @@ extern "C" {
 #include "SPH.hpp"
 #undef NDEBUG
 
-#define SPH_PERIOD 4
-#define SPH_TLIM 300.0
-
 #define DEFAULT_SEED 1  // 0 ==> time(NULL)
 
 
@@ -56,6 +53,7 @@ int main(int argc, char *argv[]) {
     BestPenalty = CurrentPenalty = PLUS_INFINITY;
 
     sph::SPHeuristic sph(Dim - 1);
+    sph.set_ncols_constr(Salesmen);
     sph_ptr = &sph;
 
     /* Find a specified number (Runs) of local optima */
@@ -148,8 +146,8 @@ int main(int argc, char *argv[]) {
         SRandom(++Seed);
 
         /* Set Partitioning Heuristic phase */
-        if (Run % SPH_PERIOD == 0) {
-            sph.set_timelimit(SPH_TLIM);
+        if (Run % SphPeriod == 0) {
+            sph.set_timelimit(SphTimeLimit);
             BestRoutes = sph.solve<>(BestRoutes);
             GainType Cost = 0;
             /* Transform back SP sol to tour*/

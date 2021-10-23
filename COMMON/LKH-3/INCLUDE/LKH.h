@@ -170,46 +170,37 @@ extern MergeTourFunction MergeWithTour;
 typedef struct _RouteData RouteData; /* Forward declaration, see the end of this file*/
 
 struct Node {
-    double Earliest, Latest;
-    double ServiceTime;
-    int Demand;            /* Customer demand in a CVRP or 1-PDTSP instance */
-    int *C;                /* A row in the cost matrix */
-    int DepotId;           /* Equal to Id if the node is a depot; otherwize 0 */
-    Node *Pred, *Suc;      /* Predecessor and successor node in
-                          the two-way list of nodes */
-    int PredCost, SucCost; /* The costs of the neighbor edges on the current tour */
-    Node *FixedTo1,        /* Pointers to the opposite end nodes of fixed edges. */
-        *FixedTo2;         /* A maximum of two fixed edges can be incident to a node */
-    int Pi;                /* Pi-value of the node */
-    Segment *Parent;       /* Parent segment of a node when the two-level
-                          tree representation is used */
-    int Id;                /* Number of the node (1...Dimension) */
-    int Rank;              /* During the ascent, the priority of the node.
+    int Id;       /* Number of the node (1...Dimension) */
+    int Loc;      /* Location of the node in the heap
+                   (zero, if the node is not in the heap) */
+    int Rank;     /* During the ascent, the priority of the node.
                    Otherwise, the ordinal number of the node in
                    the tour */
-    int Loc;               /* Location of the node in the heap
-                   (zero, if the node is not in the heap) */
-
     int V;        /* During the ascent the degree of the node minus 2.
                    Otherwise, the variable is used to mark nodes */
     int LastV;    /* Last value of V during the ascent */
     int Cost;     /* "Best" cost of an edge emanating from the node */
     int NextCost; /* During the ascent, the next best cost of an edge
                       emanating from the node */
+    int PredCost, /* The costs of the neighbor edges on the current tour */
+        SucCost;
     int SavedCost;
-    int BestPi;     /* Currently best pi-value found during the ascent */
-    int Beta;       /* Beta-value (used for computing alpha-values) */
-    int Subproblem; /* Number of the subproblem the node is part of */
-    int Sons;       /* Number of sons in the minimum spanning tree */
-    int Special;    /* Is the node a special node in Jonker and
+    int Pi;                 /* Pi-value of the node */
+    int BestPi;             /* Currently best pi-value found during the ascent */
+    int Beta;               /* Beta-value (used for computing alpha-values) */
+    int Subproblem;         /* Number of the subproblem the node is part of */
+    int Sons;               /* Number of sons in the minimum spanning tree */
+    int *C;                 /* A row in the cost matrix */
+    int Special;            /* Is the node a special node in Jonker and
                           Volgenant's mTSP to TSP transformation? */
-
-    int *M_Demand;  /* Table of demands in an M-PDTSP instance */
-    int Seq;        /* Sequence number in the current tour */
-    int DraftLimit; /* Draft limit in a TSPDL instance */
-    int Load;       /* Accumulated load in the current route */
-    int OriginalId; /* The original Id in a SDVRP or STTSPinstance */
-
+    int Demand;             /* Customer demand in a CVRP or 1-PDTSP instance */
+    int *M_Demand;          /* Table of demands in an M-PDTSP instance */
+    int Seq;                /* Sequence number in the current tour */
+    int DraftLimit;         /* Draft limit in a TSPDL instance */
+    int Load;               /* Accumulated load in the current route */
+    int OriginalId;         /* The original Id in a SDVRP or STTSPinstance */
+    Node *Pred, *Suc;       /* Predecessor and successor node in
+                          the two-way list of nodes */
     Node *OldPred, *OldSuc; /* Previous values of Pred and Suc */
     Node *BestSuc,          /* Best and next best successor node in the */
         *NextBestSuc;       /* currently best tour */
@@ -220,6 +211,9 @@ struct Node {
     Node *Prev;             /* Auxiliary pointer, usually to the previous node
                    in a list of nodes */
     Node *Mark;             /* Visited mark */
+    Node *FixedTo1,         /* Pointers to the opposite end nodes of fixed edges. */
+        *FixedTo2;          /* A maximum of two fixed edges can be incident
+                          to a node */
     Node *FixedTo1Saved,    /* Saved values of FixedTo1 and FixedTo2 */
         *FixedTo2Saved;
     Node *Head;                      /* Head of a segment of fixed or common edges */
@@ -239,11 +233,15 @@ struct Node {
     Node *SucSaved;                  /* Saved pointer to successor node */
     Candidate *CandidateSet;         /* Candidate array */
     Candidate *BackboneCandidateSet; /* Backbone candidate array */
-
+    Segment *Parent;                 /* Parent segment of a node when the two-level
+                          tree representation is used */
     Constraint *FirstConstraint;
     int *PathLength;
     int **Path;
+    double ServiceTime;
     int Pickup, Delivery;
+    int DepotId; /* Equal to Id if the node is a depot; otherwize 0 */
+    double Earliest, Latest;
     int Backhaul;
     int Serial;
     int Color;
@@ -315,7 +313,6 @@ struct Constraint {
 
 extern int AscentCandidates;   /* Number of candidate edges to be associated
                            with each node during the ascent */
-extern const int Asymmetric;   /* Is the instance asymmetric? */
 extern int BackboneTrials;     /* Number of backbone trials in each run */
 extern int Backtracking;       /* Specifies whether backtracking is used for
                            the first move in a sequence of moves */
@@ -707,6 +704,11 @@ void cava_FlipAsym_Update();
 
 /* Externally defined */
 extern const enum Types ProblemType;
+extern const int Asymmetric; /* Is the instance asymmetric? */
+
+extern int SphPeriod;
+extern double SphTimeLimit;
+
 GainType Penalty(void);
 int Forbidden(Node *Na, Node *Nb);
 void ExtractRoutes(GainType Cost);
