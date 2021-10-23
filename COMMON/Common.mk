@@ -15,10 +15,11 @@ CXX = clang++
 CPLEX_IDIR = ${CPLEX_ROOT_DIR}/cplex/include/
 CPLEX_LIB = ${CPLEX_ROOT_DIR}/cplex/lib/x86-64_linux/static_pic/
 IDIR = $(PROJECT_HOME)/LKH-3/INCLUDE
-CCFLAGS = -O3 -Wall -I$(IDIR)$(DEBUG) -flto
-CXXFLAGS = $(CCFLAGS) -std=c++17 -I$(CPLEX_IDIR) -fno-exceptions -fno-rtti
+#FLTO = -flto
+CCFLAGS = -O3 -Wall -I$(IDIR)$(DEBUG) $(FLTO)
+CXXFLAGS = $(CCFLAGS) -std=c++17 -I$(CPLEX_IDIR) -fno-exceptions
 ODIR = OBJ
-LIBS = -L$(CPLEX_LIB) -L$(PROJECT_HOME) -lcplex $(LKH_LIB_FLAG) -lm -lpthread -ldl
+LIBS = -L$(CPLEX_LIB) -L$(PROJECT_HOME) $(LKH_LIB_FLAG) -lm -lpthread -ldl -lcplex
 
 # C 
 

@@ -20,8 +20,9 @@ ODIR_SYM = OBJ_SYM
 ODIR_ASYM = OBJ_ASYM
 OPTIONS=$(CUSTOM) $(CUSTOM_PENALTY) $(CUSTOM_CACHE) $(CUSTOM_FLIP)
 #DEBUG = -g -O0 -fno-omit-frame-pointer -DNDEBUG
-CFLAGS = -O3 -Wall -I$(IDIR) -D$(TREE_TYPE) -flto $(OPTIONS) $(DEBUG)
-CXXFLAGS = $(CFLAGS) -std=c++17 -I$(CPLEX_IDIR) -fno-exceptions -fno-rtti
+#FLTO = -flto
+CFLAGS = -O3 -Wall -I$(IDIR) -D$(TREE_TYPE) $(FLTO) $(OPTIONS) $(DEBUG)
+CXXFLAGS = $(CFLAGS) -std=c++17 -I$(CPLEX_IDIR) -fno-exceptions
 
 _DEPS = Delaunay.h GainType.h Genetic.h GeoConversion.h Hashing.h Heap.h   \
        LKH.h Segment.h Sequence.h BIT.h gpx.h extract_routes.hpp SPH.hpp   \
@@ -97,7 +98,7 @@ $(ODIR_SYM) $(ODIR_ASYM):
 	mkdir -p $@
 
 clean:
-	/bin/rm -f $(ODIR_SYM)/*.o $(ODIR_ASYM)/*.o ../libLKH*.a *~ ._* $(IDIR)/*~ $(IDIR)/._* 
+	/bin/rm -f $(ODIR_SYM)/*.o* $(ODIR_ASYM)/*.o* ../libLKH*.a *~ ._* $(IDIR)/*~ $(IDIR)/._* 
 
 
 
