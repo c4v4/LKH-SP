@@ -13,12 +13,20 @@ CC = clang
 CXX = clang++
 
 UNAME_S := $(shell uname -s)
+
 ifeq ($(UNAME_S),Linux)
-	CPLEX_LIB_TYPE = linux
+CPLEX_LIB_TYPE = linux
+#CC = gcc
+#CXX = g++
+#AR = gcc-ar rcs
+CC = clang
+CXX = clang++
+AR = ar rcs
 endif
+
 ifeq ($(UNAME_S),Darwin)
-	CPLEX_LIB_TYPE = osx
-	AR = libtool -c -static -o
+CPLEX_LIB_TYPE = osx
+AR = libtool -c -static -o
 endif
 
 

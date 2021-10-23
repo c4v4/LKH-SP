@@ -7,17 +7,22 @@ CUSTOM=-DCAVA_CUSTOM # Uncomment to activate all changes
 #TREE_TYPE = THREE_LEVEL_TREE
 #TREE_TYPE = ONE_LEVEL_TREE
 
+UNAME_S := $(shell uname -s)
+
+ifeq ($(UNAME_S),Linux)
 #CC = gcc
 #CXX = g++
 #AR = gcc-ar rcs
-
 CC = clang
 CXX = clang++
-
-UNAME_S := $(shell uname -s)
-ifeq ($(UNAME_S),Darwin)
-        AR = libtool -c -static -o
+AR = ar rcs
 endif
+
+ifeq ($(UNAME_S),Darwin)
+	AR = libtool -c -static -o
+endif
+
+
 
 IDIR = INCLUDE
 CPLEX_IDIR = ${CPLEX_ROOT_DIR}/cplex/include/
