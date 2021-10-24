@@ -27,7 +27,7 @@ CPLEX_IDIR = ${CPLEX_ROOT_DIR}/cplex/include/
 CPLEX_LIB = ${CPLEX_ROOT_DIR}/cplex/lib/x86-64_$(CPLEX_LIB_TYPE)/static_pic/
 IDIR = $(PROJECT_HOME)/LKH-3/INCLUDE
 FLTO = -flto
-CCFLAGS = -O3 -Wall -I$(IDIR)$(DEBUG) $(FLTO)
+CCFLAGS = -O3 -Wall -I$(IDIR) $(DEBUG) $(FLTO)
 CXXFLAGS = $(CCFLAGS) -std=c++17 -I$(CPLEX_IDIR) -fno-exceptions
 ODIR = OBJ
 LIBS = -L$(CPLEX_LIB) -L$(PROJECT_HOME) $(LKH_LIB_FLAG) -lm -lpthread -ldl -lcplex
@@ -71,3 +71,4 @@ $(ODIR):
 
 clean:
 	/bin/rm -f $(ODIR)/*.o* *~ ._* $(IDIR)/*~ $(IDIR)/._* $(LKH_LIB) ../$(EXE)
+	$(MAKE) -C $(PROJECT_HOME) clean
