@@ -149,30 +149,29 @@ int main(int argc, char *argv[]) {
         if (Run % SphPeriod == 0) {
             sph.set_timelimit(SphTimeLimit);
             BestRoutes = sph.solve<>(BestRoutes);
-            GainType Cost = 0;
-            /* Transform back SP sol to tour*/
-            int *ws = warmstart;
-            int route = 0;
-            for (sph::idx_t j : BestRoutes) {
-                sph::Column &col = sph.get_col(j);
-                Cost += col.get_cost();
-                *ws++ = 0;
-                for (sph::idx_t &i : col) {
-                    if (ws - warmstart > DimensionSaved + 1) {
-                        fmt::print(stderr, "Error: SPH has returned a solution with overlaps, are you sure to have set it right?");
-                        abort();
+            if (!BestRoutes.empty()) { /* Transform back SP sol to tour*/
+                GainType Cost = 0;
+                int *ws = warmstart;
+                int route = 0;
+                for (sph::idx_t j : BestRoutes) {
+                    sph::Column &col = sph.get_col(j);
+                    Cost += col.get_cost();
+                    *ws++ = 0;
+                    for (sph::idx_t &i : col) {
+                        if (ws - warmstart > DimensionSaved + 1) {
+                            fmt::print(stderr, "Error: SPH has returned a solution with overlaps, are you sure to have set it right?\n");
+                            abort();
+                        }
+                        *ws++ = ++i;
                     }
-                    *ws++ = ++i;
+                    if (TraceLevel >= 1)
+                        fmt::print("Route #{}: {}\n", ++route, fmt::join(col, " "));
                 }
-
                 if (TraceLevel >= 1)
-                    fmt::print("Route #{}: {}\n", ++route, fmt::join(col, " "));
+                    fmt::print("Cost {}\n", Cost);
+                *ws++ = 0;
+                SetInitialTour(warmstart);
             }
-            if (TraceLevel >= 1)
-                fmt::print("Cost {}\n", Cost);
-
-            *ws++ = 0;
-            SetInitialTour(warmstart);
         }
     }
     PrintStatistics();
