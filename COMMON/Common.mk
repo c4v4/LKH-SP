@@ -5,26 +5,28 @@
 #  - EXE: the name of the binary created (e.g. "cvrp" or "cvrptw")
 #  - DEBUG: debug flags
 
+UNAME_S := $(shell uname -s)
+
+ifeq ($(UNAME_S),Linux)
+CPLEX_LIB_TYPE = linux
 #CC = gcc
 #CXX = g++
-#AR = gcc-ar
-
+#AR = gcc-ar rcs
 CC = clang
 CXX = clang++
-
-UNAME_S := $(shell uname -s)
-ifeq ($(UNAME_S),Linux)
-	CPLEX_LIB_TYPE = linux
+AR = ar rcs
 endif
+
 ifeq ($(UNAME_S),Darwin)
-	CPLEX_LIB_TYPE = osx
+CPLEX_LIB_TYPE = osx
+AR = libtool -c -static -o
 endif
 
 
 CPLEX_IDIR = ${CPLEX_ROOT_DIR}/cplex/include/
 CPLEX_LIB = ${CPLEX_ROOT_DIR}/cplex/lib/x86-64_$(CPLEX_LIB_TYPE)/static_pic/
 IDIR = $(PROJECT_HOME)/LKH-3/INCLUDE
-#FLTO = -flto
+FLTO = -flto
 CCFLAGS = -O3 -Wall -I$(IDIR)$(DEBUG) $(FLTO)
 CXXFLAGS = $(CCFLAGS) -std=c++17 -I$(CPLEX_IDIR) -fno-exceptions
 ODIR = OBJ
