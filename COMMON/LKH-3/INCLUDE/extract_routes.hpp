@@ -37,7 +37,7 @@ public:
         prev = Prev;
     };
 
-    int is_feasible() const { return size > 1UL; }
+    int is_feasible() const { return size >= MTSPMinSize; }
     inline GainType get_length() const { return current_length; };
     inline size_t get_size() const { return size; };
     inline int get_dist() const { return dist; };
