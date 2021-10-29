@@ -1,10 +1,10 @@
 #include "LKH.h"
 
 /*
- * The KSwapKick function makes a random K-swap kick, K>=4 
+ * The KSwapKick function makes a random K-swap kick, K>=4
  * (a generalization of the double-bridge kick).
  *
- * The algorithm is inspired by the thesis 
+ * The algorithm is inspired by the thesis
  *
  *    D. Richter,
  *    Toleranzen in Helsgauns Lin-Kernighan-Heuristik fur das TSP,
@@ -14,19 +14,30 @@
 static Node *RandomNode();
 static int compare(const void *Na, const void *Nb);
 
-void KSwapKick(int K)
-{
+void KSwapKick(int K) {
     Node **s, *N;
     int Count, i;
 
-    s = (Node **) malloc(K * sizeof(Node *));
+    s = (Node **)malloc(K * sizeof(Node *));
     Count = 0;
     N = FirstNode;
     do {
         N->Rank = ++Count;
         N->V = 0;
     } while ((N = N->Suc) != FirstNode);
+
+    if (KickNode && (rand() & 3)) {
+        Count = 0;
+        while ((KickNode->V || FixedOrCommon(KickNode, KickNode->Suc)) && Count < Dimension) {
+            KickNode = KickNode->Suc;
+            Count++;
+        }
+        if (Count == Dimension)
+            KickNode = NULL;
+    }
+
     N = s[0] = RandomNode();
+    KickNode = NULL;
     if (!N)
         goto End_KSwapKick;
     N->V = 1;
@@ -44,19 +55,18 @@ void KSwapKick(int K)
         s[i]->OldSuc = s[i]->Suc;
     for (i = 0; i < K; i++)
         Link(s[(i + 2) % K], s[i]->OldSuc);
-  End_KSwapKick:
+End_KSwapKick:
     free(s);
 }
 
 /*
  * The RandomNode function returns a random node N, for
  * which the edge (N, N->Suc) is neither a fixed edge nor
- * a common edge of tours to be merged, and N has not 
+ * a common edge of tours to be merged, and N has not
  * previously been chosen.
  */
 
-static Node *RandomNode()
-{
+static Node *RandomNode() {
     Node *N;
     int Count;
 
@@ -75,7 +85,4 @@ static Node *RandomNode()
     return Count < Dimension ? N : 0;
 }
 
-static int compare(const void *Na, const void *Nb)
-{
-    return (*(Node **) Na)->Rank - (*(Node **) Nb)->Rank;
-}
+static int compare(const void *Na, const void *Nb) { return (*(Node **)Na)->Rank - (*(Node **)Nb)->Rank; }

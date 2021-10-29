@@ -46,6 +46,7 @@ void ChooseInitialTour()
         if (InitialTourAlgorithm == BORUVKA ||
             InitialTourAlgorithm == CTSP_ALG ||
             InitialTourAlgorithm == CVRP_ALG ||
+            InitialTourAlgorithm == CVRPTW_ALG ||
             InitialTourAlgorithm == GREEDY ||
             InitialTourAlgorithm == MOORE ||
             InitialTourAlgorithm == MTSP_ALG ||
@@ -61,6 +62,8 @@ void ChooseInitialTour()
                 CTSP_InitialTour() :
                 InitialTourAlgorithm == CVRP_ALG ?
                 CVRP_InitialTour() :
+                InitialTourAlgorithm == CVRPTW_ALG ?
+                CVRPTW_InitialTour() :
                 InitialTourAlgorithm == MTSP_ALG ?
                 MTSP_InitialTour() :
                 InitialTourAlgorithm == SOP_ALG ?

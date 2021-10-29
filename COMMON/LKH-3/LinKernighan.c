@@ -189,6 +189,11 @@ GainType LinKernighan()
         }
     }
     while (PenaltyGain > 0 || Gain > 0);
+    /* if (CurrentPenalty > 0) {
+        GainType removeme = Penalty();
+        MakeFeasible_CVRPTW();
+        assert(Penalty() <= removeme);
+    } */
   End_LinKernighan:
     PredSucCostAvailable = 0;
     NormalizeNodeList();

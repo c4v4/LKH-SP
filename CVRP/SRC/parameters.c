@@ -2,8 +2,10 @@
 #include "LKH.h"
 
 
-#define MAX_TRIALS 20000
-#define RUNS 4
+#define MAX_TRIALS 100000000
+#define RUNS 2
+#define TLIM 2000
+#define RUN_TLIM 900
 #define SPH_PERIOD 2
 #define SPH_TLIM 60.0
 
@@ -75,10 +77,8 @@ void SetParameters() {
     Subgradient = 1;
     SubproblemSize = 0;
     SubsequentPatching = 1;
-    // TimeLimit = 7200ill;
-    // RunTimeLimit = 600;
-    TimeLimit = INT_MAX;
-    RunTimeLimit = INT_MAX;
+    TimeLimit = TLIM;
+    RunTimeLimit = RUN_TLIM;
     TraceLevel = 1;
     SphPeriod = SPH_PERIOD;
     SphTimeLimit = SPH_TLIM;

@@ -15,6 +15,7 @@
  * The original candidate set is re-established at exit from FindTour.
  */
 
+#define MIN(A, B) ((A) < (B) ? (A) : (B))
 
 static void SwapCandidateSets();
 static GainType OrdinalTourCost;
@@ -24,11 +25,6 @@ GainType FindTour() {
     Node *t;
     int i;
     double EntryTime = GetTime();
-
-    if (RunTimeLimit - EntryTime < TimeLimit - StartTime)
-        SA_setup(EntryTime, RunTimeLimit);
-    else
-        SA_setup(StartTime, TimeLimit);
 
     t = FirstNode;
     do
@@ -65,7 +61,7 @@ GainType FindTour() {
         }
         /* Delayed SA start to normalize temperature with BetterCost */
         if (Trial == 50)
-            SA_start();
+            SA_start(MIN(TimeLimit + StartTime, RunTimeLimit + EntryTime) - now);
         /* Choose FirstNode at random */
         if (Dimension == DimensionSaved)
             FirstNode = &NodeSet[1 + Random() % Dimension];
@@ -91,7 +87,18 @@ GainType FindTour() {
             Cost = MergeWithTour();
         }
         ExtractRoutes(Cost);
-        if (SA_test(CurrentPenalty, Cost)) {
+
+        int update = 0;
+        // if (now > EntryTime + RunTimeLimit / 2.0) { /* Delayed start */
+        if (1) {
+            update = SA_test(CurrentPenalty, Cost);
+        } else {
+            update = CurrentPenalty < BetterPenalty || (CurrentPenalty == BetterPenalty && Cost < BetterCost);
+            SA_update();
+        }
+
+        if (update) {
+            // if (CurrentPenalty < BetterPenalty || (CurrentPenalty == BetterPenalty && Cost < BetterCost)) {
             if (TraceLevel >= 1) {
                 printff("* %d: ", Trial);
                 StatusReport(Cost, EntryTime, "");

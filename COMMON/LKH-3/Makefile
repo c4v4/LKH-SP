@@ -50,7 +50,8 @@ _OBJ = Activate.o AddCandidate.o AddExtraCandidates.o                  \
        ChooseInitialTour.o Connect.o CreateCandidateSet.o              \
        CreateDelaunayCandidateSet.o CreateNNCandidateSet.o             \
        Create_POPMUSIC_CandidateSet.o CreateQuadrantCandidateSet.o     \
-	   CTSP_InitialTour.o CVRP_InitialTour.o Delaunay.o                \
+	   CTSP_InitialTour.o CVRP_InitialTour.o CVRPTW_InitialTour.o      \
+	   Delaunay.o													   \
        Distance.o Distance_MTSP.o Distance_SOP.o Distance_SPECIAL.o    \
        eprintf.o ERXT.o Excludable.o Exclude.o FindTour.o              \
        FixedOrCommonCandidates.o Flip.o Flip_SL.o Flip_SSL.o           \
@@ -64,7 +65,7 @@ _OBJ = Activate.o AddCandidate.o AddExtraCandidates.o                  \
        MakeKOptMove.o MergeTourWithBestTour.o MergeWithTourIPT.o       \
        Minimum1TreeCost.o MinimumSpanningTree.o                        \
        MTSP2TSP.o MTSP_InitialTour.o MTSP_Report.o                     \
-       MTSP_WriteSolution.o                                            \
+       MTSP_WriteSolution.o MakeFeasible_CVRPTW.o                      \
        NormalizeNodeList.o NormalizeSegmentList.o                      \
        OrderCandidateSet.o PatchCycles.o                               \
        PDPTW_Reduce.o printff.o PrintParameters.o                      \

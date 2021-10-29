@@ -16,3 +16,5 @@ CVRPTW/cvrptw
 *.sol
 out*.txt
 *.out
+callgrind*
+perf.data*

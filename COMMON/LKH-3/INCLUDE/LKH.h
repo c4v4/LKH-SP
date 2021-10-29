@@ -141,6 +141,7 @@ enum InitialTourAlgorithms {
     BORUVKA,
     CTSP_ALG,
     CVRP_ALG,
+    CVRPTW_ALG,
     GREEDY,
     MOORE,
     MTSP_ALG,
@@ -457,6 +458,7 @@ extern int TraceLevel;                      /* Specifies the level of detail of 
 extern int Trial;                           /* Ordinal number of the current trial */
 extern GainType TSPTW_CurrentMakespanCost;
 extern int TSPTW_Makespan;
+extern Node *KickNode;
 
 /* The following variables are read by the functions ReadParameters and
    ReadProblem: */
@@ -554,6 +556,7 @@ void Create_POPMUSIC_CandidateSet(int K);
 void CreateQuadrantCandidateSet(int K);
 GainType CTSP_InitialTour(void);
 GainType CVRP_InitialTour(void);
+GainType CVRPTW_InitialTour(void);
 void eprintf(const char *fmt, ...);
 int Excludable(Node *ta, Node *tb);
 void Exclude(Node *ta, Node *tb);
@@ -585,6 +588,7 @@ void Make3OptMove(Node *t1, Node *t2, Node *t3, Node *t4, Node *t5, Node *t6, in
 void Make4OptMove(Node *t1, Node *t2, Node *t3, Node *t4, Node *t5, Node *t6, Node *t7, Node *t8, int Case);
 void Make5OptMove(Node *t1, Node *t2, Node *t3, Node *t4, Node *t5, Node *t6, Node *t7, Node *t8, Node *t9, Node *t10, int Case);
 void MakeKOptMove(int K);
+void MakeFeasible_CVRPTW(void);
 GainType MergeTourWithBestTour(void);
 GainType MergeWithTourIPT(void);
 GainType MergeWithTourGPX2(void);

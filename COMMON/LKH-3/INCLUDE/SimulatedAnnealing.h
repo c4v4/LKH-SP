@@ -3,8 +3,9 @@
 
 #include "LKH.h"
 
-void SA_setup(double EntryTime, double TimeLimit);
-void SA_start(void);
+void SA_start(double TimeLeft);
 int SA_test(GainType Pnlt, GainType Cost);
+void SA_update(void);
+
 
 #endif

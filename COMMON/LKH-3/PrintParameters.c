@@ -59,6 +59,7 @@ void PrintParameters()
     printff("INITIAL_TOUR_ALGORITHM = %s\n",
             InitialTourAlgorithm == BORUVKA ? "BORUVKA" :
             InitialTourAlgorithm == CVRP_ALG ? "CVRP" :
+            InitialTourAlgorithm == CVRPTW_ALG ? "CVRPTW" :
             InitialTourAlgorithm == GREEDY ? "GREEDY" :
             InitialTourAlgorithm == MOORE ? "MOORE" :
             InitialTourAlgorithm == MTSP_ALG ? "MTSP" :

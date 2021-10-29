@@ -717,6 +717,8 @@ void ReadParameters() {
                 InitialTourAlgorithm = CTSP_ALG;
             else if (!strncmp(Token, "CVRP", strlen(Token)))
                 InitialTourAlgorithm = CVRP_ALG;
+            else if (!strncmp(Token, "CVRPTW", strlen(Token)))
+                InitialTourAlgorithm = CVRPTW_ALG;
             else if (!strncmp(Token, "GREEDY", strlen(Token)))
                 InitialTourAlgorithm = GREEDY;
             else if (!strncmp(Token, "MOORE", max(strlen(Token), 2)))

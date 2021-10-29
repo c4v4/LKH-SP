@@ -4,7 +4,7 @@
 
 #define MAX_TRIALS 50000
 #define RUNS 10000
-#define SPH_PERIOD 10 
+#define SPH_PERIOD 10
 #define SPH_TLIM 180.0
 
 /**
@@ -41,7 +41,7 @@ void SetParameters() {
     GridSize = 1000000.0;
     InitialPeriod = -1;
     InitialStepSize = 0;
-    InitialTourAlgorithm = WALK;
+    InitialTourAlgorithm = WALK;  // CVRPTW_ALG;
     InitialTourFraction = 1.0;
     Kicks = 1;
     KickType = 4;
@@ -52,7 +52,7 @@ void SetParameters() {
     MaxSwaps = 0;
     MaxTrials = MAX_TRIALS;
     MTSPDepot = 1;
-    MTSPMinSize = 1;
+    MTSPMinSize = 0;
     MTSPMaxSize = -1;
     MTSPObjective = -1;
     NonsequentialMoveType = -1;
@@ -69,7 +69,7 @@ void SetParameters() {
     RestrictedSearch = 1;
     Runs = RUNS;
     Salesmen = 1;
-    Scale = -1;
+    Scale = 10;
     Seed = 1;
     StopAtOptimum = 1;
     Subgradient = 1;

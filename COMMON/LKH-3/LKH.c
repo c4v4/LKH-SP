@@ -146,6 +146,7 @@ int TraceLevel;            /* Specifies the level of detail of the output
 int Trial;                 /* Ordinal number of the current trial */
 GainType TSPTW_CurrentMakespanCost;
 int TSPTW_Makespan;
+Node *KickNode;
 
 /* The following variables are read by the function ReadProblem: */
 
