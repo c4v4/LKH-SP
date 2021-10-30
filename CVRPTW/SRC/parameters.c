@@ -6,8 +6,8 @@
 #define RUNS 1
 #define SPH_PERIOD 2
 #define SPH_TLIM 180.0
-#define TLIM 60.0
-#define RUN_TLIM 60.0
+#define TLIM 300.0
+#define RUN_TLIM 300.0
 
 /**
  * To help linking-time optimizations (with -flto), some of the variables and functions that
