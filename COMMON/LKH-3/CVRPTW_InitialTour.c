@@ -2,6 +2,8 @@
 
 #define TWIN(N) (N + DimensionSaved)
 
+#define OldDistance(N1, N2) ((C(N1, N2) - N1->Pi - N2->Pi) / Precision)
+
 typedef struct NDepotCost_ {
     Node *N;
     double Cost;
@@ -9,65 +11,55 @@ typedef struct NDepotCost_ {
 
 static double max(double a, double b) { return a > b ? a : b; }
 
-static int compareEarliest(const void *n1, const void *n2) {
+static int compareCost(const void *n1, const void *n2) {
     double f1 = ((NDepotCost *)n1)->Cost;
     double f2 = ((NDepotCost *)n2)->Cost;
     return (f1 > f2) - (f1 < f2);
 }
 
-static Node **SelectSeeds(NDepotCost *SortableNodes) {
-    Node *StartN = SortableNodes[0].N;
-    Node *N = StartN;
-    Node **Routes = (Node **)malloc(sizeof(Node *) * Salesmen);
-    assert(Routes);
-    for (int i = 0; i < Salesmen; ++i) {
+static void SelectSeeds(NDepotCost *Seeds, Node **Routes, int Veh) {
+    for (int i = 0; i < Dim - 2 && Veh; ++i) {
+        Node *N = Seeds[i].N;
         while (/* rand() & 1 ||  */ N->V)
-            N = N->Suc;
-        Node *NextN = N->Suc;
+            N = Seeds[++i].N;
         N->V = 1;
         Link(N->Pred, N->Suc);
         N->Pred = N->Suc = NULL;
-        Routes[i] = N;
-        N = NextN;
+        Routes[--Veh] = N;
     }
-
-    return Routes;
 }
 
-static void ConstructTour(Node **Routes) {
+static void ConstructTour(Node **Routes, int Veh) {
     Node *N = NULL;
     Node *PredN = NULL;
     Node *Dep = Depot;
-    for (int i = 0; i < Salesmen; ++i) {
-        N = Routes[i];
-        do {
-            PredN = N->Pred;
+    int i = 0;
+    for (; i < Veh; ++i) {
+        N = PredN = Routes[i];
+        while ((PredN = N->Pred)) {
             Link(N->Pred, TWIN(N));
             Link(TWIN(N), N);
-        } while ((N = PredN)->Pred);
-        Link(Routes[(i + 1) % Salesmen], TWIN(Dep));
+            N = PredN;
+        }
+        if (i != Veh - 1)
+            Link(Routes[(i + 1)], TWIN(Dep));
         Link(TWIN(Dep), Dep);
         Link(Dep, TWIN(N));
         Link(TWIN(N), N);
         Dep = &NodeSet[Dim + i + 1];
     }
+    for (; i < Salesmen; ++i) {
+        N = &NodeSet[Dim + i - 1];
+        Dep = &NodeSet[Dim + i];
+        Link(TWIN(Dep), Dep);
+        Link(Dep, TWIN(N));
+    }
+    Link(Routes[0], TWIN(Dep));
 }
 
-GainType CVRPTW_InitialTour() {
-    double EntryTime = GetTime();
+int tentative_routes(Node **Routes, NDepotCost *Seeds, NDepotCost *CostSumLB, int Veh) {
     int Customers = Dim - 1;
 
-    NDepotCost *SortableNodes = (NDepotCost *)malloc(sizeof(NDepotCost) * Customers);
-    assert(SortableNodes);
-
-    for (int i = 0; i < Customers; ++i) {
-        Node *N = &NodeSet[i + 2];
-        SortableNodes[i].N = N;
-        SortableNodes[i].Cost = N->Latest;
-    }
-
-    qsort(SortableNodes, Customers, sizeof(NDepotCost), compareEarliest);
-Start:
     for (int i = 0; i < Customers; ++i) {
         Node *N = &NodeSet[i + 2];
         N->V = 0;
@@ -76,113 +68,150 @@ Start:
     }
 
     for (int i = 0; i < Customers - 1; ++i)
-        Link(SortableNodes[i].N, SortableNodes[i + 1].N);
-    Link(SortableNodes[Dim - 2].N, SortableNodes[0].N);
+        Link(CostSumLB[i].N, CostSumLB[i + 1].N);
+    Link(CostSumLB[Customers - 1].N, CostSumLB[0].N);
 
-    Node **Routes = SelectSeeds(SortableNodes);
-    int NodesLeft = Dim - 1 - Salesmen;
+    assert(Veh <= Salesmen);
+    SelectSeeds(Seeds, Routes, Veh);
+    int NodesLeft = Customers - Veh;
 
-    printff("Seed nodes:\n");
-    for (int i = 0; i < Salesmen; ++i) {
-        printff("Route #%d: %d (CostSum: " GainFormat ")\n", i, Routes[i]->Id, Routes[i]->prevCostSum);
-    }
+    printff("Seed nodes: (%d)\n", Veh);
+    // for (int i = 0; i < Veh; ++i) {
+    //    printff("Route #%d: %d (CostSum: " GainFormat ", Latest: %.0f, DepotDist: %d)\n", i, Routes[i]->Id, Routes[i]->prevCostSum,
+    //            Routes[i]->Latest, OldDistance(Depot, TWIN(Routes[i])));
+    //}
 
-    int i = Customers - 1;
-    do
-        FirstNode = SortableNodes[--i].N;
-    while (FirstNode->V == 1);
-    assert(i >= 0);
-
+    int i;
     for (; NodesLeft > 0; --NodesLeft) {
-
-        i = Customers - 1;
-        while (FirstNode->V == 1) {
-            FirstNode = SortableNodes[i--].N;
-            assert(i >= 0);
-        }
-
-        Node *N = FirstNode;
-        Node *CN = N, *LN = N, *GN = N; /* Node with the smallest CostSum if added to CR */
-        int CR = -1, LR = -1, GR = -1;  /* Route index where CN can be attached */
+        i = 0;
+        while (CostSumLB[i].N->V == 1)
+            ++i;
+        int CN = -1; /* Node with the smallest CostSum if added to CR */
+        int GN = -1; /* Node closest to time-infeasibility */
+        int CR = -1; /* Route index where CN can be attached */
+        int GR = -1; /* Route index where GN can be attached */
         GainType CostSum = PLUS_INFINITY;
-        double GlobTimeFromLatest = PLUS_INFINITY;
+        double GlobTimeFromLatest = (double)PLUS_INFINITY;
         int Cap = Capacity;
+        Node *N;
         do {
-            // printff("Node %d, V: %d\n", N->Id, N->V);
+            N = CostSumLB[i++].N;
             if (!N->V) {
+                int LN = -1;
+                int LR = -1;
                 double TimeFromLatest = MINUS_INFINITY;
-                for (int i = 0; i < Salesmen; ++i) {
-                    double CandCostSum = Routes[i]->prevCostSum + OldDistance(Routes[i], TWIN(N));
+                for (int j = 0; j < Veh; ++j) {
+                    double CandCostSum = Routes[j]->prevCostSum + OldDistance(Routes[j], TWIN(N));
                     if (CandCostSum < N->Earliest)
                         CandCostSum = N->Earliest;
-
                     if (N->Latest - CandCostSum > TimeFromLatest) {
                         TimeFromLatest = N->Latest - CandCostSum;
-                        LN = N;
-                        LR = i;
+                        LN = i - 1;
+                        LR = j;
                     }
-
                     CandCostSum += N->ServiceTime;
                     CandCostSum += OldDistance(N, TWIN(Depot));
-
-                    if (CandCostSum < CostSum && Routes[i]->prevDemandSum + N->Demand <= Cap) {
+                    if (CandCostSum < CostSum /* && Routes[j]->prevDemandSum + N->Demand <= Cap */) {
                         CostSum = CandCostSum;
-                        CN = N;
-                        CR = i;
+                        CN = i - 1;
+                        CR = j;
                     }
                 }
-
-                if (GlobTimeFromLatest > TimeFromLatest) {
+                if (LN > 0 && GlobTimeFromLatest > TimeFromLatest /* && Routes[LR]->prevDemandSum + LN->Demand <= Cap */) {
                     GlobTimeFromLatest = TimeFromLatest;
                     GN = LN;
                     GR = LR;
                 }
             }
-            N = N->Suc;
-            assert(!(Cap == INT_MAX && N == FirstNode));
-            if (N == FirstNode) {
-                if (CR == -1) {
-                    Cap = INT_MAX; /* Relax capacity constraint */
-                    printff("Relaxed Capacity Constraint\n");
-                } else
-                    break;
-            }
-        } while (1);
+            /*  if (!CN) {
+                 if (i == Customers) {
+                     i = 0;
+                     while (CostSumLB[i].N->V == 1)
+                         ++i;
+                     Cap = INT_MAX; //Relax capacity constraint
+                     printff("Relaxed Capacity Constraint\n");
+                 } else
+                     return 0;
+             } */
+        } while (i < Customers);
 
-        if (GlobTimeFromLatest < 3000) {
-            printff("Node %d placed in route %d because was %.0f from latest\n", GN->Id, GR, GlobTimeFromLatest);
-            if (GlobTimeFromLatest < 0) {
-                if (!Relocate(Routes, GN)) {
-                    int i = 0;
-                    while (SortableNodes[i].N != GN)
-                        ++i;
-                    int NewPos = rand() % Salesmen;
-                    NDepotCost tmp = SortableNodes[NewPos];
-                    SortableNodes[NewPos] = SortableNodes[i];
-                    SortableNodes[i] = tmp;
-                    goto Start;
-                } else {
-                    continue;
+        if (GlobTimeFromLatest < 0 || CostSum > Depot->Latest || CR == -1) { /* Best insertion is infeasible */
+            if (GN > 0) {
+                printff("Node %d cannot be placed in a route (Time from latest = %.0f, Cost sum = %lld <?> %.0f)\n", CostSumLB[GN].N->Id,
+                        GlobTimeFromLatest, CostSum, Depot->Latest);
+                NDepotCost tmp = CostSumLB[Veh];
+                CostSumLB[Veh] = CostSumLB[GN];
+                CostSumLB[GN] = tmp;
+            } else {
+                printff("Candidate node not found(nodes left %d).\n", NodesLeft);
+                for (int j = 0; j < Veh; ++j) {
+                    printff("Route #%d: %d (DemandSum: " GainFormat ", CostSum: " GainFormat ", Latest: %.0f, DepotDist: %d)\n", j,
+                            Routes[j]->Id, Routes[j]->prevDemandSum, Routes[j]->prevCostSum, Routes[j]->Latest,
+                            OldDistance(Depot, TWIN(Routes[j])));
                 }
             }
-            CostSum = GN->Latest - GlobTimeFromLatest + GN->ServiceTime + OldDistance(GN, TWIN(Depot));
+            return 0;
+        }
+
+        if (GlobTimeFromLatest < Depot->Latest / 5) {
+            // printff("Node %d placed in route %d because was %.0f from latest\n", GN->Id, GR, GlobTimeFromLatest);
+            CostSum = CostSumLB[GN].N->Latest - GlobTimeFromLatest + CostSumLB[GN].N->ServiceTime +
+                      OldDistance(CostSumLB[GN].N, TWIN(Depot));
             CN = GN;
             CR = GR;
         }
 
-        printff("Node %d assigned to route %d. CostSum " GainFormat "\n", CN->Id, CR, CostSum);
-        Link(CN->Pred, CN->Suc);
-        Link(Routes[CR], CN);
-        CN->Suc = NULL;
-        CN->V = 1;
-        CN->prevCostSum = CostSum - OldDistance(CN, TWIN(Depot));
-        CN->prevDemandSum = Routes[CR]->prevDemandSum + CN->Demand;
-        Routes[CR] = CN;
+        // printff("Node %d assigned to route %d. CostSum " GainFormat "\n", CN->Id, CR, CostSum);
+        Link(CostSumLB[CN].N->Pred, CostSumLB[CN].N->Suc);
+        Link(Routes[CR], CostSumLB[CN].N);
+        CostSumLB[CN].N->Suc = NULL;
+        CostSumLB[CN].N->V = 1;
+        CostSumLB[CN].N->prevCostSum = CostSum - OldDistance(CostSumLB[CN].N, TWIN(Depot));
+        CostSumLB[CN].N->prevDemandSum = Routes[CR]->prevDemandSum + CostSumLB[CN].N->Demand;
+        Routes[CR] = CostSumLB[CN].N;
     }
+    return 1;
+}
+
+GainType CVRPTW_InitialTour() {
+    double EntryTime = GetTime();
+    int Customers = Dim - 1;
+
+    NDepotCost *CostSumLB = (NDepotCost *)malloc(sizeof(NDepotCost) * Customers);
+    assert(CostSumLB);
+    NDepotCost *Seeds = (NDepotCost *)malloc(sizeof(NDepotCost) * Customers);
+    assert(Seeds);
+    Node **Routes = (Node **)malloc(sizeof(Node *) * Salesmen);
+    assert(Routes);
+
+    for (int i = 0; i < Customers; ++i) {
+        Node *N = &NodeSet[i + 2];
+        CostSumLB[i].N = Seeds[i].N = N;
+        CostSumLB[i].Cost = max(OldDistance(Depot, TWIN(N)), N->Earliest) + N->ServiceTime + OldDistance(N, TWIN(Depot));
+        Seeds[i].Cost = N->Latest - OldDistance(Depot, TWIN(N));
+    }
+    qsort(CostSumLB, Customers, sizeof(NDepotCost), compareCost);
+    qsort(Seeds, Customers, sizeof(NDepotCost), compareCost);
+
+    int feasVeh = Salesmen;
+    int failVeh = 0;
+    int Veh;
+    while (feasVeh != failVeh + 1) {
+        Veh = (feasVeh + 3 * failVeh + 3) / 4;
+        if (tentative_routes(Routes, Seeds, CostSumLB, Veh)) {
+            feasVeh = Veh;
+        } else {
+            failVeh = Veh;
+        }
+    }
+    while (tentative_routes(Routes, Seeds, CostSumLB, --Veh))
+        ;
+    assert(tentative_routes(Routes, Seeds, CostSumLB, ++Veh));
 
     printff("Final Routes:\n");
-    for (int i = 0; i < Salesmen; ++i) {
+    for (int i = 0; i < Veh; ++i) {
         printff("Route #%d: ", i);
+        printff("%d[%.0f %.0f] <-- ", Depot->Id, Depot->Earliest, Depot->Latest);
         Node *N = Routes[i];
         while (N) {
             printff("%d[%.0f (%.0f) %.0f] <-- ", N->Id, N->Earliest, N->prevCostSum - N->ServiceTime, N->Latest);
@@ -191,28 +220,28 @@ Start:
         printff("\n");
     }
 
-    ConstructTour(Routes);
+    ConstructTour(Routes, Veh);
 
     /* Print initial tour info */
     FirstNode = Depot;
     Node *N = FirstNode, *NextN;
-    GainType Cost = 0;
+    GainType Cost = 0, CostSum = 0, DemandSum = 0;
     do {
         NextN = N->Suc;
-        Cost += (C(N, NextN) - N->Pi - NextN->Pi) / Precision;
+        Cost += OldDistance(N, NextN);
         N = NextN->Suc;
-    } while ((N = N->Suc) != FirstNode);
+    } while (N != FirstNode);
     CurrentPenalty = Penalty();
     printff("CVRPTW = " GainFormat "_" GainFormat "", CurrentPenalty, Cost);
-    printff(", Time = %0.2f sec.\n", fabs(GetTime() - EntryTime));
-    free(SortableNodes);
+    printff(", Time = %0.2f sec. (%d vehicles)\n", fabs(GetTime() - EntryTime), Veh);
+    free(CostSumLB);
     free(Routes);
-
+    free(Seeds);
     return Cost;
 }
 
 
-int Relocate(Node **Routes, Node *R) {
+/* int Relocate(Node **Routes, Node *R) {
 
     static Node *StartRoute = 0;
     Node *N, *NextN, *CurrentRoute;
@@ -298,7 +327,7 @@ int Relocate(Node **Routes, Node *R) {
                 CostSum += OldDistance(PrevN, TWIN(N));
                 if (CostSum < N->Earliest)
                     CostSum = N->Earliest;
-                //assert(CostSum <= N->Latest);
+                // assert(CostSum <= N->Latest);
                 CostSum += N->ServiceTime;
                 N->prevDemandSum = DemandSum;
                 N->prevCostSum = CostSum;
@@ -308,4 +337,4 @@ int Relocate(Node **Routes, Node *R) {
         }
     }
     return 0;
-}
+} */

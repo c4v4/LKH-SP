@@ -1,6 +1,6 @@
 #include "LKH.h"
 
-//#define SIMULATED_ANNEALING
+#define SIMULATED_ANNEALING
 #ifdef SIMULATED_ANNEALING
 #define SA_ZERO_FACTOR 250 /* Temperature multiplicative factor when no initial solution is available */
 #define SA_WARM_FACTOR 50  /* Temperature multiplicative factor when a initial solution is available */

@@ -236,8 +236,6 @@ GainType Penalty_Old() {
                     petalP += CostSum - N->Latest;
                 if ((P + petalP) > CurrentPenalty || ((P + petalP) == CurrentPenalty && CurrentGain <= 0)) {
                     StartRoute = CurrentRoute;
-                    if (KickNode != N)
-                        KickNode = N;
                     return CurrentPenalty + (CurrentGain > 0);
                 }
                 CostSum += N->ServiceTime;
@@ -256,6 +254,5 @@ GainType Penalty_Old() {
         P += petalP;
         cava_PetalsData[CurrentRoute->DepotId].CandPenalty = petalP;
     } while (N != StartRoute);
-
     return P;
 }

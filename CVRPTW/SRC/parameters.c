@@ -43,7 +43,7 @@ void SetParameters() {
     GridSize = 1000000.0;
     InitialPeriod = -1;
     InitialStepSize = 0;
-    InitialTourAlgorithm = WALK;  // CVRPTW_ALG;
+    InitialTourAlgorithm = CVRPTW_ALG;
     InitialTourFraction = 1.0;
     Kicks = 1;
     KickType = 4;
@@ -70,7 +70,7 @@ void SetParameters() {
     Recombination = IPT;
     RestrictedSearch = 1;
     Runs = RUNS;
-    Salesmen = 250;
+    Salesmen = 110;
     Scale = 10;
     Seed = 1;
     StopAtOptimum = 1;
