@@ -1,11 +1,13 @@
 #include "Genetic.h"
 #include "LKH.h"
 
-
-#define MAX_TRIALS 50000
-#define RUNS 10000
-#define SPH_PERIOD 10
+/* Shorthands */
+#define MAX_TRIALS 1000000
+#define RUNS 1
+#define SPH_PERIOD 2
 #define SPH_TLIM 180.0
+#define TLIM 300.0
+#define RUN_TLIM 300.0
 
 /**
  * To help linking-time optimizations (with -flto), some of the variables and functions that
@@ -68,15 +70,15 @@ void SetParameters() {
     Recombination = IPT;
     RestrictedSearch = 1;
     Runs = RUNS;
-    Salesmen = 1;
+    Salesmen = 250;
     Scale = 10;
     Seed = 1;
     StopAtOptimum = 1;
     Subgradient = 1;
     SubproblemSize = 0;
     SubsequentPatching = 1;
-    TimeLimit = INT_MAX;
-    RunTimeLimit = INT_MAX;
+    TimeLimit = TLIM;
+    RunTimeLimit = RUN_TLIM;
     TraceLevel = 1;
     SphPeriod = SPH_PERIOD;
     SphTimeLimit = SPH_TLIM;

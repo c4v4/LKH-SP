@@ -68,13 +68,13 @@ void WriteSolFile(int *Tour, GainType Cost) {
 
     ResultFile = fopen(FullFileName, "w");
     assert(ResultFile);
-    while (NodeSet[Tour[i]].DepotId == 0)
+    while (NodeSet[Tour[i]].DepotId == 0) /*Find first depot*/
         ++i;
-    ++i;
-    assert(NodeSet[Tour[i]].DepotId == 0);
-    int end = i + DimensionSaved;
 
+    int end = i + DimensionSaved;
     for (int Route = 1; Route <= Salesmen; ++Route) {
+        while (NodeSet[Tour[i]].DepotId != 0) /*Find first non-depot */
+            ++i;
         fprintf(ResultFile, "Route #%d: ", Route);
         assert(NodeSet[Tour[i]].DepotId == 0);
         for (int mod_i = i % DimensionSaved; i < end && NodeSet[Tour[mod_i]].DepotId == 0; mod_i = ++i % DimensionSaved) {

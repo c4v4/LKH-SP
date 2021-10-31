@@ -62,10 +62,6 @@ void extract_routes_tmlp(GainType Cost) {
     if (store_best) {
         best_cost = Cost;
         BestRoutes.clear();
-        if (TraceLevel >= 0) {
-            printff(" >> Improved Best ");
-            StatusReport(Cost, StartTime, " <<");
-        }
     }
 
     static std::vector<sph::idx_t> current_route;
@@ -78,6 +74,7 @@ void extract_routes_tmlp(GainType Cost) {
 
 
     int count_infeas = 0;
+    int count_empty = 0;
     GainType CostCheck = 0;
     Node *N = Depot;
     check.clear_route(Depot);
@@ -88,47 +85,31 @@ void extract_routes_tmlp(GainType Cost) {
     do {
         N = next_N(N);
         assert(N->Id <= DimensionSaved);
-
         check.add_node(N);
         if (N->DepotId) {
             if (check.is_feasible()) {
                 sph::idx_t col_idx = sph.add_column(current_route.begin(), current_route.end(), check.get_length(), Cost);
-                if (store_best) {
+                if (store_best)
                     BestRoutes.push_back(col_idx);
-                }
             } else {
                 ++count_infeas;
                 assert(CurrentPenalty > 0);
             }
+            count_empty += check.get_size() == 1;
             current_route.clear();
             CostCheck += check.get_length();
             check.clear_route(N);
         } else
             current_route.push_back(N->Id - 2);
-
     } while (N != Depot);
 
-    /* if (CurrentPenalty == 0 && CostCheck != Cost) {
-        GainType CostCheck2 = 0;
-        N = Depot;
-        if (!Asymmetric) {
-            do
-                CostCheck2 += (C(N, N->Suc) - N->Pi - N->Suc->Pi) / Precision;
-            while ((N = N->Suc) != Depot);
-        } else if (N->Suc->Id != DimensionSaved + N->Id) {
-            do
-                if (N->Id <= DimensionSaved)
-                    CostCheck2 += (C(N, N->Suc) - N->Pi - N->Suc->Pi) / Precision;
-            while ((N = N->Suc) != Depot);
-        } else {
-            do
-                if (N->Id <= DimensionSaved)
-                    CostCheck2 += (C(N, N->Pred) - N->Pi - N->Suc->Pi) / Precision;
-            while ((N = N->Pred) != Depot);
-        }
+    if (store_best && TraceLevel >= 0) {
+        printff("** ");
+        if (MTSPMinSize == 0)
+            printff("Vehicles = %d, ", Salesmen - count_empty);
+        StatusReport(Cost, StartTime, "");
+    }
 
-        assert(CostCheck2 == CostCheck);
-    } */
     assert(CurrentPenalty > 0 || CostCheck == Cost);
     assert((count_infeas > 0) == (CurrentPenalty > 0) || ProblemType == CCVRP);
 }

@@ -30,6 +30,7 @@ void SA_start(double TimeLeft) {
     if (Run < START_FROM)
         return;
 
+    prev_time = 0.0;
     T = T_trials = T_time = cost_delta = pnlt_delta = 0.0;
     trials_step = pow(0.01, 1.0 / (double)MaxTrials);
     timelimit = TimeLeft;

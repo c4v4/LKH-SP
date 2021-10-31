@@ -2,12 +2,13 @@
 #include "LKH.h"
 
 
-#define MAX_TRIALS 100000000
-#define RUNS 2
-#define TLIM 2000
-#define RUN_TLIM 900
+/* Shorthands */
+#define MAX_TRIALS 1000000
+#define RUNS 1
 #define SPH_PERIOD 2
-#define SPH_TLIM 60.0
+#define SPH_TLIM 180.0
+#define TLIM 60.0
+#define RUN_TLIM 60.0
 
 /**
  * To help linking-time optimizations (with -flto), some of the variables and functions that
@@ -72,7 +73,7 @@ void SetParameters() {
     Runs = RUNS;
     Salesmen = 1;
     Scale = -1;
-    // Seed = 0;
+    Seed = 1;
     StopAtOptimum = 1;
     Subgradient = 1;
     SubproblemSize = 0;
