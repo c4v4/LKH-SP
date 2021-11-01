@@ -44,7 +44,6 @@ int main(int argc, char *argv[]) {
     if (argc >= 3)
         Read_InitialTour_Sol(argv[2]);
 
-
     int *warmstart = (int *)malloc((DimensionSaved + 1) * sizeof(int));
     assert(warmstart);
 
@@ -151,25 +150,26 @@ int main(int argc, char *argv[]) {
             BestRoutes = sph.solve<>(BestRoutes);
             if (!BestRoutes.empty()) { /* Transform back SP sol to tour*/
                 GainType Cost = 0;
-                int *ws = warmstart;
+                int *ws = warmstart + 1;
                 int route = 0;
                 for (sph::idx_t j : BestRoutes) {
                     sph::Column &col = sph.get_col(j);
                     Cost += col.get_cost();
-                    *ws++ = 0;
+                    *ws++ = MTSPDepot;
                     for (sph::idx_t &i : col) {
                         if (ws - warmstart > DimensionSaved + 1) {
                             fmt::print(stderr, "Error: SPH has returned a solution with overlaps, are you sure to have set it right?\n");
                             abort();
                         }
-                        *ws++ = ++i;
+                        *ws++ = i + 2;
                     }
                     if (TraceLevel >= 1)
                         fmt::print("Route #{}: {}\n", ++route, fmt::join(col, " "));
                 }
                 if (TraceLevel >= 1)
                     fmt::print("Cost {}\n", Cost);
-                *ws++ = 0;
+                warmstart[0] = warmstart[DimensionSaved];
+                WriteSolFile(warmstart, Cost);
                 SetInitialTour(warmstart);
             }
         }

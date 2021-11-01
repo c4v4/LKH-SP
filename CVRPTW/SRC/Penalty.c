@@ -57,7 +57,7 @@
  * Node::prevPenalty fileds of each node of the route need to be updated.
  */
 
-#define REDUNDANT_CHECK /* ONLY DEBUG: checks old and new and assert they are the same. */
+//#define REDUNDANT_CHECK /* ONLY DEBUG: checks old and new and assert they are the same. */
 
 GainType Penalty_Old();
 static GainType oldPenaltySum;

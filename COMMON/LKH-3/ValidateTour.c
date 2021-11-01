@@ -47,20 +47,23 @@ void ValidateTour(int *tour) {
             // Setup
             index = 0;
             int depIndex = 0;
-            for (int i = 0; i < DimensionSaved; ++i) {
-                Node *N = &NodeSet[i + 1];
+            for (int i = 1; i <= DimensionSaved; ++i) {
+                Node *N = NodeSet + i;
                 if (N->DepotId) {  // Be sure to find all the depots and set them properly
                     depots[depIndex++] = N;
                     N->Suc = N->Pred = NULL;
                     N->V = 0;
                 }
 
-                N = &NodeSet[tour[i] + 1];
+                assert(tour[i] && tour[i - 1]);
+                N = NodeSet + tour[i];
                 N->V = 0;
-                N->Pred = &NodeSet[tour[(i ? i : Dimension) - 1] + 1];
-                N->Suc = &NodeSet[tour[i + 1 >= Dimension ? 0 : i + 1] + 1];
-                if (N->Pred->DepotId) N->Pred = NULL;
-                if (N->Suc->DepotId) N->Suc = NULL;
+                N->Pred = NodeSet + tour[i - 1];
+                N->Suc = NodeSet + tour[i + 1 > Dimension ? 1 : i + 1];
+                if (N->Pred->DepotId)
+                    N->Pred = NULL;
+                if (N->Suc->DepotId)
+                    N->Suc = NULL;
                 if (N->DepotId) {
                     petals[index++].tail = N->Pred;
                     petals[index % Salesmen].head = N->Suc;
@@ -81,9 +84,12 @@ void ValidateTour(int *tour) {
             for (int c = 0; c < Salesmen; ++c) {
                 if (petals[c].head == petals[c].tail && petals[c].head->Special) {
                     for (int d = Salesmen - 1; d >= 0; --d) {
-                        if (depots[d]->DepotId == petals[c].head->Special) (petals[c].depHead = depots[d])->V++;
-                        if (depots[d]->DepotId % Salesmen + 1 == petals[c].tail->Special) (petals[c].depTail = depots[d])->V++;
-                        if (petals[c].depHead && petals[c].depTail) break;
+                        if (depots[d]->DepotId == petals[c].head->Special)
+                            (petals[c].depHead = depots[d])->V++;
+                        if (depots[d]->DepotId % Salesmen + 1 == petals[c].tail->Special)
+                            (petals[c].depTail = depots[d])->V++;
+                        if (petals[c].depHead && petals[c].depTail)
+                            break;
                     }
                     assert(petals[c].depHead);
                     assert(petals[c].depTail);
@@ -95,14 +101,18 @@ void ValidateTour(int *tour) {
                 int depotToFind = (petals[c].head->Special != 0) + (petals[c].tail->Special != 0);
                 if (depotToFind && petals[c].head != petals[c].tail) {
                     for (int d = Salesmen - 1; d >= 0; --d) {
-                        if (depots[d]->DepotId == petals[c].head->Special) (petals[c].depHead = depots[d])->V++;
+                        if (depots[d]->DepotId == petals[c].head->Special)
+                            (petals[c].depHead = depots[d])->V++;
                         else if (depots[d]->DepotId == petals[c].tail->Special)
                             (petals[c].depTail = depots[d])->V++;
-                        if ((petals[c].depHead != NULL) + (petals[c].depTail != NULL) == depotToFind) break;
+                        if ((petals[c].depHead != NULL) + (petals[c].depTail != NULL) == depotToFind)
+                            break;
                     }
                     // Check
-                    if (petals[c].depHead) assert(petals[c].depHead->DepotId && petals[c].depHead->DepotId == petals[c].head->Special);
-                    if (petals[c].depTail) assert(petals[c].depTail->DepotId && petals[c].depTail->DepotId == petals[c].tail->Special);
+                    if (petals[c].depHead)
+                        assert(petals[c].depHead->DepotId && petals[c].depHead->DepotId == petals[c].head->Special);
+                    if (petals[c].depTail)
+                        assert(petals[c].depTail->DepotId && petals[c].depTail->DepotId == petals[c].tail->Special);
                 }
             }
 
@@ -112,7 +122,8 @@ void ValidateTour(int *tour) {
             // Find a first petal without a initial depot
             for (int c = 0; c < Salesmen; ++c) {
                 assert((currentPetal = &petals[c]));
-                if (!currentPetal->depHead) break;
+                if (!currentPetal->depHead)
+                    break;
                 else if (!currentPetal->depTail) {
                     reversePetal(currentPetal);
                     break;
@@ -200,52 +211,47 @@ void ValidateTour(int *tour) {
             FREEN0(depots);
             FREEN0(petals);
         } else {
-            int depIndex = Dim;
-            if (tour[0] == MTSPDepot - 1) tour[0] = depIndex++;
-            Node *Pred = &NodeSet[tour[0] + 1];
+            int depIndex = Dim + 1;
+            Node *Pred = NodeSet + tour[0];
             Node *N;
-            for (int i = 1; i < DimensionSaved; ++i) {
-                if ((tour[i] == MTSPDepot - 1) && (depIndex < DimensionSaved))  // the last depot remains = MTSPDepot - 1
+            for (int i = 1; i <= DimensionSaved; ++i) {
+                if ((tour[i] == MTSPDepot) && (depIndex <= DimensionSaved))  // the last depot remains = MTSPDepot
                     tour[i] = depIndex++;
 
-                N = &NodeSet[tour[i] + 1];
-                (N->Pred = Pred)->Suc = N;
+                N = NodeSet + tour[i];
+                Link(Pred, N);
                 Pred = N;
             }
-
-            N = &NodeSet[tour[0] + 1];
-            (N->Pred = Pred)->Suc = N;
         }
 
         // Check tour
         Node *N = Depot;
-        int index = 0;
-        memset(tour, 0, sizeof(int) * DimensionSaved);
+        memset(tour, 0, sizeof(int) * (DimensionSaved + 1));
         do {
             assert(N->Id <= DimensionSaved && N->Id > 0);
-            tour[N->Id - 1]++;
+            tour[N->Id]++;
             assert(N == N->Suc->Pred);
             assert(N == N->Pred->Suc);
             assert(!DepotCheckForbidden(N, N->Suc));
         } while ((N = N->Suc) != Depot);
 
+        int index = 1;
         do {
             assert(tour[index] == 1);  // check tour
             tour[index++] = N->Id;
             N->V = 0;
             N->LastV = 0;
         } while ((N = N->Suc) != Depot);
+        tour[0]=tour[DimensionSaved];
 
-        assert(index == DimensionSaved);
+        assert(index == DimensionSaved + 1);
     }
 }
 
-void reversePetal(Petal *p)
-{
+void reversePetal(Petal *p) {
     Node *N = p->head, *Suc;
 
-    while (N != p->tail)
-    { //first reverse chain
+    while (N != p->tail) {  // first reverse chain
         Suc = N->Suc;
         assert(Suc && N);
         N->Suc = N->Pred;
@@ -253,17 +259,17 @@ void reversePetal(Petal *p)
         N = Suc;
     }
 
-    //Swap also the last node
+    // Swap also the last node
     Suc = N->Suc;
     N->Suc = N->Pred;
     N->Pred = Suc;
 
-    //Swap depots
+    // Swap depots
     Suc = p->depHead;
     p->depHead = p->depTail;
     p->depTail = Suc;
 
-    //Swap head with tail
+    // Swap head with tail
     Suc = p->head;
     p->head = p->tail;
     p->tail = Suc;
@@ -272,10 +278,14 @@ void reversePetal(Petal *p)
 int DepotCheckForbidden(Node *Na, Node *Nb) {
     if (Salesmen > 1 && Dimension == DimensionSaved) {
         if (Na->DepotId) {
-            if ((Nb->DepotId && MTSPMinSize >= 1) || (Nb->Special && Nb->Special != Na->DepotId && Nb->Special != Na->DepotId % Salesmen + 1)) return 1;
+            if ((Nb->DepotId && MTSPMinSize >= 1) ||
+                (Nb->Special && Nb->Special != Na->DepotId && Nb->Special != Na->DepotId % Salesmen + 1))
+                return 1;
         }
         if (Nb->DepotId) {
-            if ((Na->DepotId && MTSPMinSize >= 1) || (Na->Special && Na->Special != Nb->DepotId && Na->Special != Nb->DepotId % Salesmen + 1)) return 1;
+            if ((Na->DepotId && MTSPMinSize >= 1) ||
+                (Na->Special && Na->Special != Nb->DepotId && Na->Special != Nb->DepotId % Salesmen + 1))
+                return 1;
         }
     }
     return 0;
