@@ -70,7 +70,7 @@ void SetParameters() {
     Recombination = IPT;
     RestrictedSearch = 1;
     Runs = RUNS;
-    Salesmen = 110;
+    Salesmen = 250;
     Scale = 10;
     Seed = 1;
     StopAtOptimum = 1;

@@ -33,19 +33,69 @@ int main(int argc, char *argv[]) {
 
     Seed = argc >= 4 ? atoi(argv[3]) : DEFAULT_SEED;
 
-    StartTime = LastTime = GetTime();
+
+    // StartTime = LastTime = GetTime();
     MergeWithTour = Recombination == IPT ? MergeWithTourIPT : MergeWithTourGPX2;
     SetParameters();
     ReadProblem();
-    AllocateStructures();
-    CreateCandidateSet();
-    InitializeStatistics();
-
-    if (argc >= 3)
-        Read_InitialTour_Sol(argv[2]);
 
     int *warmstart = (int *)malloc((DimensionSaved + 1) * sizeof(int));
     assert(warmstart);
+    if (argc >= 3)
+        Read_InitialTour_Sol(argv[2]);
+    else if (MTSPMinSize == 0) {
+        if (ProblemType == CVRP)
+            CVRP_InitialTour();
+        else if (ProblemType == CVRPTW)
+            CVRPTW_InitialTour2();
+
+        int SalesmenUsed = 0;
+        Node *N = Depot, *NextN = NULL;
+        int *ws = warmstart;
+        do {
+            int Size = -1;
+            do {
+                NextN = N->Suc;
+                if (NextN->Id >= DimensionSaved)
+                    NextN = NextN->Suc;
+                if (!(N->DepotId && NextN->DepotId)) {
+                    ++Size;
+                    *ws++ = N->DepotId ? MTSPDepot : N->Id;
+                }
+            } while ((N = NextN)->DepotId == 0);
+            SalesmenUsed += Size > 0;
+        } while (N != Depot);
+        *ws++ = MTSPDepot;
+        if (SalesmenUsed < Salesmen) {
+            int diff = Salesmen - SalesmenUsed;
+            Salesmen -= diff;
+            for (int i = 1; i <= DimensionSaved; ++i) {
+                NodeSet[i].FixedTo1 -= diff; /* TODO: How many other filds should be updated here?*/
+            }
+            DimensionSaved -= diff;
+            Dimension -= 2 * diff;
+            for (int i = DimensionSaved + 1; i <= Dimension; ++i) {
+                (NodeSet[i] = NodeSet[i + diff]).Id = i;
+                assert(NodeSet[i - DimensionSaved].Id == NodeSet[i].Id);
+            }
+            for (i = Dimension + 2 * diff; i > Dimension; --i) {
+                free(NodeSet[i].MergeSuc);
+                NodeSet[i].MergeSuc = NULL;
+                NodeSet[i].Id = Dimension + 1;
+            }
+            for (int i = 0; i < Dimension; ++i) {
+                if (NodeSet[i + 1].Id != i + 1)
+                    abort();
+            }
+            SetInitialTour(warmstart);
+        }
+    }
+
+    StartTime = LastTime = GetTime();  // Put back where it was!
+
+    AllocateStructures();
+    CreateCandidateSet();
+    InitializeStatistics();
 
     Norm = 9999;
     BestCost = PLUS_INFINITY;
@@ -201,8 +251,9 @@ int main(int argc, char *argv[]) {
     printff("Best %s solution:\n", Type);
     CurrentPenalty = BestPenalty;
     SOP_Report(BestCost);
-
     printff("\n");
+
+    FreeStructures();
 
     return EXIT_SUCCESS;
 }

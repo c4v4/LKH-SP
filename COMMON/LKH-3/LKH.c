@@ -160,7 +160,7 @@ int CandidateSetSymmetric, CandidateSetType, Capacity, CoordType, DelaunayPartit
     WeightType, WeightFormat;
 
 FILE *ParameterFile, *ProblemFile, *PiFile, *InputTourFile, *InitialTourFile, *SubproblemTourFile, **MergeTourFile;
-CostFunction Distance, D, /* C, moved at the end*/ c, OldDistance;
+CostFunction Distance, D, /* C, moved at the end*/ c, OldDistance, OriginalDistance;
 
 MergeTourFunction MergeWithTour;
 
