@@ -128,7 +128,7 @@ GainType CVRPTW_InitialTour() {
         if (Optimum != MINUS_INFINITY && Optimum != 0)
             printff(", Gap = %0.2f%%", 100.0 * (BestCost - Optimum) / Optimum);
         printff(", Time = %0.2f sec.\n", fabs(GetTime() - EntryTime));
-        printff("Winner: %d | ", winner);
+        printff("Winner: %d \n", winner);
     }
     free(nodes);
     return BestCost;
