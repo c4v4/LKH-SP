@@ -556,7 +556,7 @@ void Create_POPMUSIC_CandidateSet(int K);
 void CreateQuadrantCandidateSet(int K);
 GainType CTSP_InitialTour(void);
 GainType CVRP_InitialTour(void);
-GainType CVRPTW_InitialTour2(void);
+GainType CVRPTW_InitialTour(void);
 void eprintf(const char *fmt, ...);
 int Excludable(Node *ta, Node *tb);
 void Exclude(Node *ta, Node *tb);

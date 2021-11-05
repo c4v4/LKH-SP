@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
         if (ProblemType == CVRP)
             CVRP_InitialTour();
         else if (ProblemType == CVRPTW)
-            CVRPTW_InitialTour2();
+            CVRPTW_InitialTour();
 
         int SalesmenUsed = 0;
         Node *N = Depot, *NextN = NULL;

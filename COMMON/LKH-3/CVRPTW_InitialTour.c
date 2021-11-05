@@ -66,7 +66,7 @@ static double c_2(CVRPTWNode* u) { return I1Data.lambda * u->d_du - u->c; }
 
 static int counter = 0;
 static int winner = 0;
-GainType CVRPTW_InitialTour2() {
+GainType CVRPTW_InitialTour() {
     double EntryTime = GetTime();
     printff("CVRPTW = ");
     CVRPTWNode* nodes = (CVRPTWNode*)malloc(DimensionSaved * sizeof(CVRPTWNode));
