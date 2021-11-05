@@ -36,7 +36,7 @@ typedef struct CVRPTWNode_ {
     int d_iu;              /* Distance from i */
     int d_uj;              /* Distance from j */
     int d_du;              /* Distance from depot */
-    int time_feas;         /* True if it is time-feasible */
+    int feasible;          /* True if it is feasible */
 } CVRPTWNode;
 
 typedef CVRPTWNode* (*InitStrat)(CVRPTWNode*);
@@ -171,10 +171,10 @@ void SolomonI1(CVRPTWNode* nodes) {
                     check_improve(u2, u, u2->j);
                 while (depId(u2 = u2->j) == 0);
             } while (u2 != first_depot && !(depId(u2) && depId(u2->j)));
-            assert(u->i && u->j);
-            feasible &= u->time_feas;
+            assert(check_demand == 1 || u->i && u->j);
+            feasible &= u->feasible;
             u->c = c_2(u);
-            if ((u->time_feas && !best_u->time_feas) || (u->time_feas == best_u->time_feas && u->c > best_u->c))
+            if ((u->feasible && !best_u->feasible) || (u->feasible == best_u->feasible && u->c > best_u->c))
                 best_u = u;
         } while ((N = N->Suc) != FirstNode);
 
@@ -236,7 +236,7 @@ void setup(CVRPTWNode* nodes) {
 void reset_node(CVRPTWNode* u) {
     u->i = u->j = NULL;
     u->c = 10e20;
-    u->time_feas = 0;
+    u->feasible = 0;
     b(u) = 0;
     return;
 }
@@ -256,8 +256,8 @@ void check_improve(CVRPTWNode* i, CVRPTWNode* u, CVRPTWNode* j) {
     cand_u->c = I1Data.alpha1 * c_11 + I1Data.alpha2 * c_12;
 
     double maxb_cand_u = min(l(j) - s(cand_u) - cand_u->d_uj, l(cand_u));
-    cand_u->time_feas = b_cand_u <= maxb_cand_u;  // is_time_feasible(cand_u);
-    if ((cand_u->time_feas && !u->time_feas) || (cand_u->time_feas == u->time_feas && cand_u->c < u->c))
+    cand_u->feasible = b_cand_u <= maxb_cand_u;  // is_time_feasible(cand_u);
+    if ((cand_u->feasible && !u->feasible) || (cand_u->feasible == u->feasible && cand_u->c < u->c))
         *u = *cand_u;
 }
 
@@ -295,7 +295,7 @@ CVRPTWNode* insert_node(CVRPTWNode* u) {
     assert(MinN->V == 0);
     MinN->V = 1;
     Link(MinN->Pred, MinN->Suc);
-    assert(!(u->time_feas && (dad(u)->prevDemandSum > Capacity)));
+    assert(!(u->feasible && (dad(u)->prevDemandSum > Capacity)));
     CVRPTWNode* orig_u = u;
     b(u) = max(b(u->i) + s(u->i) + u->d_iu, e(u));
     while (depId(u = u->j) == 0) {
