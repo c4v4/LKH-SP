@@ -4,20 +4,25 @@ void SetInitialTour(int *warmstart) {
 
     if (warmstart) {
         ValidateTour(warmstart);
-        Node *N = Depot;
+        Node *N = Depot, *NextN;
         do {
+            NextN = N->Suc;
+            assert(N->Id <= DimensionSaved);
+            assert(NextN->Id <= DimensionSaved);
             if (Asymmetric) {
-                Node *Na = N + DimensionSaved;
-                Na->InitialSuc = N;
-                N->InitialSuc = N->Suc + DimensionSaved;
-
-                if (Forbidden(Na, N)) eprintf("%d, %d\n", Na->Id, N->Id);
-
-                if (Forbidden(N, N->InitialSuc)) eprintf("%d, %d\n", N->Id, N->InitialSuc->Id);
+                Node *TwinN = N + DimensionSaved;
+                TwinN->InitialSuc = N;
+                Link(TwinN, N);
+                N->InitialSuc = NextN + DimensionSaved;
+                Link(N, NextN + DimensionSaved);
+                if (Forbidden(TwinN, N))
+                    eprintf("%d, %d\n", TwinN->Id, N->Id);
+                if (Forbidden(N, N->InitialSuc))
+                    eprintf("%d, %d\n", N->Id, N->InitialSuc->Id);
             } else
-                N->InitialSuc = N->Suc;
-        } while ((N = N->Suc) != Depot);
-
+                N->InitialSuc = NextN;
+        } while ((N = NextN) != Depot);
+        assert(Depot->InitialSuc);
         AddTourCandidates();
     }
 }

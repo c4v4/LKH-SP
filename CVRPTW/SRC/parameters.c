@@ -43,7 +43,7 @@ void SetParameters() {
     GridSize = 1000000.0;
     InitialPeriod = -1;
     InitialStepSize = 0;
-    InitialTourAlgorithm = WALK;
+    InitialTourAlgorithm = CVRPTW_ALG;
     InitialTourFraction = 1.0;
     Kicks = 1;
     KickType = 4;

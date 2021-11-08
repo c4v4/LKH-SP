@@ -146,6 +146,7 @@ int TraceLevel;            /* Specifies the level of detail of the output
 int Trial;                 /* Ordinal number of the current trial */
 GainType TSPTW_CurrentMakespanCost;
 int TSPTW_Makespan;
+Node *KickNode;
 
 /* The following variables are read by the function ReadProblem: */
 
@@ -159,7 +160,7 @@ int CandidateSetSymmetric, CandidateSetType, Capacity, CoordType, DelaunayPartit
     WeightType, WeightFormat;
 
 FILE *ParameterFile, *ProblemFile, *PiFile, *InputTourFile, *InitialTourFile, *SubproblemTourFile, **MergeTourFile;
-CostFunction Distance, D, /* C, moved at the end*/ c, OldDistance;
+CostFunction Distance, D, /* C, moved at the end*/ c, OldDistance, OriginalDistance;
 
 MergeTourFunction MergeWithTour;
 

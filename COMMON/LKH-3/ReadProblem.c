@@ -1390,6 +1390,7 @@ static void Read_EDGE_WEIGHT_SECTION()
             FixEdge(&NodeSet[i], &NodeSet[i + DimensionSaved]);
         if (ProblemType == SOP || ProblemType == M1_PDTSP)
             NodeSet[n].C[1] = 0;
+        OriginalDistance = Distance;
         Distance = Distance_ATSP;
         WeightType = -1;
     }
@@ -2138,6 +2139,7 @@ static void Convert2FullMatrix()
     for (i = 1; i <= n; i++)
         FixEdge(&NodeSet[i], &NodeSet[i + n]);
     c = 0;
+    OriginalDistance = Distance;
     Distance = Distance_ATSP;
     WeightType = -1;
 }

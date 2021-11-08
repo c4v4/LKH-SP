@@ -141,6 +141,7 @@ enum InitialTourAlgorithms {
     BORUVKA,
     CTSP_ALG,
     CVRP_ALG,
+    CVRPTW_ALG,
     GREEDY,
     MOORE,
     MTSP_ALG,
@@ -471,7 +472,7 @@ extern int CandidateSetSymmetric, CandidateSetType, Capacity, CoordType, Delauna
     WeightType, WeightFormat;
 
 extern FILE *ParameterFile, *ProblemFile, *PiFile, *InputTourFile, *InitialTourFile, *SubproblemTourFile, **MergeTourFile;
-extern CostFunction Distance, D, c, OldDistance;
+extern CostFunction Distance, D, c, OldDistance, OriginalDistance;
 
 /* Function prototypes: */
 Node *BestMove(Node *t1, Node *t2, GainType *G0, GainType *Gain);
@@ -554,6 +555,7 @@ void Create_POPMUSIC_CandidateSet(int K);
 void CreateQuadrantCandidateSet(int K);
 GainType CTSP_InitialTour(void);
 GainType CVRP_InitialTour(void);
+GainType CVRPTW_InitialTour(void);
 void eprintf(const char *fmt, ...);
 int Excludable(Node *ta, Node *tb);
 void Exclude(Node *ta, Node *tb);

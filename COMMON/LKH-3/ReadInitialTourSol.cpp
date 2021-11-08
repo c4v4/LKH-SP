@@ -23,9 +23,9 @@ extern "C" void Read_InitialTour_Sol(const char *FileName) {
             if (line.find("Route") != std::string::npos) {
                 std::stringstream lineStream(line.substr(line.find(delimiter) + 1, line.size()));
                 int value;
-                tour.push_back(0);
+                tour.push_back(MTSPDepot);
                 while (lineStream >> value)
-                    tour.push_back(value);
+                    tour.push_back(value + 1);
             } else if (line.find("Instance ") == std::string::npos)  // CVRPTW: file_type = 0, but with some intro lines
             {
                 file_type = 1;
@@ -38,16 +38,16 @@ extern "C" void Read_InitialTour_Sol(const char *FileName) {
                 if (!file_type && line.find("Route") != std::string::npos) {
                     std::stringstream lineStream(line.substr(line.find(delimiter) + 1, line.size()));
                     int value;
-                    tour.push_back(0);
+                    tour.push_back(MTSPDepot);
                     while (lineStream >> value)
-                        tour.push_back(value);
+                        tour.push_back(value + 1);
                 } else if (file_type) {
                     std::stringstream lineStream(line);
                     int value;
                     for (int i = 0; i < 7; ++i)
                         lineStream >> value;  // ignore first 7 integers
                     while (lineStream >> value)
-                        tour.push_back(value);
+                        tour.push_back(value + 1);
                 }
                 // else ignore line
             }
@@ -55,6 +55,7 @@ extern "C" void Read_InitialTour_Sol(const char *FileName) {
     }
 
     if (!tour.empty()) {
+        tour.push_back(tour[0]);
         SetInitialTour(tour.data());
     }
 }
