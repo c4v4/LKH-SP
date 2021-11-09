@@ -96,7 +96,8 @@ GainType CVRPTW_InitialTour() {
         SolomonI1(&Cost, &Vehicles);
         CurrentPenalty = Penalty();
 #ifdef MINIMIZE_ROUTES
-        if (Vehicles < CurrentVehicles) {
+        if (Vehicles < CurrentVehicles ||
+            (Vehicles == CurrentVehicles && (CurrentPenalty < BestPenalty || (CurrentPenalty == BestPenalty && Cost < BestCost)))) {
 #else
         if (CurrentPenalty < BestPenalty || (CurrentPenalty == BestPenalty && Cost < BestCost)) {
 #endif
