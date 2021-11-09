@@ -36,8 +36,8 @@ static int DepotCheckForbidden(Node *Na, Node *Nb);
 static void reversePetal(Petal *p);
 
 void ValidateTour(int *tour) {
-    if (Salesmen > 1) {
-        if (ProblemType == CVRP || ProblemType == CTSP || ProblemType == TSP) {
+    if (ProblemType == CVRP || ProblemType == CTSP || ProblemType == TSP) {
+        if (Salesmen > 1) {
             int index = 0;
             Petal *petals = NULL;
             Node **depots = NULL;
@@ -210,42 +210,42 @@ void ValidateTour(int *tour) {
 
             FREEN0(depots);
             FREEN0(petals);
-        } else {
-            int depIndex = Dim + 1;
-            Node *Pred = NodeSet + tour[0];
-            Node *N;
-            for (int i = 1; i <= DimensionSaved; ++i) {
-                if ((tour[i] == MTSPDepot) && (depIndex <= DimensionSaved))  // the last depot remains = MTSPDepot
-                    tour[i] = depIndex++;
-
-                N = NodeSet + tour[i];
-                Link(Pred, N);
-                Pred = N;
-            }
         }
+    } else {
+        int depIndex = Dim + 1;
+        Node *Pred = NodeSet + tour[0];
+        Node *N;
+        for (int i = 1; i <= DimensionSaved; ++i) {
+            if ((tour[i] == MTSPDepot) && (depIndex <= DimensionSaved))  // the last depot remains = MTSPDepot
+                tour[i] = depIndex++;
 
-        // Check tour
-        Node *N = Depot;
-        memset(tour, 0, sizeof(int) * (DimensionSaved + 1));
-        do {
-            assert(N->Id <= DimensionSaved && N->Id > 0);
-            tour[N->Id]++;
-            assert(N == N->Suc->Pred);
-            assert(N == N->Pred->Suc);
-            assert(!DepotCheckForbidden(N, N->Suc));
-        } while ((N = N->Suc) != Depot);
-
-        int index = 1;
-        do {
-            assert(tour[index] == 1);  // check tour
-            tour[index++] = N->Id;
-            N->V = 0;
-            N->LastV = 0;
-        } while ((N = N->Suc) != Depot);
-        tour[0]=tour[DimensionSaved];
-
-        assert(index == DimensionSaved + 1);
+            N = NodeSet + tour[i];
+            Link(Pred, N);
+            Pred = N;
+        }
     }
+
+    // Check tour
+    Node *N = Depot;
+    memset(tour, 0, sizeof(int) * (DimensionSaved + 1));
+    do {
+        assert(N->Id <= DimensionSaved && N->Id > 0);
+        tour[N->Id]++;
+        assert(N == N->Suc->Pred);
+        assert(N == N->Pred->Suc);
+        assert(!DepotCheckForbidden(N, N->Suc));
+    } while ((N = N->Suc) != Depot);
+
+    int index = 1;
+    do {
+        assert(tour[index] == 1);  // check tour
+        tour[index++] = N->Id;
+        N->V = 0;
+        N->LastV = 0;
+    } while ((N = N->Suc) != Depot);
+    tour[0] = tour[DimensionSaved];
+
+    assert(index == DimensionSaved + 1);
 }
 
 void reversePetal(Petal *p) {

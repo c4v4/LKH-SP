@@ -22,7 +22,8 @@
  * where the last route are of very poor quality).
  */
 
-//#define MINIMIZE_ROUTES /* Keep solution with lowest number of routes (default: minimize distance) */
+#define MINIMIZE_ROUTES /* Keep solution with lowest number of routes (default: minimize distance) */
+#define SEQUENTIAL      /* Uncomment to use the sequential verions of the algorithm (default: parallel) */
 
 #define TWIN(N) ((N) + DimensionSaved)                   /* Get the "twin" node in the TSP->ATSP transformation */
 #define Dist(N1, N2) (OldDistance(N1, TWIN(N2)))         /* Distance shorthand for Nodes */
@@ -125,7 +126,13 @@ GainType CVRPTW_InitialTour() {
     return BestCost;
 }
 
-
+#ifdef SEQUENTIAL
+#define FEAS_INIT 0
+#define FEAS_OP(A, B) (A) |= (B)
+#else
+#define FEAS_INIT 1
+#define FEAS_OP(A, B) (A) &= (B)
+#endif
 void SolomonI1(GainType* Cost, int* Vehicles) {
     double EntryTime = GetTime();
     int check_demand = 1;
@@ -137,14 +144,14 @@ void SolomonI1(GainType* Cost, int* Vehicles) {
 
     CVRPTWNode* prev_u = new_route(&first_depot);
     for (int NodesLeft = Dim - 2; NodesLeft; --NodesLeft) {
-        /* Note: Suc and Pred fields form a 1-tree where the
+        /* Note: Next and Prev fields form a 1-tree where the
          * loop is made by nodes for which N->V == 0.
-         * The loop can be reached following Suc. */
+         * The loop can be reached following Next. */
         while (FirstNode->V)
             FirstNode = FirstNode->Next;
         Node* N = FirstNode;
         CVRPTWNode* best_u = cvrptw_n(FirstNode);
-        int feasible = 1;
+        int feasible = FEAS_INIT;
         do {
             CVRPTWNode* u = cvrptw_n(N);
             if (u->i && dad(u->i) != dad(prev_u)) {
@@ -168,7 +175,7 @@ void SolomonI1(GainType* Cost, int* Vehicles) {
                 } while (u2 != first_depot && !(depId(u2) && depId(u2->j)));
                 assert(check_demand == 1 || u->i && u->j);
             }
-            feasible &= u->feasible;
+            FEAS_OP(feasible, u->feasible);
             u->c_2 = I1Data.lambda * u->d_du - u->c_1;
             if ((u->feasible && !best_u->feasible) || (u->feasible == best_u->feasible && u->c_2 > best_u->c_2))
                 best_u = u;
@@ -184,8 +191,8 @@ void SolomonI1(GainType* Cost, int* Vehicles) {
     *Vehicles = routes;
     *Cost = buid_tour();
     if (TraceLevel >= 2)
-        printff("SolomonI1 (%.0f, %.0f, %.0f, %.0f) = " GainFormat "_" GainFormat ", Vehicles = %d, Time = %.1f sec.\n", I1Data.mu,
-                I1Data.lambda, I1Data.alpha1, I1Data.alpha2, CurrentPenalty, Cost, Vehicles, fabs(GetTime() - EntryTime));
+        printff("SolomonI1 (%.0f, %.0f, %.0f, %.0f) = " GainFormat ", Vehicles = %d, Time = %.1f sec.\n", I1Data.mu, I1Data.lambda,
+                I1Data.alpha1, I1Data.alpha2, *Cost, *Vehicles, fabs(GetTime() - EntryTime));
 }
 
 
