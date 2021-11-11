@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
             int diff = Salesmen - SalesmenUsed;
             Salesmen -= diff;
             for (int i = 1; i <= DimensionSaved; ++i) {
-                NodeSet[i].FixedTo1 -= diff; /* TODO: How many other filds should be updated here?*/
+                NodeSet[i].FixedTo1 -= diff; //TODO: How many other fields should be updated here?
             }
             DimensionSaved -= diff;
             Dimension -= 2 * diff;

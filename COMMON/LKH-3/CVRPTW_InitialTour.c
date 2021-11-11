@@ -15,15 +15,14 @@
  * insertion is known to be feasible without the need of propagating the delay.
  *
  * Another change from what described in the paper regards the "sequential" vs. "parallel" version.
- * The original algorithm is designed as "sequential" constructive algorithm, i.e., the routes
- * are constructed one after the other. While, in this implementation many routes are
+ * The original algorithm is designed as "sequential" constructive algorithm, i.e., routes
+ * are built one after the other. While, in this implementation one can choose whether many routes are
  * created at the same time, such that every new customer can be inserted in the best
  * route available at that time (an mitigate the common effect in "sequential" constructives
  * where the last route are of very poor quality).
  */
 
-#define MINIMIZE_ROUTES /* Keep solution with lowest number of routes (default: minimize distance) */
-#define SEQUENTIAL      /* Uncomment to use the sequential verions of the algorithm (default: parallel) */
+//#define MINIMIZE_ROUTES /* Keep solution with lowest number of routes (default: minimize distance) */
 
 #define TWIN(N) ((N) + DimensionSaved)                   /* Get the "twin" node in the TSP->ATSP transformation */
 #define Dist(N1, N2) (OldDistance(N1, TWIN(N2)))         /* Distance shorthand for Nodes */
@@ -58,6 +57,7 @@ typedef CVRPTWNode* (*InitStrat)();
 typedef struct Insertion1MetaData_ {
     double mu, lambda, alpha1, alpha2;
     InitStrat InitNode;
+    int parallel;
 } Insertion1MetaData;
 
 static void SolomonI1(GainType* Cost, int* Vehicles);
@@ -68,6 +68,7 @@ static int needs_update(CVRPTWNode* u);
 static void setup();
 static CVRPTWNode* new_route(CVRPTWNode** first_depot);
 static CVRPTWNode* insert_node(CVRPTWNode* u);
+static CVRPTWNode* FarthestNode0();
 static CVRPTWNode* FarthestNode1();
 static CVRPTWNode* FarthestNode2();
 static CVRPTWNode* UrgentNode();
@@ -84,16 +85,43 @@ GainType CVRPTW_InitialTour() {
     InitStrat FarthestNode = coordinates_are_used() ? FarthestNode1 : FarthestNode2;
     nodes = (CVRPTWNode*)malloc(DimensionSaved * sizeof(CVRPTWNode));
 
-    /* Parameters suggested in the Solomon's paper: mu, lambda, alpha1, alpha2 and first-route-node strategy */
-    Insertion1MetaData I1Conf[] = {{1.0, 1.0, 1.0, 0.0, FarthestNode}, {1.0, 1.0, 1.0, 0.0, UrgentNode},
-                                   {1.0, 2.0, 1.0, 0.0, FarthestNode}, {1.0, 2.0, 1.0, 0.0, UrgentNode},
-                                   {1.0, 1.0, 0.0, 1.0, FarthestNode}, {1.0, 1.0, 0.0, 1.0, UrgentNode},
-                                   {1.0, 2.0, 0.0, 1.0, FarthestNode}, {1.0, 2.0, 0.0, 1.0, UrgentNode}};
+    /* Parameters suggested in the Solomon's paper: mu, lambda, alpha1, alpha2. + First-route-node strategy and sequential/parallel
+     * Data obtained with the 56 100-customers Solomon's instances.*/
+    Insertion1MetaData I1Conf[] = {
+        {1.0, 1.0, 1.0, 0.0, NULL, 0},       /* Best salesmen 19/56. Best length 32/56 */
+        {1.0, 2.0, 1.0, 0.0, NULL, 0},       /* Best salesmen 35/56. Best length 24/56 */
+        /* {1.0, 1.0, 0.0, 1.0, NULL, 0}, */ /* Best salesmen  1/56. Best length  0/56 <-- remove */
+        /* {1.0, 2.0, 0.0, 1.0, NULL, 0}  */ /* Best salesmen  1/56. Best length  0/56 <-- remove */
+    };
 
     for (int i = 0; i < sizeof(I1Conf) / sizeof(*I1Conf); ++i) {
+        I1Data = I1Conf[i];
+        for (int paral = 0; paral < 2; ++paral) {
+            /* sequential (0): Best salesmen 28/56. Best length 14/56 */
+            /* parallel   (1): Best salesmen 28/56. Best length 42/56 */
+            I1Data.parallel = paral;
+            for (int init_strat = 0; init_strat < 3; ++init_strat) {
+                /* FarthestNode0 (0): Best salesmen 11/56. Best length 17/56 */
+                /* FarthestNode1 (1): Best salesmen 19/56. Best length 18/56 */
+                /* UrgentNode    (2): Best salesmen 19/56. Best length 13/56 */
+                /* FarthestNode2 (3): Best salesmen  7/56. Best length  8/56 <-- remove */
+                switch (init_strat) {
+                case 0:
+                    I1Data.InitNode = FarthestNode0;
+                    break;
+                case 1:
+                    I1Data.InitNode = FarthestNode;
+                    break;
+                case 2:
+                    I1Data.InitNode = UrgentNode;
+                    break;
+                    /* case 3:
+                        I1Data.InitNode = FarthestNode2;
+                        break; */
+                }
+
         int Vehicles = Salesmen;
         GainType Cost = PLUS_INFINITY;
-        I1Data = I1Conf[i];
         SolomonI1(&Cost, &Vehicles);
         CurrentPenalty = Penalty();
 #ifdef MINIMIZE_ROUTES
@@ -108,6 +136,8 @@ GainType CVRPTW_InitialTour() {
             for (int i = 1; i <= Dimension; ++i) {
                 NodeSet[i].Suc = NodeSet[i].Next;
                 NodeSet[i].Pred = NodeSet[i].Prev;
+                    }
+                }
             }
         }
     }
@@ -126,13 +156,6 @@ GainType CVRPTW_InitialTour() {
     return BestCost;
 }
 
-#ifdef SEQUENTIAL
-#define FEAS_INIT 0
-#define FEAS_OP(A, B) (A) |= (B)
-#else
-#define FEAS_INIT 1
-#define FEAS_OP(A, B) (A) &= (B)
-#endif
 void SolomonI1(GainType* Cost, int* Vehicles) {
     double EntryTime = GetTime();
     int check_demand = 1;
@@ -151,7 +174,7 @@ void SolomonI1(GainType* Cost, int* Vehicles) {
             FirstNode = FirstNode->Next;
         Node* N = FirstNode;
         CVRPTWNode* best_u = cvrptw_n(FirstNode);
-        int feasible = FEAS_INIT;
+        int feasible = I1Data.parallel;
         do {
             CVRPTWNode* u = cvrptw_n(N);
             if (u->i && dad(u->i) != dad(prev_u)) {
@@ -175,7 +198,7 @@ void SolomonI1(GainType* Cost, int* Vehicles) {
                 } while (u2 != first_depot && !(depId(u2) && depId(u2->j)));
                 assert(check_demand == 1 || u->i && u->j);
             }
-            FEAS_OP(feasible, u->feasible);
+            feasible = I1Data.parallel ? feasible && u->feasible : feasible || u->feasible;
             u->c_2 = I1Data.lambda * u->d_du - u->c_1;
             if ((u->feasible && !best_u->feasible) || (u->feasible == best_u->feasible && u->c_2 > best_u->c_2))
                 best_u = u;
@@ -190,9 +213,14 @@ void SolomonI1(GainType* Cost, int* Vehicles) {
     }
     *Vehicles = routes;
     *Cost = buid_tour();
-    if (TraceLevel >= 2)
-        printff("SolomonI1 (%.0f, %.0f, %.0f, %.0f) = " GainFormat ", Vehicles = %d, Time = %.1f sec.\n", I1Data.mu, I1Data.lambda,
-                I1Data.alpha1, I1Data.alpha2, *Cost, *Vehicles, fabs(GetTime() - EntryTime));
+    if (TraceLevel >= 1)
+        printff("SolomonI1 (%.0f, %.0f, %.0f, %.0f, %s, %d) = " GainFormat ", Vehicles = %d, Time = %.1f sec.\n", I1Data.mu, I1Data.lambda,
+                I1Data.alpha1, I1Data.alpha2,
+                (I1Data.InitNode == FarthestNode0   ? "F0"
+                 : I1Data.InitNode == FarthestNode1 ? "F1"
+                 : I1Data.InitNode == FarthestNode2 ? "F2"
+                                                    : "Ur"),
+                I1Data.parallel, *Cost, *Vehicles, fabs(GetTime() - EntryTime));
 }
 
 
@@ -288,7 +316,6 @@ CVRPTWNode* insert_node(CVRPTWNode* u) {
     Node* N = u->N;
     N->V = 1;
     Link2(N->Prev, N->Next);
-    assert(!(u->feasible && (dad(u)->prevDemandSum > Capacity)));
     CVRPTWNode* orig_u = u;
     b(u) = MAX(b(u->i) + s(u->i) + u->d_iu, e(u));
     while (depId(u = u->j) == 0) {
@@ -304,6 +331,20 @@ CVRPTWNode* insert_node(CVRPTWNode* u) {
         l(u) = MIN(l(u->j) - s(u) - u->d_uj, l(u));
     while (depId(u = u->i) == 0);
     return orig_u;
+}
+
+/* Return farthest node from depot. */
+CVRPTWNode* FarthestNode0() {
+    while (FirstNode->V)
+        FirstNode = FirstNode->Next;
+    Node* N = FirstNode;
+    CVRPTWNode* farthest_n = cvrptw_n(N);
+    do {
+        CVRPTWNode* n = cvrptw_n(N);
+        if (n->d_du > farthest_n->d_du)
+            farthest_n = n;
+    } while ((N = N->Next) != FirstNode);
+    return farthest_n;
 }
 
 /* Return farthest node from the barycenter of the nodes
