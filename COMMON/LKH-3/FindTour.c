@@ -63,6 +63,8 @@ GainType FindTour() {
                 printff("*** LKH Time limit exceeded ***\n");
             break;
         }
+        /* if (now - EntryTime >= RunTimeLimit / 2.0)
+            FreezeSalesmen(); */
         /* Delayed SA start to normalize temperature with BetterCost */
         if (Trial == 50)
             SA_start();
@@ -99,8 +101,6 @@ GainType FindTour() {
             BetterCost = Cost;
             BetterPenalty = CurrentPenalty;
             RecordBetterTour();
-            if (BetterPenalty < BestPenalty || (BetterPenalty == BestPenalty && BetterCost < BestCost))
-                WriteTour(OutputTourFileName, BetterTour, BetterCost);
             if (StopAtOptimum) {
                 if (ProblemType != CCVRP && ProblemType != TRP && ProblemType != MLP && MTSPObjective != MINMAX &&
                             MTSPObjective != MINMAX_SIZE
@@ -151,6 +151,7 @@ GainType FindTour() {
     if (Trial > MaxTrials)
         Trial = MaxTrials;
     ResetCandidateSet();
+    /* UnfreezeSalesmen(); */
     CurrentPenalty = BetterPenalty;
     return BetterCost;
 }

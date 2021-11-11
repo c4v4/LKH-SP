@@ -113,7 +113,7 @@ GainType Penalty()
                 CostSum += cost / Precision;
                 N = (Forward ? SUC(NextN) : PRED(NextN));
             } while (N->DepotId == 0);
-            if (Size < MTSPMinSize)
+            if (Size < MTSPMinSize && !NextN->FixedTo2)
                 petalP += MTSPMinSize - Size;
             if (CostSum > Depot->Latest)
                 petalP += CostSum - Depot->Latest;
@@ -244,7 +244,7 @@ GainType Penalty_Old() {
             CostSum += (C(N, NextN) - N->Pi - NextN->Pi) / Precision;
             N = Forward ? SUCC(NextN) : PREDD(NextN);
         } while (N->DepotId == 0);
-        if (Size < MTSPMinSize)
+        if (Size < MTSPMinSize && !NextN->FixedTo2)
             petalP += MTSPMinSize - Size;
         if (CostSum > Depot->Latest &&
             ((P + (petalP += CostSum - Depot->Latest)) > CurrentPenalty || ((P + petalP) == CurrentPenalty && CurrentGain <= 0))) {

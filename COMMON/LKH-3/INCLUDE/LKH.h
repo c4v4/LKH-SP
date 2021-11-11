@@ -471,7 +471,7 @@ extern int CandidateSetSymmetric, CandidateSetType, Capacity, CoordType, Delauna
     PatchingCRestricted, RiskThreshold, RohePartitioning, Salesmen, SierpinskiPartitioning, SubproblemBorders, SubproblemsCompressed,
     WeightType, WeightFormat;
 
-extern FILE *ParameterFile, *ProblemFile, *PiFile, *InputTourFile, *InitialTourFile, *SubproblemTourFile, **MergeTourFile;
+extern FILE *ParameterFile, *ProblemFile, *PiFile, *InputTourFile, *InitialTourFile, *SubproblemTourFile, **MergeTourFile, *OutputSolFile;
 extern CostFunction Distance, D, c, OldDistance, OriginalDistance;
 
 /* Function prototypes: */
@@ -567,6 +567,7 @@ void Flip_SSL(Node *t1, Node *t2, Node *t3);
 void FreeCandidateSets(void);
 void FreeSegments(void);
 void FreeStructures(void);
+void FreezeSalesmen(void);
 char *FullName(char *Name, GainType Cost);
 int fscanint(FILE *f, int *v);
 GainType Gain23(void);
@@ -644,6 +645,7 @@ GainType TSPDL_InitialTour(void);
 GainType TSPTW_MakespanCost(void);
 void TSPTW_Reduce(void);
 void TrimCandidateSet(int MaxCandidates);
+void UnfreezeSalesmen(void);
 void UpdateStatistics(GainType Cost, double Time);
 void VRPB_Reduce(void);
 void WriteCandidates(void);

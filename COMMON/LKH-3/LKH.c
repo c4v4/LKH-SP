@@ -159,7 +159,7 @@ int CandidateSetSymmetric, CandidateSetType, Capacity, CoordType, DelaunayPartit
     PatchingCRestricted, RiskThreshold, RohePartitioning, Salesmen, SierpinskiPartitioning, SubproblemBorders, SubproblemsCompressed,
     WeightType, WeightFormat;
 
-FILE *ParameterFile, *ProblemFile, *PiFile, *InputTourFile, *InitialTourFile, *SubproblemTourFile, **MergeTourFile;
+FILE *ParameterFile, *ProblemFile, *PiFile, *InputTourFile, *InitialTourFile, *SubproblemTourFile, **MergeTourFile, *OutputSolFile;
 CostFunction Distance, D, /* C, moved at the end*/ c, OldDistance, OriginalDistance;
 
 MergeTourFunction MergeWithTour;

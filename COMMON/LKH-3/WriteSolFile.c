@@ -53,39 +53,44 @@ int tour_file_name_with_length(char **dest, const char *src) {
 }
 
 void WriteSolFile(int *Tour, GainType Cost) {
-    FILE *ResultFile;
-    char *FullFileName;
     int i = 0;
+    char *FullFileName = NULL;
     time_t Now;
 
-    char *tempFileName = NULL;
-    tour_file_name_with_length(&tempFileName, ProblemFileName);
-    FullFileName = FullName(tempFileName, Cost);
-    Now = time(&Now);
+    if (OutputSolFile == NULL) {
+        char *tempFileName = NULL;
+        tour_file_name_with_length(&tempFileName, ProblemFileName);
+        FullFileName = FullName(tempFileName, Cost);
+        Now = time(&Now);
 
-    if (TraceLevel >= 1)
-        printff("Writing CVRPLIB solution file: \"%s\" ... ", FullFileName);
+        if (TraceLevel >= 1)
+            printff("Writing CVRPLIB solution file: \"%s\" ... ", FullFileName);
 
-    ResultFile = fopen(FullFileName, "w");
-    assert(ResultFile);
-    while (NodeSet[Tour[i]].DepotId == 0) /*Find first depot*/
-        ++i;
-
-    int end = i + DimensionSaved;
-    for (int Route = 1; Route <= Salesmen; ++Route) {
-        while (NodeSet[Tour[i]].DepotId != 0) /*Find first non-depot */
-            ++i;
-        fprintf(ResultFile, "Route #%d: ", Route);
-        assert(NodeSet[Tour[i]].DepotId == 0);
-        for (int mod_i = i % DimensionSaved; i < end && NodeSet[Tour[mod_i]].DepotId == 0; mod_i = ++i % DimensionSaved) {
-            fprintf(ResultFile, "%d ", Tour[mod_i] - 1);
-        }
-        fprintf(ResultFile, "\n");
-        ++i;
+        OutputSolFile = fopen(FullFileName, "w");
+        assert(OutputSolFile);
     }
 
-    fprintf(ResultFile, "Cost " GainFormat "\n", Cost);
-    fclose(ResultFile);
+    while (NodeSet[Tour[i]].DepotId == 0) /*Find first depot*/
+        ++i;
+    int end = i + DimensionSaved;
+
+    int Route = 1;
+    while (i < end) {
+        while (NodeSet[Tour[i % DimensionSaved]].DepotId != 0) /*Find first non-depot */
+            ++i;
+        fprintf(OutputSolFile, "Route #%d: ", Route++);
+        int mod_i = i % DimensionSaved;
+        while (NodeSet[Tour[mod_i]].DepotId == 0) {
+            fprintf(OutputSolFile, "%d ", Tour[mod_i] - 1);
+            mod_i = ++i % DimensionSaved;
+        }
+        fprintf(OutputSolFile, "\n");
+    }
+
+    fprintf(OutputSolFile, "Cost " GainFormat "\n", Cost);
+    fflush(OutputSolFile);
+    if (FullFileName)
+        fclose(OutputSolFile);
     if (TraceLevel >= 1)
         printff("done.\n");
 }

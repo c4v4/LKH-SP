@@ -33,9 +33,9 @@ int main(int argc, char *argv[]) {
 
     Seed = argc >= 4 ? atoi(argv[3]) : DEFAULT_SEED;
 
-
-    // StartTime = LastTime = GetTime();
+    StartTime = LastTime = GetTime();
     MergeWithTour = Recombination == IPT ? MergeWithTourIPT : MergeWithTourGPX2;
+    OutputSolFile = stdout;
     SetParameters();
     ReadProblem();
 
@@ -68,10 +68,9 @@ int main(int argc, char *argv[]) {
         *ws++ = MTSPDepot;
         if (SalesmenUsed < Salesmen) {
             int diff = Salesmen - SalesmenUsed;
-            Salesmen -= diff;
-            for (int i = 1; i <= DimensionSaved; ++i) {
-                NodeSet[i].FixedTo1 -= diff; //TODO: How many other fields should be updated here?
-            }
+            Salesmen = SalesmenUsed + 2;  // Keep some more space
+            for (int i = 1; i <= DimensionSaved; ++i)
+                NodeSet[i].FixedTo1 -= diff;
             DimensionSaved -= diff;
             Dimension -= 2 * diff;
             for (int i = DimensionSaved + 1; i <= Dimension; ++i) {
@@ -90,8 +89,6 @@ int main(int argc, char *argv[]) {
             SetInitialTour(warmstart);
         }
     }
-
-    StartTime = LastTime = GetTime();  // Put back where it was!
 
     AllocateStructures();
     CreateCandidateSet();
@@ -153,7 +150,7 @@ int main(int argc, char *argv[]) {
             RecordBetterTour();
             RecordBestTour();
             WriteTour(TourFileName, BestTour, BestCost);
-            WriteSolFile(BestTour, BestCost);
+            //WriteSolFile(BestTour, BestCost);
         }
         OldOptimum = Optimum;
         if (MTSPObjective != MINMAX && MTSPObjective != MINMAX_SIZE) {
@@ -201,23 +198,16 @@ int main(int argc, char *argv[]) {
             if (!BestRoutes.empty()) { /* Transform back SP sol to tour*/
                 GainType Cost = 0;
                 int *ws = warmstart + 1;
-                int route = 0;
                 for (sph::idx_t j : BestRoutes) {
                     sph::Column &col = sph.get_col(j);
                     Cost += col.get_cost();
                     *ws++ = MTSPDepot;
                     for (sph::idx_t &i : col) {
-                        if (ws - warmstart > DimensionSaved + 1) {
-                            fmt::print(stderr, "Error: SPH has returned a solution with overlaps, are you sure to have set it right?\n");
-                            abort();
-                        }
+                        if (ws - warmstart > DimensionSaved + 1)
+                            eprintf("Error SPH: Solution too long!\n");
                         *ws++ = i + 2;
                     }
-                    if (TraceLevel >= 1)
-                        fmt::print("Route #{}: {}\n", ++route, fmt::join(col, " "));
                 }
-                if (TraceLevel >= 1)
-                    fmt::print("Cost {}\n", Cost);
                 warmstart[0] = warmstart[DimensionSaved];
                 WriteSolFile(warmstart, Cost);
                 SetInitialTour(warmstart);

@@ -55,7 +55,7 @@ _OBJ = Activate.o AddCandidate.o AddExtraCandidates.o                  \
        Distance.o Distance_MTSP.o Distance_SOP.o Distance_SPECIAL.o    \
        eprintf.o ERXT.o Excludable.o Exclude.o FindTour.o              \
        FixedOrCommonCandidates.o Flip.o Flip_SL.o Flip_SSL.o           \
-       FreeStructures.o                                    			   \
+       FreeStructures.o  FreezeSalesmen.o                 			   \
        fscanint.o Gain23.o GenerateCandidates.o Genetic.o              \
        GeoConversion.o GetTime.o GreedyTour.o Hashing.o Heap.o         \
        Improvement.o IsBackboneCandidate.o IsCandidate.o               \

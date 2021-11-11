@@ -1,15 +1,15 @@
 #include "LKH.h"
 
-//#define SIMULATED_ANNEALING
+#define SIMULATED_ANNEALING
 #ifdef SIMULATED_ANNEALING
-#define SA_ZERO_FACTOR 250 /* Temperature multiplicative factor when no initial solution is available */
-#define SA_WARM_FACTOR 50  /* Temperature multiplicative factor when a initial solution is available */
+#define SA_ZERO_FACTOR 50 /* Temperature multiplicative factor when no initial solution is available */
+#define SA_WARM_FACTOR 10 /* Temperature multiplicative factor when a initial solution is available */
 #else
 #define SA_ZERO_FACTOR 0
 #define SA_WARM_FACTOR 0
 #endif
 
-#define SA_SCALING_FACTOR 0.00001
+#define SA_SCALING_FACTOR 1E-8
 #define T_0_cost (BetterCost * SA_SCALING_FACTOR)
 #define T_0_pnlt (BetterPenalty * SA_SCALING_FACTOR)
 #define lnU_01() (log((double)rand() / (double)RAND_MAX))
@@ -37,11 +37,10 @@ void SA_setup(double EntryTime, double TimeLimit) {
 void SA_start() {
 
     if (Dim <= 10000) {
-        if (FirstNode->InitialSuc) {
-            T = T_trials = T_time = SA_WARM_FACTOR * SA_SCALING_FACTOR;
-        } else {
-            T = T_trials = T_time = SA_ZERO_FACTOR * SA_SCALING_FACTOR;
-        }
+        if (Run <= SphPeriod && !InitialTourFileName)
+            T = T_trials = T_time = SA_ZERO_FACTOR * SA_SCALING_FACTOR * DimensionSaved * ((Run - 1) % SphPeriod);
+        else
+            T = T_trials = T_time = SA_WARM_FACTOR * SA_SCALING_FACTOR * DimensionSaved * ((Run - 1) % SphPeriod);
     }
     cost_delta = T * BetterCost;
     pnlt_delta = T * BetterPenalty;
@@ -71,7 +70,7 @@ int SA_test(GainType Pnlt, GainType Cost) {
     GainType temp_cost = BetterCost - cost_delta * lnU_01();
     GainType temp_pnlt = BetterPenalty - pnlt_delta * lnU_01();
 
-    return Pnlt < BetterPenalty || (Pnlt <= temp_pnlt && Cost < temp_cost);
+    return Pnlt < BetterPenalty || (Pnlt <= temp_pnlt && Cost < temp_cost && Cost != BetterCost);
 }
 #else
 

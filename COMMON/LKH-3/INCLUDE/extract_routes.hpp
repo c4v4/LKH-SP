@@ -16,7 +16,7 @@ extern "C" {
 }
 
 
-extern void *sph_ptr;
+extern sph::SPHeuristic *sph_ptr;
 extern std::vector<sph::idx_t> BestRoutes; /* Vector containing routes indexes of BestTour */
 
 
@@ -28,7 +28,7 @@ public:
         dist = (C(prev, realN) - prev->Pi - realN->Pi) / Precision;
         current_length += dist;
         prev = N;
-        ++size;
+        size += !N->DepotId;
     };
 
     void clear_route(Node *Prev) {
@@ -37,7 +37,7 @@ public:
         prev = Prev;
     };
 
-    int is_feasible() const { return size > MTSPMinSize; }
+    int is_feasible() const { return size >= MTSPMinSize; }
     inline GainType get_length() const { return current_length; };
     inline size_t get_size() const { return size; };
     inline int get_dist() const { return dist; };
@@ -65,16 +65,15 @@ void extract_routes_tmlp(GainType Cost) {
     }
 
     static std::vector<sph::idx_t> current_route;
-
-    sph::SPHeuristic &sph = *((sph::SPHeuristic *)sph_ptr);
+    sph::SPHeuristic &sph = *sph_ptr;
     ConstrChecker check;
 
     if (CurrentPenalty && ProblemType != CCVRP)
         Cost = INT_MAX;
 
-
+    int *BestTourIter = BestTour;
     int count_infeas = 0;
-    int count_empty = 0;
+    int count_routes = 0;
     GainType CostCheck = 0;
     Node *N = Depot;
     check.clear_route(Depot);
@@ -83,31 +82,38 @@ void extract_routes_tmlp(GainType Cost) {
                    : N->Suc != N + DimensionSaved ? [](Node *N) { return N->Suc->Suc; }
                                                   : [](Node *N) { return N->Pred->Pred; });
     do {
+        Node *PrevN = N;
         N = next_N(N);
         assert(N->Id <= DimensionSaved);
         check.add_node(N);
+        *BestTourIter++ = N->Id;
         if (N->DepotId) {
             if (check.is_feasible()) {
                 sph::idx_t col_idx = sph.add_column(current_route.begin(), current_route.end(), check.get_length(), Cost);
                 if (store_best)
                     BestRoutes.push_back(col_idx);
-            } else {
+            } else if (PrevN->FixedTo2 == NULL) {
                 ++count_infeas;
                 assert(CurrentPenalty > 0);
             }
-            count_empty += check.get_size() == 1;
-            current_route.clear();
+            count_routes += check.get_size() > 0;
             CostCheck += check.get_length();
+            current_route.clear();
             check.clear_route(N);
         } else
             current_route.push_back(N->Id - 2);
     } while (N != Depot);
-
+    if (store_best) {
+        assert(BestTourIter == BestTour + DimensionSaved);
+        *BestTourIter = BestTour[0];
+        BestCost = CostCheck;
+        WriteSolFile(BestTour, BestCost);
+    }
     if (store_best && TraceLevel >= 0) {
         printff("** ");
         if (MTSPMinSize == 0)
-            printff("Vehicles = %d, ", Salesmen - count_empty);
-        StatusReport(Cost, StartTime, "");
+            printff("Vehicles = %d, ", count_routes);
+        StatusReport(CostCheck, StartTime, "");
     }
 
     assert(CurrentPenalty > 0 || CostCheck == Cost);
