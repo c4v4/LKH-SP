@@ -66,25 +66,24 @@ int main(int argc, char *argv[]) {
             SalesmenUsed += Size > 0;
         } while (N != Depot);
         *ws++ = MTSPDepot;
+        /* Add some more vehicles */
+        for (int i = 0; i < 5; ++i) {
+            ++SalesmenUsed;
+            *ws++ = MTSPDepot;
+        }
         if (SalesmenUsed < Salesmen) {
             int diff = Salesmen - SalesmenUsed;
-            Salesmen = SalesmenUsed + 2;  // Keep some more space
-            for (int i = 1; i <= DimensionSaved; ++i)
-                NodeSet[i].FixedTo1 -= diff;
+            Salesmen = SalesmenUsed;
             DimensionSaved -= diff;
             Dimension -= 2 * diff;
-            for (int i = DimensionSaved + 1; i <= Dimension; ++i) {
+            for (int i = 1; i <= DimensionSaved; ++i)
+                NodeSet[i].FixedTo1 -= diff;
+            for (int i = DimensionSaved + 1; i <= Dimension; ++i)
                 (NodeSet[i] = NodeSet[i + diff]).Id = i;
-                assert(NodeSet[i - DimensionSaved].Id == NodeSet[i].Id);
-            }
             for (i = Dimension + 2 * diff; i > Dimension; --i) {
                 free(NodeSet[i].MergeSuc);
                 NodeSet[i].MergeSuc = NULL;
                 NodeSet[i].Id = Dimension + 1;
-            }
-            for (int i = 0; i < Dimension; ++i) {
-                if (NodeSet[i + 1].Id != i + 1)
-                    abort();
             }
             SetInitialTour(warmstart);
         }
