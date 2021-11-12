@@ -82,8 +82,10 @@ int main(int argc, char *argv[]) {
                 (NodeSet[i] = NodeSet[i + diff]).Id = i;
             for (i = Dimension + 2 * diff; i > Dimension; --i) {
                 free(NodeSet[i].MergeSuc);
-                NodeSet[i].MergeSuc = NULL;
-                NodeSet[i].Id = Dimension + 1;
+                free(NodeSet[i].CandidateSet);
+                free(NodeSet[i].BackboneCandidateSet);
+                NodeSet[i].MergeSuc = NodeSet[i].CandidateSet = NodeSet[i].BackboneCandidateSet = NULL;
+                NodeSet[i].Id = 0;
             }
             SetInitialTour(warmstart);
         }
@@ -149,7 +151,7 @@ int main(int argc, char *argv[]) {
             RecordBetterTour();
             RecordBestTour();
             WriteTour(TourFileName, BestTour, BestCost);
-            //WriteSolFile(BestTour, BestCost);
+            // WriteSolFile(BestTour, BestCost);
         }
         OldOptimum = Optimum;
         if (MTSPObjective != MINMAX && MTSPObjective != MINMAX_SIZE) {
@@ -193,7 +195,7 @@ int main(int argc, char *argv[]) {
         /* Set Partitioning Heuristic phase */
         if (Run % SphPeriod == 0) {
             sph.set_timelimit(SphTimeLimit);
-            BestRoutes = sph.solve<>(BestRoutes);
+            BestRoutes = sph.solve<sph::INST_HARD_CAP, sph::SetCov_ActiveColTest>(BestRoutes);
             if (!BestRoutes.empty()) { /* Transform back SP sol to tour*/
                 GainType Cost = 0;
                 int *ws = warmstart + 1;
