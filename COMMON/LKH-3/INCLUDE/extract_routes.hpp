@@ -40,6 +40,7 @@ public:
     int is_feasible() const { return size >= MTSPMinSize; }
     inline GainType get_length() const { return current_length; };
     inline size_t get_size() const { return size; };
+    inline bool empty() const { return size == 0; }
     inline int get_dist() const { return dist; };
 
 protected:
@@ -90,7 +91,7 @@ void extract_routes_tmlp(GainType Cost) {
         if (N->DepotId) {
             if (check.is_feasible()) {
                 sph::idx_t col_idx = sph.add_column(current_route.begin(), current_route.end(), check.get_length(), Cost);
-                if (store_best)
+                if (store_best && !check.empty())
                     BestRoutes.push_back(col_idx);
             } else if (PrevN->FixedTo2 == NULL) {
                 ++count_infeas;
