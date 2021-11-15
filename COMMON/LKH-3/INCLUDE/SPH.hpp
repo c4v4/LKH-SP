@@ -29,8 +29,6 @@
 #include <cstdint>
 #include <limits>
 
-#undef NDEBUG
-
 /**
  * VERBOSE: If defined, switches on few prints.
  * VERBOSE_LEVEL [0-3]: Define how many prints: 0 few (default); 1 some; 2 a lot; 3 all
@@ -1044,7 +1042,9 @@ namespace sph {
         [[nodiscard]] inline Column &get_col(idx_t idx) { return cols[idx]; }
         [[nodiscard]] inline const Column &get_col(idx_t idx) const { return cols[idx]; }
         [[nodiscard]] inline real_t get_fixed_cost() const { return fixed_cost; }
-        [[nodiscard]] inline idx_t get_ncols_constr() const { return std::max<idx_t>(0, ncols_constr - fixed_cols.size()); }
+        [[nodiscard]] inline idx_t get_ncols_constr() const {
+            return ncols_constr > fixed_cols.size() ? ncols_constr - fixed_cols.size() : 0;
+        }
         inline void set_ncols_constr(idx_t ncols_constr_) { ncols_constr = ncols_constr_; }
 
         inline void set_timelimit(double seconds) { timelimit = Timer(seconds); }
@@ -1764,7 +1764,8 @@ namespace sph {
             fixed_cost = inst.get_fixed_cost();
             for (idx_t gj : fixed_cols_global_idxs) { fixed_cost += inst.get_col(gj).get_cost(); }
 
-            if (inst.get_ncols_constr() > 0) { ncols_constr = inst.get_ncols_constr() - inst.get_fixed_cols().size(); }
+            ncols_constr = inst.get_ncols_constr();
+            ncols_constr = ncols_constr > fixed_cols_global_idxs.size() ? ncols_constr - fixed_cols_global_idxs.size() : 0;
 
             // compact rows
             idx_t li = 0;
@@ -2058,11 +2059,11 @@ namespace sph {
                 return LocalSolution();
             }
 
-            SPH_DEBUG {
+            //SPH_DEBUG {
                 if ((res = CPXwriteprob(env, lp, "model.lp", nullptr))) {
                     fmt::print(stderr, "Error while writing problem file(errno: {})\n", res);
                 }
-            }
+            //}
 
             if ((res = CPXmipopt(env, lp))) {
                 fmt::print("Cplex finished with error {}\n", res);

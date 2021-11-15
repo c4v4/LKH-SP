@@ -24,4 +24,4 @@ private:
     GainType current_demand = 0;
 };
 
-extern "C" void ExtractRoutes(GainType Cost) { extract_routes_tmlp<CVRPChecker>(Cost); }
+extern "C" int ExtractRoutes(GainType Cost) { return extract_routes_tmlp<CVRPChecker>(Cost); }

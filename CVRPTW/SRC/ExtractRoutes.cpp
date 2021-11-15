@@ -38,4 +38,4 @@ private:
 };
 
 
-extern "C" void ExtractRoutes(GainType Cost) { extract_routes_tmlp<CvrptwChecker>(Cost); }
+extern "C" int ExtractRoutes(GainType Cost) { return extract_routes_tmlp<CvrptwChecker>(Cost); }

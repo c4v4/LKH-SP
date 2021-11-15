@@ -54,9 +54,11 @@ protected:
  * @brief Template function the extracts feasible routes from a solution.
  *
  * @tparam ConstrChecker: Class that checks route feasibility
+ *
+ * @return true if best_cost has been improved.
  */
 template <typename ConstrChecker>
-void extract_routes_tmlp(GainType Cost) {
+int extract_routes_tmlp(GainType Cost) {
     static GainType best_cost = Cost + 1;
 
     bool store_best = Cost < best_cost && CurrentPenalty == 0;
@@ -90,9 +92,11 @@ void extract_routes_tmlp(GainType Cost) {
         *BestTourIter++ = N->Id;
         if (N->DepotId) {
             if (check.is_feasible()) {
-                sph::idx_t col_idx = sph.add_column(current_route.begin(), current_route.end(), check.get_length(), Cost);
-                if (store_best && !check.empty())
-                    BestRoutes.push_back(col_idx);
+                if (!check.empty()) {
+                    sph::idx_t col_idx = sph.add_column(current_route.begin(), current_route.end(), check.get_length(), Cost);
+                    if (store_best)
+                        BestRoutes.push_back(col_idx);
+                }
             } else if (PrevN->FixedTo2 == NULL) {
                 ++count_infeas;
                 assert(CurrentPenalty > 0);
@@ -119,4 +123,6 @@ void extract_routes_tmlp(GainType Cost) {
 
     assert(CurrentPenalty > 0 || CostCheck == Cost);
     assert((count_infeas > 0) == (CurrentPenalty > 0) || ProblemType == CCVRP);
+
+    return store_best;
 }

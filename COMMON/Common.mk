@@ -38,7 +38,7 @@ _DEPS = Delaunay.h GainType.h Genetic.h GeoConversion.h Hashing.h Heap.h      \
         LKH.h Segment.h Sequence.h BIT.h gpx.h extract_routes.hpp SPH.hpp
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS)) Makefile
 
-_CCOBJ = Forbidden.o Penalty.o parameters.o 
+_CCOBJ = Forbidden.o Penalty.o parameters.o ReadProblem.o
 CCOBJ = $(patsubst %,$(ODIR)/%,$(_CCOBJ))
 
 $(ODIR)/%.o: %.c $(CCDEPS) | $(ODIR)
@@ -46,7 +46,7 @@ $(ODIR)/%.o: %.c $(CCDEPS) | $(ODIR)
 
 # C++
 
-CXXOBJ = $(ODIR)/ExtractRoutes.opp
+CXXOBJ = $(ODIR)/ExtractRoutes.opp $(ODIR)/main.opp
 
 $(ODIR)/%.opp: %.cpp $(DEPS) | $(ODIR)
 	$(CXX) -c -o $@ $< $(CXXFLAGS)

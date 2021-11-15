@@ -69,7 +69,7 @@ _OBJ = Activate.o AddCandidate.o AddExtraCandidates.o                  \
        NormalizeNodeList.o NormalizeSegmentList.o                      \
        OrderCandidateSet.o PatchCycles.o                               \
        PDPTW_Reduce.o printff.o PrintParameters.o                      \
-       Random.o ReadProblem.o ReadLine.o RecordBestTour.o 			   \
+       Random.o ReadLine.o RecordBestTour.o 						   \
        RecordBetterTour.o RemoveFirstActive.o                          \
        ResetCandidateSet.o RestoreTour.o                               \
        SegmentSize.o Sequence.o SetInitialTour.o SFCTour.o  		   \
@@ -82,7 +82,7 @@ _OBJ = Activate.o AddCandidate.o AddExtraCandidates.o                  \
 	   VRPB_Reduce.o BIT.o        									   \
        WriteCandidates.o WritePenalties.o WriteTour.o WriteSolFile.o   \
        MergeWithTourGPX2.o gpx.o									   \
-	   main.opp ReadInitialTourSol.opp
+	   ReadInitialTourSol.opp
 
 OBJ_SYM = $(patsubst %,$(ODIR_SYM)/%,$(_OBJ))
 OBJ_ASYM = $(patsubst %,$(ODIR_ASYM)/%,$(_OBJ))

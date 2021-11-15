@@ -24,11 +24,12 @@ GainType FindTour() {
     Node *t;
     int i;
     double EntryTime = GetTime();
-
-    if (RunTimeLimit - EntryTime < TimeLimit - StartTime)
-        SA_setup(EntryTime, RunTimeLimit);
+    double LastImprTime = EntryTime;
+    double SaTimeLimit = Run == 1 ? RunTimeLimit / 5 : RunTimeLimit;
+    if (SaTimeLimit < TimeLimit - (EntryTime - StartTime))
+        SA_setup(0.0, SaTimeLimit);
     else
-        SA_setup(StartTime, TimeLimit);
+        SA_setup(EntryTime - StartTime, TimeLimit);
 
     t = FirstNode;
     do
@@ -55,18 +56,23 @@ GainType FindTour() {
         double now = GetTime();
         if (now - EntryTime >= RunTimeLimit) {
             if (TraceLevel >= 1)
-                printff("*** Run Time limit exceeded ***\n");
+                printff("*** Run time limit exceeded ***\n");
             break;
         }
         if (now - StartTime >= TimeLimit) {
             if (TraceLevel >= 1)
-                printff("*** LKH Time limit exceeded ***\n");
+                printff("*** LKH time limit exceeded ***\n");
+            break;
+        }
+        if (Run == 0 && now - LastImprTime > RunTimeLimit / 10.0) {
+            if (TraceLevel >= 1)
+                printff("*** First Run early exit (%.0f) ***\n", now - LastImprTime);
             break;
         }
         /* if (now - EntryTime >= RunTimeLimit / 2.0)
             FreezeSalesmen(); */
         /* Delayed SA start to normalize temperature with BetterCost */
-        if (Trial == 50)
+        if (Trial == 5)
             SA_start();
         /* Choose FirstNode at random */
         if (Dimension == DimensionSaved)
@@ -92,7 +98,8 @@ GainType FindTour() {
             NodeSet[Dimension].Next = &NodeSet[1];
             Cost = MergeWithTour();
         }
-        ExtractRoutes(Cost);
+        if (ExtractRoutes(Cost))
+            LastImprTime = now;
         if (SA_test(CurrentPenalty, Cost)) {
             if (TraceLevel >= 1) {
                 printff("* %d: ", Trial);

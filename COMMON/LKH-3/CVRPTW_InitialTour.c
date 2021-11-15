@@ -22,7 +22,7 @@
  * where the last route are of very poor quality).
  */
 
-#define MINIMIZE_ROUTES /* Keep solution with lowest number of routes (default: minimize distance) */
+//#define MINIMIZE_ROUTES /* Keep solution with lowest number of routes (default: minimize distance) */
 
 #define TWIN(N) ((N) + DimensionSaved)                   /* Get the "twin" node in the TSP->ATSP transformation */
 #define Dist(N1, N2) (OldDistance(N1, TWIN(N2)))         /* Distance shorthand for Nodes */

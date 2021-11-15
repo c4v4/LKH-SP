@@ -70,10 +70,11 @@ int Distance_EXPLICIT(Node * Na, Node * Nb)
     return Na->Id < Nb->Id ? Nb->C[Na->Id] : Na->C[Nb->Id];
 }
 
-int Distance_FLOOR_2D(Node * Na, Node * Nb)
+int Distance_FLOOR_2D(Node* Na, Node* Nb) 
 {
     double xd = Na->X - Nb->X, yd = Na->Y - Nb->Y;
-    return (int) floor(Scale * sqrt(xd * xd + yd * yd));
+    // return (int) floor(Scale * sqrt(xd * xd + yd * yd));
+    return (int)(Scale * sqrt(xd * xd + yd * yd)); /*Assumes non-negative*/
 }
 
 int Distance_FLOOR_3D(Node * Na, Node * Nb)

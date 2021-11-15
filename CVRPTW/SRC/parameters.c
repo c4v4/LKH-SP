@@ -2,12 +2,12 @@
 #include "LKH.h"
 
 /* Shorthands */
-#define MAX_TRIALS 1000000
-#define RUNS 1
-#define SPH_PERIOD 2
-#define SPH_TLIM 180.0
-#define TLIM 300.0
-#define RUN_TLIM 300.0
+#define MAX_TRIALS 10000
+#define RUNS 10
+#define SPH_PERIOD 400
+#define SPH_TLIM 120.0
+#define TLIM 1000000
+#define RUN_TLIM 100000 
 
 /**
  * To help linking-time optimizations (with -flto), some of the variables and functions that
@@ -70,8 +70,8 @@ void SetParameters() {
     Recombination = IPT;
     RestrictedSearch = 1;
     Runs = RUNS;
-    Salesmen = 250;
-    Scale = -1;
+    //Salesmen = 250;
+    Scale = 10;
     Seed = 1;
     StopAtOptimum = 1;
     Subgradient = 1;

@@ -6,6 +6,8 @@ extern "C" {
 #include "LKH.h"
 }
 
+#include <x86intrin.h>
+
 #include <vector>
 
 #define VERBOSE
@@ -22,12 +24,12 @@ sph::SPHeuristic *sph_ptr;          /* SPHeuristc pointer */
 std::vector<sph::idx_t> BestRoutes; /* Vector containing routes indexes of BestTour */
 
 int main(int argc, char *argv[]) {
+    unsigned long long EntryClock = __rdtsc();
     GainType Cost, OldOptimum;
     double Time, LastTime;
     Node *N;
     int i;
 
-    /* Read the specification of the problem */
     if (argc >= 2)
         ProblemFileName = argv[1];
 
@@ -38,6 +40,10 @@ int main(int argc, char *argv[]) {
     OutputSolFile = stdout;
     SetParameters();
     ReadProblem();
+
+    Seed = argc >= 5 ? atoi(argv[4]) : DEFAULT_SEED;
+    Seed = argc >= 6 ? atoi(argv[5]) : DEFAULT_SEED;
+    Seed = argc >= 7 ? atoi(argv[6]) : DEFAULT_SEED;
 
     int *warmstart = (int *)malloc((DimensionSaved + 1) * sizeof(int));
     assert(warmstart);
@@ -67,7 +73,7 @@ int main(int argc, char *argv[]) {
         } while (N != Depot);
         *ws++ = MTSPDepot;
         /* Add some more vehicles */
-        for (int i = 0; i < 5; ++i) {
+        for (int i = 0; i < 20; ++i) {
             ++SalesmenUsed;
             *ws++ = MTSPDepot;
         }
@@ -84,7 +90,9 @@ int main(int argc, char *argv[]) {
                 free(NodeSet[i].MergeSuc);
                 free(NodeSet[i].CandidateSet);
                 free(NodeSet[i].BackboneCandidateSet);
-                NodeSet[i].MergeSuc = NodeSet[i].CandidateSet = NodeSet[i].BackboneCandidateSet = NULL;
+                NodeSet[i].MergeSuc = NULL;
+                NodeSet[i].CandidateSet = NULL;
+                NodeSet[i].BackboneCandidateSet = NULL;
                 NodeSet[i].Id = 0;
             }
             SetInitialTour(warmstart);
@@ -95,17 +103,18 @@ int main(int argc, char *argv[]) {
     CreateCandidateSet();
     InitializeStatistics();
 
+    RunTimeLimit = Dim / 2;
+    SphTimeLimit = RunTimeLimit / 2;
     Norm = 9999;
     BestCost = PLUS_INFINITY;
     BestPenalty = CurrentPenalty = PLUS_INFINITY;
 
     sph::SPHeuristic sph(Dim - 1);
-    sph.set_ncols_constr(Salesmen);
     sph_ptr = &sph;
 
     /* Find a specified number (Runs) of local optima */
 
-    for (Run = 1; Run <= Runs; Run++) {
+    for (Run = 0; Run <= Runs; Run++) {
         LastTime = GetTime();
         if (LastTime - StartTime >= TimeLimit) {
             if (TraceLevel >= 1)
@@ -193,9 +202,9 @@ int main(int argc, char *argv[]) {
         SRandom(++Seed);
 
         /* Set Partitioning Heuristic phase */
-        if (Run % SphPeriod == 0) {
+        if (Run && Run % SphPeriod == 0) {
             sph.set_timelimit(SphTimeLimit);
-            BestRoutes = sph.solve<sph::INST_HARD_CAP, sph::SetCov_ActiveColTest>(BestRoutes);
+            BestRoutes = sph.solve<500000>(BestRoutes);
             if (!BestRoutes.empty()) { /* Transform back SP sol to tour*/
                 GainType Cost = 0;
                 int *ws = warmstart + 1;
@@ -209,6 +218,8 @@ int main(int argc, char *argv[]) {
                         *ws++ = i + 2;
                     }
                 }
+                for (sph::idx_t j = BestRoutes.size(); j < Salesmen; ++j)
+                    *ws++ = MTSPDepot;
                 warmstart[0] = warmstart[DimensionSaved];
                 WriteSolFile(warmstart, Cost);
                 SetInitialTour(warmstart);
@@ -240,11 +251,11 @@ int main(int argc, char *argv[]) {
     }
 
     printff("Best %s solution:\n", Type);
+    printff("Total cpu cycles: %lld\n", __rdtsc() - EntryClock);
     CurrentPenalty = BestPenalty;
     SOP_Report(BestCost);
     printff("\n");
 
     FreeStructures();
-
     return EXIT_SUCCESS;
 }

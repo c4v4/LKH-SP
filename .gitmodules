@@ -1,0 +1,6 @@
+[submodule "VRPTWController"]
+	path = VRPTWController
+	url = git@github.com:laser-ufpb/VRPTWController.git
+[submodule "CVRPController"]
+	path = CVRPController
+	url = git@github.com:laser-ufpb/CVRPController.git

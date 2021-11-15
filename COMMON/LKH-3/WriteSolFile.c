@@ -74,10 +74,10 @@ void WriteSolFile(int *Tour, GainType Cost) {
         ++i;
     int end = i + DimensionSaved;
 
+    while (NodeSet[Tour[i % DimensionSaved]].DepotId != 0) /*Find first non-depot */
+        ++i;
     int Route = 1;
     while (i < end) {
-        while (NodeSet[Tour[i % DimensionSaved]].DepotId != 0) /*Find first non-depot */
-            ++i;
         fprintf(OutputSolFile, "Route #%d: ", Route++);
         int mod_i = i % DimensionSaved;
         while (NodeSet[Tour[mod_i]].DepotId == 0) {
@@ -85,9 +85,11 @@ void WriteSolFile(int *Tour, GainType Cost) {
             mod_i = ++i % DimensionSaved;
         }
         fprintf(OutputSolFile, "\n");
+        while (NodeSet[Tour[i % DimensionSaved]].DepotId != 0) /*Find first non-depot */
+            ++i;
     }
 
-    fprintf(OutputSolFile, "Cost " GainFormat "\n", Cost);
+    fprintf(OutputSolFile, "Cost %.3f \n", (double)Cost / Scale);
     fflush(OutputSolFile);
     if (FullFileName)
         fclose(OutputSolFile);

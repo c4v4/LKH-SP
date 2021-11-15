@@ -715,4 +715,4 @@ extern double SphTimeLimit;
 
 GainType Penalty(void);
 int Forbidden(Node *Na, Node *Nb);
-void ExtractRoutes(GainType Cost);
+int ExtractRoutes(GainType Cost);
