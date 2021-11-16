@@ -26,7 +26,7 @@ const int SubsequentMoveTypeSpecial = MoveTypeSpecial;
 Node *BestMove(Node *t1, Node *t2, GainType *G0, GainType *Gain) { return BestSpecialOptMove(t1, t2, G0, Gain); }
 Node *BestSubsequentMove(Node *t1, Node *t2, GainType *G0, GainType *Gain) { return BestSpecialOptMove(t1, t2, G0, Gain); }
 
-void SetParameters() {
+void SetDefaultParameters() {
     AscentCandidates = 50;
     BackboneTrials = 0;
     Backtracking = 0;

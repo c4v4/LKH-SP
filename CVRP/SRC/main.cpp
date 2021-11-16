@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
     StartTime = LastTime = GetTime();
     MergeWithTour = Recombination == IPT ? MergeWithTourIPT : MergeWithTourGPX2;
     OutputSolFile = stdout;
-    SetParameters();
+    SetDefaultParameters();
     ReadProblem();
 
     int *warmstart = (int *)malloc((DimensionSaved + 1) * sizeof(int));

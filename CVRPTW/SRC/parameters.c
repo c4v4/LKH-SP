@@ -2,12 +2,12 @@
 #include "LKH.h"
 
 /* Shorthands */
-#define MAX_TRIALS 10000
-#define RUNS 10
-#define SPH_PERIOD 400
+#define MAX_TRIALS 10000000
+#define RUNS 10000000
+#define SPH_PERIOD 3
 #define SPH_TLIM 120.0
-#define TLIM 1000000
-#define RUN_TLIM 100000 
+#define TLIM DBL_MAX
+#define RUN_TLIM DBL_MAX 
 
 /**
  * To help linking-time optimizations (with -flto), some of the variables and functions that
@@ -25,7 +25,7 @@ const int SubsequentMoveTypeSpecial = MoveTypeSpecial;
 Node *BestMove(Node *t1, Node *t2, GainType *G0, GainType *Gain) { return BestSpecialOptMove(t1, t2, G0, Gain); }
 Node *BestSubsequentMove(Node *t1, Node *t2, GainType *G0, GainType *Gain) { return BestSpecialOptMove(t1, t2, G0, Gain); }
 
-void SetParameters() {
+void SetDefaultParameters() {
     AscentCandidates = 50;
     BackboneTrials = 0;
     Backtracking = 0;
@@ -79,7 +79,7 @@ void SetParameters() {
     SubsequentPatching = 1;
     TimeLimit = TLIM;
     RunTimeLimit = RUN_TLIM;
-    TraceLevel = 1;
+    TraceLevel = 0;
     SphPeriod = SPH_PERIOD;
     SphTimeLimit = SPH_TLIM;
 }

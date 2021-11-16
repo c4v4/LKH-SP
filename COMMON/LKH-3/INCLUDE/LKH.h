@@ -619,7 +619,7 @@ Node *RemoveFirstActive(void);
 void ResetCandidateSet(void);
 void RestoreTour(void);
 int SegmentSize(Node *ta, Node *tb);
-void SetParameters(void);
+void SetDefaultParameters(void);
 void SINTEF_WriteSolution(char *FileName, GainType Cost);
 GainType SFCTour(int CurveType);
 void SolveCompressedSubproblem(int CurrentSubproblem, int Subproblems, GainType *GlobalBestCost);

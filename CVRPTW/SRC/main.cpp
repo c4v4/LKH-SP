@@ -30,26 +30,33 @@ int main(int argc, char *argv[]) {
     Node *N;
     int i;
 
-    if (argc >= 2)
+    SetDefaultParameters();
+    if (argc > 1)
         ProblemFileName = argv[1];
+    if (argc > 2)
+        Seed = atoi(argv[2]);
+    if (argc > 3)
+        TimeLimit = atoi(argv[3]);
+    if (argc > 4) {
+        RunTimeLimit = TimeLimit / atoi(argv[4]);
+        SphTimeLimit = RunTimeLimit / (2 * atoi(argv[4]));
+    }
 
-    Seed = argc >= 4 ? atoi(argv[3]) : DEFAULT_SEED;
+    for (i = 0; i < argc; i++)
+        printff("%s ", argv[i]);
+    printff("\n");
 
     StartTime = LastTime = GetTime();
     MergeWithTour = Recombination == IPT ? MergeWithTourIPT : MergeWithTourGPX2;
     OutputSolFile = stdout;
-    SetParameters();
     ReadProblem();
-
-    Seed = argc >= 5 ? atoi(argv[4]) : DEFAULT_SEED;
-    Seed = argc >= 6 ? atoi(argv[5]) : DEFAULT_SEED;
-    Seed = argc >= 7 ? atoi(argv[6]) : DEFAULT_SEED;
 
     int *warmstart = (int *)malloc((DimensionSaved + 1) * sizeof(int));
     assert(warmstart);
-    if (argc >= 3)
+    /* if (argc >= 3)
         Read_InitialTour_Sol(argv[2]);
-    else if (MTSPMinSize == 0) {
+    else */
+    if (MTSPMinSize == 0) {
         if (ProblemType == CVRP)
             CVRP_InitialTour();
         else if (ProblemType == CVRPTW)
@@ -103,8 +110,6 @@ int main(int argc, char *argv[]) {
     CreateCandidateSet();
     InitializeStatistics();
 
-    RunTimeLimit = Dim / 2;
-    SphTimeLimit = RunTimeLimit / 2;
     Norm = 9999;
     BestCost = PLUS_INFINITY;
     BestPenalty = CurrentPenalty = PLUS_INFINITY;

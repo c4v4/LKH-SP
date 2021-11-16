@@ -25,7 +25,7 @@ GainType FindTour() {
     int i;
     double EntryTime = GetTime();
     double LastImprTime = EntryTime;
-    double SaTimeLimit = Run == 1 ? RunTimeLimit / 5 : RunTimeLimit;
+    double SaTimeLimit = /* Run == 0 ? RunTimeLimit / 2 : */ RunTimeLimit;
     if (SaTimeLimit < TimeLimit - (EntryTime - StartTime))
         SA_setup(0.0, SaTimeLimit);
     else
@@ -64,9 +64,9 @@ GainType FindTour() {
                 printff("*** LKH time limit exceeded ***\n");
             break;
         }
-        if (Run == 0 && now - LastImprTime > RunTimeLimit / 10.0) {
+        if ((Run == 0) && (now - LastImprTime > RunTimeLimit / 10.0)) {
             if (TraceLevel >= 1)
-                printff("*** First Run early exit (%.0f) ***\n", now - LastImprTime);
+                printff("*** First Run early exit: no improvements for %.1f sec. ***\n", now - LastImprTime);
             break;
         }
         /* if (now - EntryTime >= RunTimeLimit / 2.0)

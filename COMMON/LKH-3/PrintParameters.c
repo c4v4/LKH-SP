@@ -185,6 +185,10 @@ void PrintParameters()
         printff("# TIME_LIMIT =\n");
     else
         printff("TIME_LIMIT = %0.1f\n", TimeLimit);
+    if (RunTimeLimit == DBL_MAX)
+        printff("# TIME_LIMIT =\n");
+    else
+        printff("RUN_TIME_LIMIT = %0.1f\n", RunTimeLimit);
     printff("%sTOUR_FILE = %s\n",
             TourFileName ? "" : "# ", TourFileName ? TourFileName : "");
     printff("TRACE_LEVEL = %d\n", TraceLevel);
