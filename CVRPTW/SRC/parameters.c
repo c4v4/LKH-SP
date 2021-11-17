@@ -79,7 +79,7 @@ void SetDefaultParameters() {
     SubsequentPatching = 1;
     TimeLimit = TLIM;
     RunTimeLimit = RUN_TLIM;
-    TraceLevel = 0;
+    TraceLevel = 1;
     SphPeriod = SPH_PERIOD;
     SphTimeLimit = SPH_TLIM;
 }

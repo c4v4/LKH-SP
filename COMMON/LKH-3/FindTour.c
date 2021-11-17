@@ -22,10 +22,10 @@ static GainType OrdinalTourCost;
 GainType FindTour() {
     GainType Cost;
     Node *t;
-    int i;
+    int i, SA_Started = 0;
     double EntryTime = GetTime();
     double LastImprTime = EntryTime;
-    double SaTimeLimit = /* Run == 0 ? RunTimeLimit / 2 : */ RunTimeLimit;
+    double SaTimeLimit = RunTimeLimit;
     if (SaTimeLimit < TimeLimit - (EntryTime - StartTime))
         SA_setup(0.0, SaTimeLimit);
     else
@@ -64,16 +64,11 @@ GainType FindTour() {
                 printff("*** LKH time limit exceeded ***\n");
             break;
         }
-        if ((Run == 0) && (now - LastImprTime > RunTimeLimit / 10.0)) {
-            if (TraceLevel >= 1)
-                printff("*** First Run early exit: no improvements for %.1f sec. ***\n", now - LastImprTime);
-            break;
-        }
-        /* if (now - EntryTime >= RunTimeLimit / 2.0)
-            FreezeSalesmen(); */
         /* Delayed SA start to normalize temperature with BetterCost */
-        if (Trial == 5)
+        if (!SA_Started && ((Run != 1 && Trial >= 5) || (Run == 1 && (now - EntryTime > RunTimeLimit / 2.0)))) {
             SA_start();
+            SA_Started = 1;
+        }
         /* Choose FirstNode at random */
         if (Dimension == DimensionSaved)
             FirstNode = &NodeSet[1 + Random() % Dimension];
@@ -158,7 +153,6 @@ GainType FindTour() {
     if (Trial > MaxTrials)
         Trial = MaxTrials;
     ResetCandidateSet();
-    /* UnfreezeSalesmen(); */
     CurrentPenalty = BetterPenalty;
     return BetterCost;
 }

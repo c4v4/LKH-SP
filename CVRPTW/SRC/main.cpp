@@ -37,10 +37,10 @@ int main(int argc, char *argv[]) {
         Seed = atoi(argv[2]);
     if (argc > 3)
         TimeLimit = atoi(argv[3]);
-    if (argc > 4) {
+    /* if (argc > 4) {
         RunTimeLimit = TimeLimit / atoi(argv[4]);
         SphTimeLimit = RunTimeLimit / (2 * atoi(argv[4]));
-    }
+    } */
 
     for (i = 0; i < argc; i++)
         printff("%s ", argv[i]);
@@ -119,13 +119,34 @@ int main(int argc, char *argv[]) {
 
     /* Find a specified number (Runs) of local optima */
 
-    for (Run = 0; Run <= Runs; Run++) {
+    for (Run = 1; Run <= Runs; Run++) {
         LastTime = GetTime();
         if (LastTime - StartTime >= TimeLimit) {
             if (TraceLevel >= 1)
                 printff("*** Time limit exceeded ***\n");
             break;
         }
+
+        /************* Time limit strategy **************/
+        SphTimeLimit = TimeLimit / 32;
+        if (Run < 4)
+            if (Run < 2)
+                RunTimeLimit = TimeLimit / 8;
+            else if (Run == 2)
+                RunTimeLimit = TimeLimit / 8;
+            else
+                RunTimeLimit = TimeLimit / 4;
+        else if (Run < 6)
+            if (Run == 4)
+                RunTimeLimit = TimeLimit / 16;
+            else
+                RunTimeLimit = TimeLimit / 8;
+        else if (Run == 6)
+            RunTimeLimit = TimeLimit / 8;
+        else
+            RunTimeLimit = TimeLimit / 8;
+        /************************************************/
+
         Cost = FindTour(); /* using the Lin-Kernighan heuristic */
         if (MaxPopulationSize > 1 && !TSPTW_Makespan) {
             /* Genetic algorithm */
