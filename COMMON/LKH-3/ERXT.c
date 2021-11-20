@@ -1,4 +1,5 @@
 #include "LKH.h"
+#include "Genetic.h"
 
 /* 
  * The ERXT function applies the Edge Recombination Crossover operator (ERX)

@@ -387,9 +387,9 @@ static int reversed;
 static char *dontLook;
 static GainType tourLength;
 
-static void createNeighbors();
-static void threeOpt();
-static void doubleBridgeKick();
+static void createNeighbors(void);
+static void threeOpt(void);
+static void doubleBridgeKick(void);
 static int prev(int v);
 static int next(int v);
 static int PREV(int v);

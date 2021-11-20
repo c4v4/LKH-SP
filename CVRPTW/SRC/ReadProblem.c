@@ -3,7 +3,7 @@
 
 static const char Delimiters[] = " :=\n\t\r\f\v\xef\xbb\xbf";
 static void CheckSpecificationPart(void);
-static char *Copy(char *S);
+static char *Copy(const char *S);
 static void CreateNodes(void);
 static int FixEdge(Node *Na, Node *Nb);
 static void Read_DIMENSION(void);
@@ -11,7 +11,7 @@ static void Read_NAME(void);
 static void Read_NODE_SECTION(void);
 static void Read_SALESMEN_and_CAPACITY(void);
 static void Read_TOUR_SECTION(FILE **File);
-static void Convert2FullMatrix();
+static void Convert2FullMatrix(void);
 
 void ReadProblem() {
     int i, j, K;
@@ -339,7 +339,7 @@ static void CheckSpecificationPart() {
             "asymetric problems");
 }
 
-static char *Copy(char *S) {
+static char *Copy(const char *S) {
     char *Buffer;
 
     if (!S || strlen(S) == 0)

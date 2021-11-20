@@ -62,11 +62,11 @@ static int was_empty_route(Node *, Node *); /* Used to test *only once* if a rem
                                                 flags is reseted (To avoid counting multiple times the same route).*/
 
 #ifdef REDUNDANT_CHECK
-GainType Penalty_();
-GainType Penalty() {
+GainType Penalty_(void);
+GainType Penalty(void) {
     assert(CurrentPenalty >= 0);
-    GainType P1 = Penalty_();
-    GainType P2 = Penalty_Old();
+    GainType P1 = Penalty_(void);
+    GainType P2 = Penalty_Old(void);
     int accepted1 = P1 < CurrentPenalty || (P1 == CurrentPenalty && CurrentGain > 0);
     int accepted2 = P2 < CurrentPenalty || (P2 == CurrentPenalty && CurrentGain > 0);
     assert(accepted1 == accepted2);

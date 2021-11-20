@@ -42,6 +42,6 @@ typedef enum {right, left} side;
 extern point *p_array;
 
 void delaunay(int n);
-void free_memory();
+void free_memory(void);
 
 #endif

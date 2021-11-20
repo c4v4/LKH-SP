@@ -701,7 +701,7 @@ extern Node **cava_NodeCache;
 #endif
 
 #ifdef CAVA_FLIP
-void cava_FlipAsym_Update();
+void cava_FlipAsym_Update(void);
 #endif
 
 #endif

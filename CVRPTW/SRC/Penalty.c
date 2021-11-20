@@ -59,12 +59,12 @@
 
 //#define REDUNDANT_CHECK /* ONLY DEBUG: checks old and new and assert they are the same. */
 
-GainType Penalty_Old();
+GainType Penalty_Old(void);
 static GainType oldPenaltySum;
-static int setup_Penalty();
+static int setup_Penalty(void);
 static Node *setup_node(Node *N);
 static void route_min_node_update(Node *t);
-static void update_Penalty();
+static void update_Penalty(void);
 
 #ifdef REDUNDANT_CHECK
 static GainType Penalty_();

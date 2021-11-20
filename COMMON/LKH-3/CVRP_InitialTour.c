@@ -1,6 +1,6 @@
 #include "LKH.h"
 
-/* The CVRP_InitialTour function computes an initial tour using the 
+/* The CVRP_InitialTour function computes an initial tour using the
  * Clarke and Wright savings algorithm.
  */
 
@@ -10,12 +10,12 @@
 #define Size LastV
 #define Load Loc
 
-static Node *Find(Node * v);
-static void Union(Node * x, Node * y);
-static void MakeSets();
+static Node *Find(Node *v);
+static void Union(Node *x, Node *y);
+static void MakeSets(void);
 static void Distribute(int Constrained, double R);
 static int compareValue(const void *s1, const void *s2);
-static void CreateS();
+static void CreateS(void);
 
 typedef struct Saving {
     int Value, i, j;
@@ -24,8 +24,7 @@ typedef struct Saving {
 static Saving *S;
 static int Sets, SSize;
 
-GainType CVRP_InitialTour()
-{
+GainType CVRP_InitialTour() {
     Node *N, *Last, *Next, *Tour;
     int s, Dim = Dimension - Salesmen + 1, it;
     GainType Cost, BestCost = PLUS_INFINITY, BestPenalty = PLUS_INFINITY;
@@ -74,8 +73,7 @@ GainType CVRP_InitialTour()
             if (N->Degree <= 1) {
                 for (s = 1; s <= Salesmen; s++) {
                     Tour = s == 1 ? Depot : &NodeSet[Dim + s - 1];
-                    if (Tour->Degree <= 1 &&
-                        (Sets == 1 || Find(N) != Find(Tour))) {
+                    if (Tour->Degree <= 1 && (Sets == 1 || Find(N) != Find(Tour))) {
                         Union(N, Tour);
                         if (N->Degree <= 1)
                             N = N->Pred;
@@ -100,10 +98,10 @@ GainType CVRP_InitialTour()
         Cost += ServiceTime * (Dim - 1);
         CurrentPenalty = PLUS_INFINITY;
         CurrentPenalty = Penalty();
-        if (CurrentPenalty < BestPenalty ||
-            (CurrentPenalty == BestPenalty && Cost < BestCost)) {
+        if (CurrentPenalty < BestPenalty || (CurrentPenalty == BestPenalty && Cost < BestCost)) {
             N = FirstNode;
-            while ((N = N->OldSuc = N->Suc) != FirstNode);
+            while ((N = N->OldSuc = N->Suc) != FirstNode)
+                ;
             BestCost = Cost;
             BestPenalty = CurrentPenalty;
         }
@@ -130,12 +128,11 @@ GainType CVRP_InitialTour()
     return Cost;
 }
 
-void CreateS()
-{
+void CreateS() {
     int Dim = Dimension - Salesmen + 1, i, j;
     Node *Ni, *Nj;
     SSize = 0;
-    S = (Saving *) malloc((Dim - 2) * (Dim - 1) / 2 * sizeof(Saving));
+    S = (Saving *)malloc((Dim - 2) * (Dim - 1) / 2 * sizeof(Saving));
     /* Compute savings */
     for (i = 1; i < Dim; i++) {
         Ni = &NodeSet[i];
@@ -145,9 +142,7 @@ void CreateS()
             Nj = &NodeSet[j];
             if (Nj == Depot || Forbidden(Ni, Nj))
                 continue;
-            S[SSize].Value = FixedOrCommon(Ni, Nj) ? INT_MAX :
-                OldDistance(Ni, Depot) +
-                OldDistance(Depot, Nj) - OldDistance(Ni, Nj);
+            S[SSize].Value = FixedOrCommon(Ni, Nj) ? INT_MAX : OldDistance(Ni, Depot) + OldDistance(Depot, Nj) - OldDistance(Ni, Nj);
             S[SSize].i = i;
             S[SSize].j = j;
             SSize++;
@@ -157,28 +152,24 @@ void CreateS()
     qsort(S, SSize, sizeof(Saving), compareValue);
 }
 
-static Node *Find(Node * v)
-{
+static Node *Find(Node *v) {
     if (v != v->Dad)
         v->Dad = Find(v->Dad);
     return v->Dad;
 }
 
-static void Union(Node * x, Node * y)
-{
+static void Union(Node *x, Node *y) {
     Node *u = Find(x), *v = Find(y);
     if (u->Size < v->Size) {
         u->Dad = v;
         v->Size += u->Size;
         v->Load += u->Load;
-        v->Cost += u->Cost + OldDistance(x, y) -
-            OldDistance(x, Depot) - OldDistance(y, Depot);
+        v->Cost += u->Cost + OldDistance(x, y) - OldDistance(x, Depot) - OldDistance(y, Depot);
     } else {
         v->Dad = u;
         u->Size += v->Size;
         u->Load += v->Load;
-        u->Cost += v->Cost + OldDistance(x, y) -
-            OldDistance(x, Depot) - OldDistance(y, Depot);
+        u->Cost += v->Cost + OldDistance(x, y) - OldDistance(x, Depot) - OldDistance(y, Depot);
     }
     if (x->Degree++ == 0)
         x->Prev = y;
@@ -191,8 +182,7 @@ static void Union(Node * x, Node * y)
     Sets--;
 }
 
-static void MakeSets()
-{
+static void MakeSets() {
     Node *N = FirstNode;
     Sets = 0;
     do {
@@ -206,8 +196,7 @@ static void MakeSets()
     } while ((N = N->Suc) != FirstNode);
 }
 
-static void Distribute(int Constrained, double R)
-{
+static void Distribute(int Constrained, double R) {
     Node *Ni, *Nj, *u, *v;
     int i;
 
@@ -221,20 +210,17 @@ static void Distribute(int Constrained, double R)
             v = Find(Nj);
             if (u == v)
                 continue;
-            if (!Constrained ||
-                (u->Load + v->Load <= Capacity &&
-                 (DistanceLimit == DBL_MAX ||
-                  u->Cost + v->Cost + OldDistance(Ni, Nj) -
-                  OldDistance(Ni, Depot) - OldDistance(Nj, Depot) +
-                  (u->Size + v->Size) * ServiceTime <= DistanceLimit)))
+            if (!Constrained || (u->Load + v->Load <= Capacity &&
+                                 (DistanceLimit == DBL_MAX || u->Cost + v->Cost + OldDistance(Ni, Nj) - OldDistance(Ni, Depot) -
+                                                                      OldDistance(Nj, Depot) + (u->Size + v->Size) * ServiceTime <=
+                                                                  DistanceLimit)))
                 Union(Ni, Nj);
         }
     }
 }
 
-static int compareValue(const void *s1, const void *s2)
-{
-    int v1 = ((Saving *) s1)->Value;
-    int v2 = ((Saving *) s2)->Value;
+static int compareValue(const void *s1, const void *s2) {
+    int v1 = ((const Saving *)s1)->Value;
+    int v2 = ((const Saving *)s2)->Value;
     return v1 > v2 ? -1 : v1 == v2 ? 0 : 1;
 }

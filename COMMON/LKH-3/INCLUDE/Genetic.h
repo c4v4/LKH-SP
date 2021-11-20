@@ -15,7 +15,7 @@
     (((Penalty) > PenaltyFitness[i]) ||\
      ((Penalty) == PenaltyFitness[i] && (Cost) > Fitness[i]))
 
-typedef void (*CrossoverFunction) ();
+typedef void (*CrossoverFunction) (void);
 
 extern int MaxPopulationSize; /* The maximum size of the population */ 
 extern int PopulationSize;    /* The current size of the population */
@@ -29,14 +29,14 @@ extern GainType *Fitness;     /* The fitness (tour cost) of each individual */
 
 void AddToPopulation(GainType Penalty, GainType Cost);
 void ApplyCrossover(int i, int j);
-void FreePopulation();
+void FreePopulation(void);
 int HasFitness(GainType Penalty, GainType Cost);
 int LinearSelection(int Size, double Bias);
 GainType MergeTourWithIndividual(int i);
-void PrintPopulation();
+void PrintPopulation(void);
 void ReplaceIndividualWithTour(int i, GainType Penalty, GainType Cost);
 int ReplacementIndividual(GainType Penalty, GainType Cost);
 
-void ERXT();
+void ERXT(void);
 
 #endif

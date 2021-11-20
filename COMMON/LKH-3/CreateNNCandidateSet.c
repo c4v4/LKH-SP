@@ -6,23 +6,22 @@
  *
  * Time complexity is O(K*N*N).
  *
- * The function is called from the CreateCandidateSet and 
+ * The function is called from the CreateCandidateSet and
  * AddExtraCandidates functions. It is intended for use on non-geometric
  * and toroidal instances.
  */
 
 static int compareX(const void *Na, const void *Nb);
 
-void CreateNNCandidateSet(int K)
-{
+void CreateNNCandidateSet(int K) {
     Node **XNearList, **To, *Na, *Nb;
     int *Cost, d, a, b, k, Count, Forward;
 
     if (TraceLevel >= 2)
         printff("Creating NN candidate set ... \n");
-    XNearList = (Node **) malloc(Dimension * sizeof(Node *));
-    To = (Node **) malloc((K + 1) * sizeof(Node *));
-    Cost = (int *) malloc((K + 1) * sizeof(int));
+    XNearList = (Node **)malloc(Dimension * sizeof(Node *));
+    To = (Node **)malloc((K + 1) * sizeof(Node *));
+    Cost = (int *)malloc((K + 1) * sizeof(int));
     for (Na = FirstNode, k = 0; k < Dimension; Na = Na->Suc, k++)
         XNearList[k] = Na;
     qsort(XNearList, Dimension, sizeof(Node *), compareX);
@@ -55,11 +54,10 @@ void CreateNNCandidateSet(int K)
         printff("done\n");
 }
 
-static int compareX(const void *Na, const void *Nb)
-{
-    double x1 = (*(Node **) Na)->X;
-    double y1 = (*(Node **) Na)->Y;
-    double x2 = (*(Node **) Nb)->X;
-    double y2 = (*(Node **) Nb)->Y;
+static int compareX(const void *Na, const void *Nb) {
+    double x1 = (*(Node *const *)Na)->X;
+    double y1 = (*(Node *const *)Na)->Y;
+    double x2 = (*(Node *const *)Nb)->X;
+    double y2 = (*(Node *const *)Nb)->Y;
     return x1 < x2 ? -1 : x1 > x2 ? 1 : y1 < y2 ? -1 : y1 > y2 ? 1 : 0;
 }

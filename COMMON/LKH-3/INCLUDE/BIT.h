@@ -8,7 +8,7 @@
 #include "LKH.h"
 
 void BIT_Make(int Size);
-void BIT_Update();
+void BIT_Update(void);
 
 int BIT_LoadDiff3Opt(Node *t1, Node *t2, Node *t3, Node *t4,
                      Node *t5, Node *t6);

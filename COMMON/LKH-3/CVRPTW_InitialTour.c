@@ -52,7 +52,7 @@ typedef struct CVRPTWNode_ {
     int feasible;          /* True if it is feasible */
 } CVRPTWNode;
 
-typedef CVRPTWNode* (*InitStrat)();
+typedef CVRPTWNode* (*InitStrat)(void);
 
 typedef struct Insertion1MetaData_ {
     double mu, lambda, alpha1, alpha2;
@@ -65,15 +65,15 @@ static Node* next_depot(CVRPTWNode* dep);
 static void try_improve_c1(CVRPTWNode* i, CVRPTWNode* u, CVRPTWNode* j);
 static void reset_node(CVRPTWNode* u);
 static int needs_update(CVRPTWNode* u);
-static void setup();
+static void setup(void);
 static CVRPTWNode* new_route(CVRPTWNode** first_depot);
 static CVRPTWNode* insert_node(CVRPTWNode* u);
-static CVRPTWNode* FarthestNode0();
-static CVRPTWNode* FarthestNode1();
-static CVRPTWNode* FarthestNode2();
-static CVRPTWNode* UrgentNode();
-static GainType buid_tour();
-static int coordinates_are_used();
+static CVRPTWNode* FarthestNode0(void);
+static CVRPTWNode* FarthestNode1(void);
+static CVRPTWNode* FarthestNode2(void);
+static CVRPTWNode* UrgentNode(void);
+static GainType buid_tour(void);
+static int coordinates_are_used(void);
 
 static Insertion1MetaData I1Data;
 static int CurrentVehicles = INT_MAX;
@@ -94,7 +94,7 @@ GainType CVRPTW_InitialTour() {
         /* {1.0, 2.0, 0.0, 1.0, NULL, 0}  */ /* Best salesmen  1/56. Best length  0/56 <-- remove */
     };
 
-    for (int i = 0; i < sizeof(I1Conf) / sizeof(*I1Conf); ++i) {
+    for (unsigned i = 0; i < sizeof(I1Conf) / sizeof(*I1Conf); ++i) {
         I1Data = I1Conf[i];
         for (int paral = 0; paral < 2; ++paral) {
             /* sequential (0): Best salesmen 28/56. Best length 14/56 */

@@ -405,14 +405,14 @@ static void RemoveFromList(Node * N, Node ** First)
 
 static int compareX(const void *Na, const void *Nb)
 {
-    double x1 = (*(Node **) Na)->X;
-    double y1 = (*(Node **) Na)->Y;
-    double x2 = (*(Node **) Nb)->X;
-    double y2 = (*(Node **) Nb)->Y;
+    double x1 = (*(Node *const *) Na)->X;
+    double y1 = (*(Node *const *) Na)->Y;
+    double x2 = (*(Node *const *) Nb)->X;
+    double y2 = (*(Node *const *) Nb)->Y;
     return x1 < x2 ? -1 : x1 > x2 ? 1 : y1 < y2 ? -1 : y1 > y2 ? 1 : 0;
 }
 
 static int compareCost(const void *Na, const void *Nb)
 {
-    return (*(Node **) Na)->Cost - (*(Node **) Nb)->Cost;
+    return (*(Node *const *) Na)->Cost - (*(Node *const *) Nb)->Cost;
 }

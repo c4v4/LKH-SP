@@ -25,7 +25,7 @@ static void splice(edge * a, edge * b, point * v);
 static edge *make_edge(point * u, point * v);
 
 static void alloc_memory(int n);
-static edge *get_edge();
+static edge *get_edge(void);
 static void free_edge(edge * e);
 
 static void divide(point * p_sorted[], int l, int r, edge ** l_ccw,
@@ -502,10 +502,10 @@ static void free_edge(edge * e)
 
 static int compare(const void *p1, const void *p2)
 {
-    real x1 = (*(point **) p1)->x;
-    real y1 = (*(point **) p1)->y;
-    real x2 = (*(point **) p2)->x;
-    real y2 = (*(point **) p2)->y;
+    real x1 = (*(point *const *) p1)->x;
+    real y1 = (*(point *const *) p1)->y;
+    real x2 = (*(point *const *) p2)->x;
+    real y2 = (*(point *const *) p2)->y;
 
     return x1 < x2 ? -1 : x1 > x2 ? 1 : y1 < y2 ? -1 : y1 > y2 ? 1 : 0;
 }
