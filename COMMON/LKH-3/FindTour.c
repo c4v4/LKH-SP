@@ -65,7 +65,8 @@ GainType FindTour() {
             break;
         }
         /* Delayed SA start to normalize temperature with BetterCost */
-        if (!SA_Started && ((Run != 1 && Trial >= 5) || (Run == 1 && (now - EntryTime > RunTimeLimit / 2.0)))) {
+        // if (!SA_Started && ((Run != 1 && Trial >= 5) || (Run == 1 && (now - EntryTime > RunTimeLimit / 2.0)))) {
+        if (Trial == 10) {
             SA_start();
             SA_Started = 1;
         }
@@ -93,13 +94,14 @@ GainType FindTour() {
             NodeSet[Dimension].Next = &NodeSet[1];
             Cost = MergeWithTour();
         }
-        if (ExtractRoutes(Cost))
+        if (ExtractRoutes(Cost)) {
             LastImprTime = now;
-        if (SA_test(CurrentPenalty, Cost)) {
             if (TraceLevel >= 1) {
                 printff("* %d: ", Trial);
                 StatusReport(Cost, EntryTime, "");
             }
+        }
+        if (SA_test(CurrentPenalty, Cost)) {
             BetterCost = Cost;
             BetterPenalty = CurrentPenalty;
             RecordBetterTour();

@@ -173,6 +173,7 @@ Node **cava_NodeCache;
 
 int SphPeriod;
 double SphTimeLimit;
+double SAFactor;
 
 /////// Sequence.h ///////
 Node **t;      /* The sequence of nodes to be used in a move */

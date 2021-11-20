@@ -34,13 +34,9 @@ int main(int argc, char *argv[]) {
     if (argc > 1)
         ProblemFileName = argv[1];
     if (argc > 2)
-        Seed = atoi(argv[2]);
+        TimeLimit = atoi(argv[2]);
     if (argc > 3)
-        TimeLimit = atoi(argv[3]);
-    /* if (argc > 4) {
-        RunTimeLimit = TimeLimit / atoi(argv[4]);
-        SphTimeLimit = RunTimeLimit / (2 * atoi(argv[4]));
-    } */
+        Seed = atoi(argv[3]);
 
     for (i = 0; i < argc; i++)
         printff("%s ", argv[i]);
@@ -117,8 +113,11 @@ int main(int argc, char *argv[]) {
     sph::SPHeuristic sph(Dim - 1);
     sph_ptr = &sph;
 
-    /* Find a specified number (Runs) of local optima */
+    double Tlim = (TimeLimit - GetTime() + StartTime); /* Remaining time */
+    SphTimeLimit = Tlim / 30;
+    RunTimeLimit = Tlim / 10;
 
+    /* Find a specified number (Runs) of local optima */
     for (Run = 1; Run <= Runs; Run++) {
         LastTime = GetTime();
         if (LastTime - StartTime >= TimeLimit) {
@@ -126,27 +125,7 @@ int main(int argc, char *argv[]) {
                 printff("*** Time limit exceeded ***\n");
             break;
         }
-
-        /************* Time limit strategy **************/
-        SphTimeLimit = TimeLimit / 32;
-        if (Run < 4)
-            if (Run < 2)
-                RunTimeLimit = TimeLimit / 8;
-            else if (Run == 2)
-                RunTimeLimit = TimeLimit / 8;
-            else
-                RunTimeLimit = TimeLimit / 4;
-        else if (Run < 6)
-            if (Run == 4)
-                RunTimeLimit = TimeLimit / 16;
-            else
-                RunTimeLimit = TimeLimit / 8;
-        else if (Run == 6)
-            RunTimeLimit = TimeLimit / 8;
-        else
-            RunTimeLimit = TimeLimit / 8;
-        /************************************************/
-
+        printff("Run time limit: %.1f, remaining Time: %.1f\n", RunTimeLimit, TimeLimit - LastTime + StartTime);
         Cost = FindTour(); /* using the Lin-Kernighan heuristic */
         if (MaxPopulationSize > 1 && !TSPTW_Makespan) {
             /* Genetic algorithm */
@@ -250,6 +229,7 @@ int main(int argc, char *argv[]) {
                 WriteSolFile(warmstart, Cost);
                 SetInitialTour(warmstart);
             }
+            RunTimeLimit *= 2;
         }
     }
     PrintStatistics();

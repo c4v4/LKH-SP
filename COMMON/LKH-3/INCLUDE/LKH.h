@@ -712,6 +712,7 @@ extern const int Asymmetric; /* Is the instance asymmetric? */
 
 extern int SphPeriod;
 extern double SphTimeLimit;
+extern double SAFactor; /*Intensity of Simulated Annealing (default 1.0)*/
 
 GainType Penalty(void);
 int Forbidden(Node *Na, Node *Nb);
