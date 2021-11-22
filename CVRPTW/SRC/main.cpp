@@ -26,7 +26,10 @@ std::vector<sph::idx_t> BestRoutes; /* Vector containing routes indexes of BestT
 void print_sol(sph::Instance &inst, sph::GlobalSolution &sol) {
     int route = 1;
     for (sph::idx_t j : sol) {
-        fmt::print("Route #{}: {}\n", route++, fmt::join(inst.get_col(j), " "));
+        fmt::print("Route #{}: ", route++);
+        for (sph::idx_t i : inst.get_col(j))
+            fmt::print("{} ", i + 1);
+        fmt::print("\n");
     }
     fmt::print("Cost {}\n", sol.get_cost());
     fflush(stdout);
@@ -47,6 +50,8 @@ int main(int argc, char *argv[]) {
         TimeLimit = atoi(argv[2]);
     if (argc > 3)
         Seed = atoi(argv[3]);
+    if (argc > 4)
+        SAFactor = atof(argv[4]);
 
     for (i = 0; i < argc; i++)
         printff("%s ", argv[i]);
@@ -127,8 +132,6 @@ int main(int argc, char *argv[]) {
     sph_ptr = &sph;
 
     double Tlim = (TimeLimit - GetTime() + StartTime); /* Remaining time */
-#warning "Remove also this line!"
-    Tlim -= Tlim / 15;
     SphTimeLimit = Tlim / 30;
     RunTimeLimit = Tlim / 10;
 
@@ -224,7 +227,7 @@ int main(int argc, char *argv[]) {
         /* Set Partitioning Heuristic phase */
         if (Run && Run % SphPeriod == 0) {
             sph.set_timelimit(SphTimeLimit);
-            sph.set_ncols_constr(0);
+            sph.set_ncols_constr(BestRoutes.size());
             auto BestRCopy = BestRoutes;
             BestRoutes = sph.solve(BestRoutes);
             if (!BestRoutes.empty()) { /* Transform back SP sol to tour*/
@@ -245,13 +248,6 @@ int main(int argc, char *argv[]) {
                 warmstart[0] = warmstart[DimensionSaved];
                 WriteSolFile(warmstart, Cost);
                 SetInitialTour(warmstart);
-
-#warning "Second sph round active!"
-                sph.set_timelimit(SphTimeLimit);
-                sph.set_ncols_constr(BestRoutes.size());
-                auto BestRoutes2 = sph.solve(BestRCopy);
-                fmt::print("#SPH: Try1 {}, try2 {}: percentage improvement {}\n", Cost, BestRoutes2.get_cost(),
-                           (Cost - BestRoutes2.get_cost()) / Cost);
             }
             RunTimeLimit *= 2;
         }

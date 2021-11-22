@@ -7,7 +7,7 @@
 #define SPH_PERIOD 3
 #define SPH_TLIM 120.0
 #define TLIM DBL_MAX
-#define RUN_TLIM DBL_MAX 
+#define RUN_TLIM DBL_MAX
 
 /**
  * To help linking-time optimizations (with -flto), some of the variables and functions that
@@ -70,9 +70,12 @@ void SetDefaultParameters() {
     Recombination = IPT;
     RestrictedSearch = 1;
     Runs = RUNS;
-    //Salesmen = 250;
+    // Salesmen = 250;
+    SAFactor = 1.0;
     Scale = 10;
     Seed = 1;
+    SphPeriod = SPH_PERIOD;
+    SphTimeLimit = SPH_TLIM;
     StopAtOptimum = 1;
     Subgradient = 1;
     SubproblemSize = 0;
@@ -80,6 +83,4 @@ void SetDefaultParameters() {
     TimeLimit = TLIM;
     RunTimeLimit = RUN_TLIM;
     TraceLevel = 1;
-    SphPeriod = SPH_PERIOD;
-    SphTimeLimit = SPH_TLIM;
 }

@@ -93,7 +93,8 @@ int extract_routes_tmlp(GainType Cost) {
         if (N->DepotId) {
             if (check.is_feasible()) {
                 if (!check.empty()) {
-                    sph::idx_t col_idx = sph.add_column(current_route.begin(), current_route.end(), check.get_length(), Cost);
+                    sph::idx_t col_idx = sph.add_column(current_route.begin(), current_route.end(),
+                                                        (sph::real_t)check.get_length() / (sph::real_t)Scale, Cost);
                     if (store_best)
                         BestRoutes.push_back(col_idx);
                 }

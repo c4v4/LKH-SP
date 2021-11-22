@@ -3543,7 +3543,7 @@ namespace sph {
          *
          * @return std::vector<idx_t> Best solution found.
          */
-        inline const GlobalSolution/*&*/ solve(const std::vector<idx_t> &S_init) {
+        inline const GlobalSolution& solve(const std::vector<idx_t> &S_init) {
             real_t S_init_cost = 0.0;
             if (!S_init.empty()) {
                 S_init_cost = 0.0;
@@ -3561,16 +3561,12 @@ namespace sph {
          *
          * @return std::vector<idx_t>
          */
-        inline const GlobalSolution/*&*/ solve() {
+        inline const GlobalSolution& solve() {
             SPH_VERBOSE(0) { fmt::print(" Set Partitioning Heuristic: \n"); }
-            SPH_DEBUG { fmt::print(" Warning: running in debug mode\n"); }
             SPH_VERBOSE(0) { fmt::print(" SP Instance size: {}x{}\n", inst.get_nrows(), inst.get_ncols()); }
-            
-            #warning "Warmstart not updated in solver! (due to testing)"
-            //warmstart = refinement.solve(warmstart); 
-            //return warmstart;
-            
-            return refinement.solve(warmstart);
+            SPH_DEBUG { fmt::print(" Warning: running in debug mode\n"); }
+            warmstart = refinement.solve(warmstart); 
+            return warmstart;
         }
 
         /**
