@@ -15,6 +15,7 @@ extern "C" {
 #endif
 }
 
+#define SCALED(X) ((sph::real_t)X / (sph::real_t)Scale)
 
 extern sph::SPHeuristic *sph_ptr;
 extern std::vector<sph::idx_t> BestRoutes; /* Vector containing routes indexes of BestTour */
@@ -93,8 +94,8 @@ int extract_routes_tmlp(GainType Cost) {
         if (N->DepotId) {
             if (check.is_feasible()) {
                 if (!check.empty()) {
-                    sph::idx_t col_idx = sph.add_column(current_route.begin(), current_route.end(),
-                                                        (sph::real_t)check.get_length() / (sph::real_t)Scale, Cost);
+                    sph::idx_t col_idx = sph.add_column(current_route.begin(), current_route.end(), SCALED(check.get_length()),
+                                                        SCALED(Cost));
                     if (store_best)
                         BestRoutes.push_back(col_idx);
                 }

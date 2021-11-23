@@ -11,7 +11,7 @@ extern "C" {
 #include <vector>
 
 #define VERBOSE
-#define VERBOSE_LEVEL 1
+#define VERBOSE_LEVEL 3
 
 #define NDEBUG
 #include "SPH.hpp"
@@ -235,7 +235,7 @@ int main(int argc, char *argv[]) {
                 int *ws = warmstart + 1;
                 for (sph::idx_t j : BestRoutes) {
                     sph::Column &col = sph.get_col(j);
-                    Cost += col.get_cost();
+                    Cost += col.get_cost() * Scale;
                     *ws++ = MTSPDepot;
                     for (sph::idx_t &i : col) {
                         if (ws - warmstart > DimensionSaved + 1)

@@ -60,6 +60,7 @@ namespace sph {
     constexpr idx_t NOT_AN_INDEX = std::numeric_limits<sph::idx_t>::max();
     constexpr idx_t MAX_INDEX = std::numeric_limits<sph::idx_t>::max();
     constexpr real_t HAS_INTEGRAL_COSTS = 1.0;  // 1.0 if yes , 0.0 if no
+    constexpr real_t EPSILON = 1E-6;
 
     enum KeepStrat { SPP, SCP };
 
@@ -591,10 +592,10 @@ namespace sph {
     public:
         Stopwatch() : begin(std::chrono::steady_clock::now()), last(begin) { }
 
-        double seconds_from_begin() { return std::chrono::duration<double>(now() - begin).count(); }
-        double millisec_from_begin() { return std::chrono::duration<double, std::milli>(now() - begin).count(); }
-        double microsec_from_begin() { return std::chrono::duration<double, std::micro>(now() - begin).count(); }
-        double nanosec_from_begin() { return std::chrono::duration<double, std::nano>(now() - begin).count(); }
+        double seconds_from_begin() const { return std::chrono::duration<double>(now() - begin).count(); }
+        double millisec_from_begin() const { return std::chrono::duration<double, std::milli>(now() - begin).count(); }
+        double microsec_from_begin() const { return std::chrono::duration<double, std::micro>(now() - begin).count(); }
+        double nanosec_from_begin() const { return std::chrono::duration<double, std::nano>(now() - begin).count(); }
 
         double seconds_lap() {
             auto old_last = last;
@@ -621,7 +622,7 @@ namespace sph {
         }
 
     protected:
-        std::chrono::steady_clock::time_point now() { return std::chrono::steady_clock::now(); }
+        static std::chrono::steady_clock::time_point now() { return std::chrono::steady_clock::now(); }
 
     private:
         std::chrono::steady_clock::time_point begin;
@@ -635,12 +636,12 @@ namespace sph {
         Timer() : end(now()) { }
         Timer(double second_tlim) : end(now() + std::chrono::microseconds(static_cast<uint64_t>(second_tlim * 1E6))) { }
 
-        double seconds_until_end() { return std::chrono::duration<double>(end - now()).count(); }
-        double millisec_until_end() { return std::chrono::duration<double, std::milli>(end - now()).count(); }
-        double microsec_until_end() { return std::chrono::duration<double, std::micro>(end - now()).count(); }
-        double nanosec_until_end() { return std::chrono::duration<double, std::nano>(end - now()).count(); }
+        double seconds_until_end() const { return std::chrono::duration<double>(end - now()).count(); }
+        double millisec_until_end() const { return std::chrono::duration<double, std::milli>(end - now()).count(); }
+        double microsec_until_end() const { return std::chrono::duration<double, std::micro>(end - now()).count(); }
+        double nanosec_until_end() const { return std::chrono::duration<double, std::nano>(end - now()).count(); }
 
-        bool exceeded_tlim() { return now() >= end; }
+        bool exceeded_tlim() const { return now() >= end; }
 
     private:
         std::chrono::steady_clock::time_point end;
@@ -1076,8 +1077,11 @@ namespace sph {
         [[nodiscard]] inline idx_t get_active_rows_size() const { return nactive_rows; }
 
         [[nodiscard]] inline std::vector<idx_t> &get_active_cols() { return active_cols; }
+        [[nodiscard]] inline const std::vector<idx_t> &get_active_cols() const { return active_cols; }
         [[nodiscard]] inline std::vector<idx_t> &get_fixed_cols() { return fixed_cols; }
+        [[nodiscard]] inline const std::vector<idx_t> &get_fixed_cols() const { return fixed_cols; }
         [[nodiscard]] inline UniqueColSet &get_cols() { return cols; }
+        [[nodiscard]] inline const UniqueColSet &get_cols() const { return cols; }
         [[nodiscard]] inline Column &get_col(idx_t idx) { return cols[idx]; }
         [[nodiscard]] inline const Column &get_col(idx_t idx) const { return cols[idx]; }
         [[nodiscard]] inline real_t get_fixed_cost() const { return fixed_cost; }
@@ -1091,7 +1095,7 @@ namespace sph {
         inline void set_timelimit(double seconds) { timelimit = Timer(seconds); }
         [[nodiscard]] inline Timer &get_timelimit() { return timelimit; }
 
-        [[nodiscard]] inline bool is_row_active(idx_t gi) {
+        [[nodiscard]] inline bool is_row_active(idx_t gi) const {
             assert(gi < nrows);
             return active_rows[gi];
         }
@@ -1109,8 +1113,20 @@ namespace sph {
                     active_rows[i] = false;
                 }
             }
-
             _fix_columns(idxs);
+        }
+
+        void update_sol_costs(const std::vector<idx_t> sol_cols, real_t sol_cost) {
+            for (idx_t gj : sol_cols) {
+                if (cols[gj].get_solcost() > sol_cost) {
+                    cols[gj].set_solcost(sol_cost);
+                }
+            }
+            for (idx_t gj : fixed_cols) {
+                if (cols[gj].get_solcost() > sol_cost) {
+                    cols[gj].set_solcost(sol_cost);
+                }
+            }
         }
 
         void fix_columns(const std::vector<idx_t> &idxs, const MStar &M_star) {
@@ -1596,11 +1612,14 @@ namespace sph {
         [[nodiscard]] inline const Row &get_row(idx_t idx) const { return rows[idx]; }
 
         [[nodiscard]] inline std::vector<idx_t> &get_fixed_cols() { return fixed_cols_global_idxs; }
+        [[nodiscard]] inline const std::vector<idx_t> &get_fixed_cols() const { return fixed_cols_global_idxs; }
         [[nodiscard]] inline real_t get_fixed_cost() const { return fixed_cost; }
         [[nodiscard]] inline idx_t get_ncols_constr() const { return ncols_constr; }
         [[nodiscard]] inline Instance &get_instance() { return inst; }
+        [[nodiscard]] inline const Instance &get_instance() const { return inst; }
 
         [[nodiscard]] Timer &get_timelimit() { return inst.get_timelimit(); }
+        [[nodiscard]] const Timer &get_timelimit() const { return inst.get_timelimit(); }
 
         inline void new_best_cb(GlobalSolution &sol) { inst.new_best_cb(sol); }
 
@@ -1676,7 +1695,7 @@ namespace sph {
 
             return global_LB;
         }
-        [[nodiscard]] idx_t find_local_col_idx(idx_t gj) {
+        [[nodiscard]] idx_t find_local_col_idx(idx_t gj) const {
 
             for (idx_t gi : inst.get_col(gj)) {
                 if (_is_global_row_active(gi)) {
@@ -1691,7 +1710,7 @@ namespace sph {
             }
             return NOT_AN_INDEX;
         }
-        [[nodiscard]] std::vector<idx_t> get_localized_solution(const std::vector<idx_t> &glob_sol) {
+        [[nodiscard]] std::vector<idx_t> get_localized_solution(const std::vector<idx_t> &glob_sol) const {
             assert(glob_sol.size() >= fixed_cols_global_idxs.size());
 
             std::vector<idx_t> local_sol;
@@ -1842,7 +1861,7 @@ namespace sph {
             return global_LB;
         }
 
-        idx_t fix_columns(std::vector<idx_t> &local_idxs_to_fix, std::vector<real_t> &u_star) {
+        idx_t fix_columns(const std::vector<idx_t> &local_idxs_to_fix, std::vector<real_t> &u_star) {
 
             if (local_idxs_to_fix.empty()) {
                 return rows.size();
@@ -1874,8 +1893,9 @@ namespace sph {
                 fixed_cost += inst.get_col(gj).get_cost();
             }
 
-            ncols_constr = inst.get_ncols_constr();
-            ncols_constr = ncols_constr > fixed_cols_global_idxs.size() ? ncols_constr - fixed_cols_global_idxs.size() : 0U;
+            if (inst.get_ncols_constr() > 0) {
+                ncols_constr = inst.get_ncols_constr() - inst.get_fixed_cols().size();
+            }
 
             // compact rows
             idx_t li = 0;
@@ -1969,7 +1989,7 @@ namespace sph {
 
 
     private:
-        [[nodiscard]] inline bool _is_global_row_active(const idx_t gbl_idx) {
+        [[nodiscard]] inline bool _is_global_row_active(const idx_t gbl_idx) const {
             assert(gbl_idx < global_to_local_row_idxs.size());
             return global_to_local_row_idxs[gbl_idx] != NOT_AN_INDEX;
         }
@@ -2061,7 +2081,7 @@ namespace sph {
         template <typename Inst>
         [[nodiscard]] inline real_t compute_cost(Inst& inst) const {
             real_t cost = 0.0;
-            for (auto j : *this) {
+            for (idx_t j : *this) {
                 cost += inst.get_col(j).get_cost();
             }
             return cost;
@@ -2078,7 +2098,7 @@ namespace sph {
         template <typename... Args>
         explicit LocalSolution(Args&&... _args) : BaseSolution(std::forward<Args>(_args)...) { }
 
-        [[nodiscard]] inline real_t compute_cost(SubInstance& subinst) const { return BaseSolution::compute_cost(subinst); }
+        [[nodiscard]] inline real_t compute_cost(const SubInstance& subinst) const { return BaseSolution::compute_cost(subinst); }
     };
 
 
@@ -2095,27 +2115,44 @@ namespace sph {
         GlobalSolution(GlobalSolution&& other) noexcept : BaseSolution(std::move(other)), cost(other.cost) { }
 
         template <typename Container>
-        GlobalSolution(Container&& col, real_t cost_) : BaseSolution(std::forward<Container>(col)) {
+        GlobalSolution(Container&& cols, real_t cost_) : BaseSolution(std::forward<Container>(cols)) {
             cost = cost_;
         }
 
         GlobalSolution& operator=(const GlobalSolution& other) = default;
         GlobalSolution& operator=(GlobalSolution&& other) = default;
 
-        GlobalSolution(SubInstance& subinst, const LocalSolution& sol) {
+        GlobalSolution(const SubInstance& subinst, const LocalSolution& sol) { SetFromLocal(subinst, sol); }
+
+        void SetFromLocal(const SubInstance& subinst, const LocalSolution& sol) {
+            clear();
+            if (sol.empty()) {
+                cost = REAL_MAX;
+                return;
+            }
+            const Instance& inst = subinst.get_instance();
+            const UniqueColSet& gcols = inst.get_cols();
+            cost = 0.0;
+            reserve(sol.size() + subinst.get_fixed_cols().size() + inst.get_fixed_cols().size());
             for (idx_t j : sol) {
+                cost += subinst.get_col(j).get_cost();
                 emplace_back(subinst.get_global_col_idx(j));
             }
             for (idx_t j : subinst.get_fixed_cols()) {
+                cost += gcols[j].get_cost();
                 emplace_back(j);
             }
-            for (idx_t j : subinst.get_instance().get_fixed_cols()) {
+            for (idx_t j : inst.get_fixed_cols()) {
+                cost += gcols[j].get_cost();
                 emplace_back(j);
             }
 
-            cost = BaseSolution::compute_cost(subinst.get_instance());
+            SPH_DEBUG {
+                MStar cov_check;
+                cov_check.reset_covered(gcols, *this, inst.get_nrows());
+                assert(cov_check.get_uncovered() == 0);
+            }
         }
-
 
         [[nodiscard]] inline real_t get_cost() const { return cost; }
 
@@ -2177,7 +2214,7 @@ namespace sph {
 
         ~ExactSolver() { CPXcloseCPLEX(&env); }
 
-        LocalSolution build_and_opt(SubInstance& subinst, LocalSolution& warmstart, Timer& time_limit) {
+        LocalSolution build_and_opt(const SubInstance& subinst, const LocalSolution& warmstart, const Timer& time_limit) {
             if (subinst.get_ncols() == 0 || subinst.get_nrows() == 0) {
                 return LocalSolution();
             }
@@ -2242,7 +2279,7 @@ namespace sph {
         ////////// PRIVATE METHODS //////////
 
     private:
-        int build_model(SubInstance& subinst) {
+        int build_model(const SubInstance& subinst) {
             int res;
 
             if ((res = CPXchgobjoffset(env, lp, subinst.get_fixed_cost()))) {
@@ -2269,8 +2306,8 @@ namespace sph {
             return 0;
         }
 
-        int add_variables(SubInstance& subinst) {
-            SubInstCols& cols = subinst.get_cols();
+        int add_variables(const SubInstance& subinst) {
+            const SubInstCols& cols = subinst.get_cols();
             idx_t ncols = subinst.get_ncols();
 
             ASSIGN_UP(ctype, ncols, 'B');
@@ -2283,8 +2320,8 @@ namespace sph {
             return CPXnewcols(env, lp, ncols, dbl_vals.data(), lb.data(), ones.data(), ctype.data(), nullptr);
         }
 
-        int add_cov_constraints(SubInstance& subinst) {
-            std::vector<Row>& rows = subinst.get_rows();
+        int add_cov_constraints(const SubInstance& subinst) {
+            const std::vector<Row>& rows = subinst.get_rows();
             idx_t nrows = subinst.get_nrows();
 
             RESIZE_UP(rmatbeg, nrows);
@@ -2305,7 +2342,7 @@ namespace sph {
                               nullptr);
         }
 
-        int add_maxcols_constraint(SubInstance& subinst, double col_num_constr) {
+        int add_maxcols_constraint(const SubInstance& subinst, double col_num_constr) {
             idx_t ncols = subinst.get_ncols();
 
             int beg = 0;
@@ -2318,7 +2355,7 @@ namespace sph {
         }
 
 
-        int set_warmstart(LocalSolution& warmstart) {
+        int set_warmstart(const LocalSolution& warmstart) {
             idx_t wsize = warmstart.size();
             if (wsize > 0) {
 
@@ -2423,13 +2460,13 @@ namespace sph {
         GlobalMultipliers& operator=(const GlobalMultipliers& other) = default;
         GlobalMultipliers& operator=(GlobalMultipliers&& other) = default;
 
-        GlobalMultipliers(SubInstance& subinst, LocalMultipliers mult)
+        GlobalMultipliers(const SubInstance& subinst, const LocalMultipliers& mult)
             : std::vector<real_t>(subinst.get_instance().get_nrows(), 0.0), lb(REAL_LOWEST) {
             for (idx_t i = 0; i < mult.size(); ++i) { (*this)[subinst.get_global_row_idx(i)] = mult[i]; }
             update_lb(subinst.get_instance());
         }
 
-        inline void update_lb(Instance& inst) {
+        inline void update_lb(const Instance& inst) {
 
             real_t lb1 = inst.get_fixed_cost();
             real_t lb2 = 0.0;
@@ -2871,7 +2908,7 @@ namespace sph {
             return u_0;
         }
 
-        LocalMultipliers solve(real_t UB, const LocalMultipliers& u_0, Timer& time_limit) {
+        LocalMultipliers solve(real_t UB, const LocalMultipliers& u_0, const Timer& time_limit) {
             size_t max_iter = 10 * subinst.get_rows().size();
             idx_t nrows = subinst.get_rows().size();
 
@@ -2995,11 +3032,11 @@ namespace sph {
     public:
         TwoPhase(SubInstance& subinst_) : subinst(subinst_), subgradient(subinst_) { }
 
-        inline GlobalSolution solve(const real_t global_UB, GlobalSolution& S_star, Timer& exact_time_limit) {
+        inline GlobalSolution solve(const real_t global_UB, const GlobalSolution& S_star, const Timer& exact_time_limit) {
             return operator()(global_UB, S_star, exact_time_limit);
         }
 
-        GlobalSolution operator()(const real_t global_UB, GlobalSolution& S_star, Timer& exact_time_limit) {
+        GlobalSolution operator()(const real_t global_UB, const GlobalSolution& S_star, const Timer& exact_time_limit) {
 
             LocalMultipliers u_star(subinst.get_nrows(), 0.0);
 
@@ -3017,53 +3054,25 @@ namespace sph {
                 glo_u = GlobalMultipliers(subinst, u_k);
             }
             if (glb_LB >= glb_UB_star - HAS_INTEGRAL_COSTS || subinst.get_nrows() == 0) {
-                return S_star;
+                return GlobalSolution();
             }
 
             // 2. HEURISTIC PHASE
-            LocalSolution S_curr(subinst.get_localized_solution(S_star));
-            cplex_heur(S_curr, S_star, glb_UB_star, exact_time_limit);
-
-            return S_star;
+            LocalSolution S(subinst.get_localized_solution(S_star));
+            S = cplex_heur(S, exact_time_limit);
+            return GlobalSolution(subinst, S);
         }
 
         inline GlobalMultipliers& get_global_u() { return glo_u; }
 
     private:
-        void cplex_heur(LocalSolution& S_init, GlobalSolution& S_star, real_t& glb_UB_star, Timer& exact_time_limit) {
+        LocalSolution cplex_heur(const LocalSolution& S_init, const Timer& exact_time_limit) {
 
             real_t fixed_cost = subinst.get_fixed_cost();
             real_t S_init_cost = S_init.compute_cost(subinst);
             SPH_VERBOSE(3) { fmt::print("    │ Initial solution value {} (global: {})\n", S_init_cost, S_init_cost + fixed_cost); }
 
-            LocalSolution S = exact.build_and_opt(subinst, S_init, exact_time_limit);
-
-            if (!S.empty()) {
-
-                real_t S_cost = S.compute_cost(subinst);
-
-                real_t gS_cost = fixed_cost + S_cost;
-                subinst.update_sol_costs(S, gS_cost);
-
-                if (gS_cost < glb_UB_star) {
-
-                    glb_UB_star = gS_cost;
-                    S_star = GlobalSolution(subinst, S);
-                    subinst.new_best_cb(S_star);
-                    SPH_VERBOSE(3) {
-                        fmt::print("    │ ══> CPLEX improved global UB: {} (fixed {} + local-cost {})\n", S_star.get_cost(), fixed_cost,
-                                   S_cost);
-                    }
-
-                } else {
-                    SPH_VERBOSE(3) {
-                        fmt::print("    │ ──> CPLEX Improved local UB: {} (global value {}, best is {})\n", S_cost, S_cost + fixed_cost,
-                                   glb_UB_star);
-                    }
-                }
-            }
-
-            SPH_VERBOSE(3) { fmt::print("    └───────────────────────────────────────────────────────────────────────\n\n"); }
+            return exact.build_and_opt(subinst, S_init, exact_time_limit);
         }
 
 
@@ -3162,11 +3171,15 @@ namespace sph {
 
                     assert(!(std::fabs(pi - PI_MIN) > 0.001 && inst.get_fixed_cols().empty()));
                     pi *= ALPHA;  // 6.
-
-                    if (S.get_cost() < S_star.get_cost()) {  // update best solution
-                        S_star = std::move(S);               // 5.
-                        last_improving_pi = pi;
-                        pi = std::max(pi / (ALPHA * ALPHA), PI_MIN);  // 6.
+                    
+                    if (!S.empty()) {
+                        inst.update_sol_costs(S, S.get_cost());
+                        if (S_star.get_cost() - S.get_cost() > EPSILON) {  // update best solution
+                            inst.new_best_cb(S);
+                            S_star = std::move(S);  // 5.
+                            last_improving_pi = pi;
+                            pi = std::max(pi / (ALPHA * ALPHA), PI_MIN);  // 6.
+                        }
                     }
 
                     if (S_star.get_cost() - 1.0 <= BETA * u_star.get_lb() || pi > PI_MAX || inst.get_active_rows_size() <= 0) {
@@ -3543,7 +3556,7 @@ namespace sph {
          *
          * @return std::vector<idx_t> Best solution found.
          */
-        inline const GlobalSolution& solve(const std::vector<idx_t> &S_init) {
+        inline const GlobalSolution &solve(const std::vector<idx_t> &S_init) {
             real_t S_init_cost = 0.0;
             if (!S_init.empty()) {
                 S_init_cost = 0.0;
@@ -3561,11 +3574,11 @@ namespace sph {
          *
          * @return std::vector<idx_t>
          */
-        inline const GlobalSolution& solve() {
+        inline const GlobalSolution &solve() {
             SPH_VERBOSE(0) { fmt::print(" Set Partitioning Heuristic: \n"); }
-            SPH_VERBOSE(0) { fmt::print(" SP Instance size: {}x{}\n", inst.get_nrows(), inst.get_ncols()); }
             SPH_DEBUG { fmt::print(" Warning: running in debug mode\n"); }
-            warmstart = refinement.solve(warmstart); 
+            SPH_VERBOSE(0) { fmt::print(" SP Instance size: {}x{}\n", inst.get_nrows(), inst.get_ncols()); }
+            warmstart = refinement.solve(warmstart);
             return warmstart;
         }
 
