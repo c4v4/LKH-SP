@@ -43,6 +43,11 @@ int main(int argc, char *argv[]) {
     Node *N;
     int i;
 
+    if (argc == 1) {
+        printff("Usage: ./cvrptw <instance-file> [<time-limit>] [<random-seed>] [simulated-annealing-temperature-factor>]\n");
+        return EXIT_FAILURE;
+    }
+
     SetDefaultParameters();
     if (argc > 1)
         ProblemFileName = argv[1];
@@ -143,7 +148,7 @@ int main(int argc, char *argv[]) {
                 printff("*** Time limit exceeded ***\n");
             break;
         }
-        printff("Run time limit: %.1f, remaining Time: %.1f\n", RunTimeLimit, TimeLimit - LastTime + StartTime);
+        printff("Run time limit: %g sec., remaining Time: %g sec.\n", RunTimeLimit, TimeLimit - LastTime + StartTime);
         Cost = FindTour(); /* using the Lin-Kernighan heuristic */
         if (MaxPopulationSize > 1 && !TSPTW_Makespan) {
             /* Genetic algorithm */
