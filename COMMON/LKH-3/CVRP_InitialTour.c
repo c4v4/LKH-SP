@@ -48,13 +48,13 @@ GainType CVRP_InitialTour() {
         }
         MakeSets();
         if (it > 0)
-            Distribute(1, 0.01);
+            Distribute(1, 0.01); /* Randomize Union */
         if (Sets > Salesmen)
-            Distribute(1, 0);
+            Distribute(1, 0); /* Deterministic Union (if infeasible and the randomized skiped something) */
         if (Sets > Salesmen) {
             if (BestPenalty == 0)
                 continue;
-            Distribute(0, 0);
+            Distribute(0, 0); /* Deterministic Union ignoring capacity */
         }
         Sets += Salesmen;
         N = FirstNode;

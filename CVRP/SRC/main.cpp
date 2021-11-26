@@ -6,48 +6,70 @@ extern "C" {
 #include "LKH.h"
 }
 
+#include <x86intrin.h>
+
 #include <vector>
 
 #define VERBOSE
-#define VERBOSE_LEVEL 10
+#define VERBOSE_LEVEL 3
 
 #define NDEBUG
 #include "SPH.hpp"
 #undef NDEBUG
 
-#define DEFAULT_SEED 1  // 0 ==> time(NULL)
-
 
 sph::SPHeuristic *sph_ptr;          /* SPHeuristc pointer */
 std::vector<sph::idx_t> BestRoutes; /* Vector containing routes indexes of BestTour */
 
+void print_sol(sph::Instance &inst, sph::GlobalSolution &sol) {
+    int route = 1;
+    for (sph::idx_t j : sol) {
+        fmt::print("Route #{}: ", route++);
+        for (sph::idx_t i : inst.get_col(j))
+            fmt::print("{} ", i + 1);
+        fmt::print("\n");
+    }
+    fmt::print("Cost {}\n", sol.get_cost());
+    fflush(stdout);
+}
+
+
 int main(int argc, char *argv[]) {
+    unsigned long long EntryClock = __rdtsc();
     GainType Cost, OldOptimum;
     double Time, LastTime;
     Node *N;
     int i;
 
-    /* Read the specification of the problem */
-    if (argc >= 2)
-        ProblemFileName = argv[1];
+    if (argc == 1) {
+        printff("Usage: ./cvrp <instance-file> [<time-limit>] [<random-seed>] [simulated-annealing-temperature-factor>]\n");
+        return EXIT_FAILURE;
+    }
 
-    Seed = argc >= 4 ? atoi(argv[3]) : DEFAULT_SEED;
+    SetDefaultParameters();
+    if (argc > 1)
+        ProblemFileName = argv[1];
+    if (argc > 2)
+        TimeLimit = atoi(argv[2]);
+    if (argc > 3)
+        Seed = atoi(argv[3]);
+    if (argc > 4)
+        SAFactor = atof(argv[4]);
+
+    for (i = 0; i < argc; i++)
+        printff("%s ", argv[i]);
+    printff("\n");
 
     StartTime = LastTime = GetTime();
     MergeWithTour = Recombination == IPT ? MergeWithTourIPT : MergeWithTourGPX2;
     OutputSolFile = stdout;
-    SetDefaultParameters();
     ReadProblem();
 
     int *warmstart = (int *)malloc((DimensionSaved + 1) * sizeof(int));
     assert(warmstart);
-    if (argc >= 3)
-        Read_InitialTour_Sol(argv[2]);
-    else if (MTSPMinSize == 0) {
-        if (ProblemType == CVRP)
-            CVRP_InitialTour();
-        else if (ProblemType == CVRPTW)
-            CVRPTW_InitialTour();
+    if (MTSPMinSize == 0) {
+        assert(ProblemType == CVRP);
+        CVRP_InitialTour();
 
         int SalesmenUsed = 0;
         Node *N = Depot, *NextN = NULL;
@@ -97,17 +119,21 @@ int main(int argc, char *argv[]) {
     CreateCandidateSet();
     InitializeStatistics();
 
-    RunTimeLimit = Dim / 2;
-    SphTimeLimit = RunTimeLimit / 2;
     Norm = 9999;
     BestCost = PLUS_INFINITY;
     BestPenalty = CurrentPenalty = PLUS_INFINITY;
 
     sph::SPHeuristic sph(Dim - 1);
+    sph.set_new_best_callback(print_sol);
+    sph.set_max_routes(500'000U);
+    sph.set_keepcol_strategy(sph::SPP);
     sph_ptr = &sph;
 
-    /* Find a specified number (Runs) of local optima */
+    double Tlim = (TimeLimit - GetTime() + StartTime); /* Remaining time */
+    SphTimeLimit = Tlim / 30;
+    RunTimeLimit = Tlim / 10;
 
+    /* Find a specified number (Runs) of local optima */
     for (Run = 1; Run <= Runs; Run++) {
         LastTime = GetTime();
         if (LastTime - StartTime >= TimeLimit) {
@@ -115,6 +141,7 @@ int main(int argc, char *argv[]) {
                 printff("*** Time limit exceeded ***\n");
             break;
         }
+        printff("Run time limit: %g sec., remaining Time: %g sec.\n", RunTimeLimit, TimeLimit - LastTime + StartTime);
         Cost = FindTour(); /* using the Lin-Kernighan heuristic */
         if (MaxPopulationSize > 1 && !TSPTW_Makespan) {
             /* Genetic algorithm */
@@ -196,15 +223,17 @@ int main(int argc, char *argv[]) {
         SRandom(++Seed);
 
         /* Set Partitioning Heuristic phase */
-        if (Run % SphPeriod == 0) {
+        if (Run && Run % SphPeriod == 0) {
             sph.set_timelimit(SphTimeLimit);
-            BestRoutes = sph.solve<500000>(BestRoutes);
+            sph.set_ncols_constr(BestRoutes.size());
+            auto BestRCopy = BestRoutes;
+            BestRoutes = sph.solve(BestRoutes);
             if (!BestRoutes.empty()) { /* Transform back SP sol to tour*/
                 GainType Cost = 0;
                 int *ws = warmstart + 1;
                 for (sph::idx_t j : BestRoutes) {
                     sph::Column &col = sph.get_col(j);
-                    Cost += col.get_cost();
+                    Cost += col.get_cost() * Scale;
                     *ws++ = MTSPDepot;
                     for (sph::idx_t &i : col) {
                         if (ws - warmstart > DimensionSaved + 1)
@@ -218,6 +247,7 @@ int main(int argc, char *argv[]) {
                 WriteSolFile(warmstart, Cost);
                 SetInitialTour(warmstart);
             }
+            RunTimeLimit *= 2;
         }
     }
     PrintStatistics();
@@ -245,11 +275,11 @@ int main(int argc, char *argv[]) {
     }
 
     printff("Best %s solution:\n", Type);
+    printff("Total cpu cycles: %lld\n", __rdtsc() - EntryClock);
     CurrentPenalty = BestPenalty;
     SOP_Report(BestCost);
     printff("\n");
 
     FreeStructures();
-
     return EXIT_SUCCESS;
 }

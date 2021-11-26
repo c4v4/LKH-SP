@@ -17,8 +17,6 @@ extern "C" {
 #include "SPH.hpp"
 #undef NDEBUG
 
-#define DEFAULT_SEED 1  // 0 ==> time(NULL)
-
 
 sph::SPHeuristic *sph_ptr;          /* SPHeuristc pointer */
 std::vector<sph::idx_t> BestRoutes; /* Vector containing routes indexes of BestTour */
@@ -69,14 +67,9 @@ int main(int argc, char *argv[]) {
 
     int *warmstart = (int *)malloc((DimensionSaved + 1) * sizeof(int));
     assert(warmstart);
-    /* if (argc >= 3)
-        Read_InitialTour_Sol(argv[2]);
-    else */
     if (MTSPMinSize == 0) {
-        if (ProblemType == CVRP)
-            CVRP_InitialTour();
-        else if (ProblemType == CVRPTW)
-            CVRPTW_InitialTour();
+        assert(ProblemType == CVRPTW);
+        CVRPTW_InitialTour();
 
         int SalesmenUsed = 0;
         Node *N = Depot, *NextN = NULL;
