@@ -365,6 +365,7 @@ static void CreateNodes() {
             eprintf("DIMENSION too large in HPP problem");
     }
     NodeSet = (Node *)calloc(Dimension + 1, sizeof(Node));
+    assert(Dimension > 1);
     for (i = 1; i <= Dimension; i++, Prev = N) {
         N = &NodeSet[i];
         if (i == 1)

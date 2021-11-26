@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
         printff("%s ", argv[i]);
     printff("\n");
 
-    StartTime = LastTime = GetTime();
+    StartTime = GetTime();
     MergeWithTour = Recombination == IPT ? MergeWithTourIPT : MergeWithTourGPX2;
     OutputSolFile = stdout;
     ReadProblem();
@@ -281,5 +281,6 @@ int main(int argc, char *argv[]) {
     printff("\n");
 
     FreeStructures();
+    free(warmstart);
     return EXIT_SUCCESS;
 }

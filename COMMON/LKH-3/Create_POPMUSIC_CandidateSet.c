@@ -95,6 +95,7 @@ void Create_POPMUSIC_CandidateSet(int K)
             } else
                 deleted++;
         } while ((N = N->Suc) != FirstNode);
+        assert(n > 0);
         shuffle(n, solution);
         solution[n] = solution[0];
         node[n] = node[solution[0]];

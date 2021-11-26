@@ -145,7 +145,7 @@ int d4_vertices_id(int *solution_blue, int *solution_red, int *d4_vertices,
 
     //create a matrix (n_cities x 4) with all edges;
     M_aux = alloc_matrixi(n_cities, 4);
-
+    assert(n_cities > 1);
     for (i = 1; i < n_cities - 1; i++) {
         aux = solution_blue[i];
         M_aux[aux][0] = solution_blue[i + 1];
@@ -947,6 +947,7 @@ void findInputs(int *sol_blue, int *sol_red)
         *sol_red_reduc, *sol_blue_reduc_t, *sol_red_reduc_t;
     gate_structure gate;
 
+    assert(n_cand > 0);
     for (i = 0; i < n_cand; i++) {
         comp_size = (int) ceil(size[i] / 2); // the inputs/outputs are created
                                              // with maximum size
@@ -959,6 +960,7 @@ void findInputs(int *sol_blue, int *sol_red)
     }
 
     // Solutions without common edges
+    assert(n > 0);
     sol_blue_reduc = alloc_vectori(n);
     sol_red_reduc = alloc_vectori(n);
     sol_blue_reduc_t = alloc_vectori(n);
@@ -987,6 +989,7 @@ void findInputs(int *sol_blue, int *sol_red)
         M_neigh[i][0] = 0; // the first column indicates the number
                            // of neighbours       
     }
+    assert(n_reduc <= n);
     for (i = 0; i < n_reduc; i++) {
         gate.num = sol_blue_reduc[i];
         gate.time = sol_blue_reduc_t[i];

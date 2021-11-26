@@ -16,7 +16,7 @@ void STTSP2TSP()
             N1->Serial = i++;
         }
     } while ((N1 = N1->Suc) != FirstNode);
-    Matrix = (int **) malloc(NewDimension * sizeof(int **));
+    Matrix = (int **) malloc(NewDimension * sizeof(int *));
     for (i = 0; i < NewDimension; i++)
         Matrix[i] = (int *) malloc(NewDimension * sizeof(int));
     do {
