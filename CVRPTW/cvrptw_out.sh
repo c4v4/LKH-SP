@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 args=($(cat /proc/$PPID/cmdline | tr '\000' ' '))
 # args[0]: Controller
