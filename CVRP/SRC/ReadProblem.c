@@ -526,6 +526,8 @@ void ReadProblem()
             Salesmen = MinSalesmen;
             if (Salesmen > Dimension)
                 eprintf("CVRP: SALESMEN larger than DIMENSION");
+        } else if (Salesmen == -1) {  // probe Salesmen
+            Salesmen = 1.1 * MinSalesmen > Dimension? Dimension : 1.1 * MinSalesmen;
         } else if (Salesmen < MinSalesmen)
             eprintf("CVRP: SALESMEN too small to meet demand");
         assert(Salesmen >= 1 && Salesmen <= Dimension);

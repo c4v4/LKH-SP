@@ -17,6 +17,7 @@ extern "C" {
 #include "SPH.hpp"
 #undef NDEBUG
 
+#define EXTRA_SALESMEN 20
 
 sph::SPHeuristic *sph_ptr;          /* SPHeuristc pointer */
 std::vector<sph::idx_t> BestRoutes; /* Vector containing routes indexes of BestTour */
@@ -65,7 +66,7 @@ int main(int argc, char *argv[]) {
     OutputSolFile = stdout;
     ReadProblem();
 
-    int *warmstart = (int *)malloc((DimensionSaved + 1) * sizeof(int));
+    int *warmstart = (int *)malloc((DimensionSaved + 1 + EXTRA_SALESMEN) * sizeof(int));
     assert(warmstart);
     if (MTSPMinSize == 0) {
         assert(ProblemType == CVRPTW);
@@ -89,7 +90,7 @@ int main(int argc, char *argv[]) {
         } while (N != Depot);
         *ws++ = MTSPDepot;
         /* Add some more vehicles */
-        for (int i = 0; i < 20; ++i) {
+        for (int i = 0; i < EXTRA_SALESMEN; ++i) {
             ++SalesmenUsed;
             *ws++ = MTSPDepot;
         }

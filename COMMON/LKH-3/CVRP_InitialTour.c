@@ -9,6 +9,7 @@
 #define Degree V
 #define Size LastV
 #define Load Loc
+#define Dist Distance
 
 static Node *Find(Node *v);
 static void Union(Node *x, Node *y);
@@ -142,7 +143,7 @@ void CreateS() {
             Nj = &NodeSet[j];
             if (Nj == Depot || Forbidden(Ni, Nj))
                 continue;
-            S[SSize].Value = FixedOrCommon(Ni, Nj) ? INT_MAX : OldDistance(Ni, Depot) + OldDistance(Depot, Nj) - OldDistance(Ni, Nj);
+            S[SSize].Value = FixedOrCommon(Ni, Nj) ? INT_MAX : Dist(Ni, Depot) + Dist(Depot, Nj) - Dist(Ni, Nj);
             S[SSize].i = i;
             S[SSize].j = j;
             SSize++;
@@ -164,12 +165,12 @@ static void Union(Node *x, Node *y) {
         u->Dad = v;
         v->Size += u->Size;
         v->Load += u->Load;
-        v->Cost += u->Cost + OldDistance(x, y) - OldDistance(x, Depot) - OldDistance(y, Depot);
+        v->Cost += u->Cost + Dist(x, y) - Dist(x, Depot) - Dist(y, Depot);
     } else {
         v->Dad = u;
         u->Size += v->Size;
         u->Load += v->Load;
-        u->Cost += v->Cost + OldDistance(x, y) - OldDistance(x, Depot) - OldDistance(y, Depot);
+        u->Cost += v->Cost + Dist(x, y) - Dist(x, Depot) - Dist(y, Depot);
     }
     if (x->Degree++ == 0)
         x->Prev = y;
@@ -191,7 +192,7 @@ static void MakeSets() {
         N->Degree = 0;
         N->Size = 1;
         N->Load = N->Demand;
-        N->Cost = 2 * OldDistance(N, Depot);
+        N->Cost = 2 * Dist(N, Depot);
         Sets++;
     } while ((N = N->Suc) != FirstNode);
 }
@@ -211,8 +212,8 @@ static void Distribute(int Constrained, double R) {
             if (u == v)
                 continue;
             if (!Constrained || (u->Load + v->Load <= Capacity &&
-                                 (DistanceLimit == DBL_MAX || u->Cost + v->Cost + OldDistance(Ni, Nj) - OldDistance(Ni, Depot) -
-                                                                      OldDistance(Nj, Depot) + (u->Size + v->Size) * ServiceTime <=
+                                 (DistanceLimit == DBL_MAX || u->Cost + v->Cost + Dist(Ni, Nj) - Dist(Ni, Depot) -
+                                                                      Dist(Nj, Depot) + (u->Size + v->Size) * ServiceTime <=
                                                                   DistanceLimit)))
                 Union(Ni, Nj);
         }

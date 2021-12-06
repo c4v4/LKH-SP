@@ -4,8 +4,8 @@
 
 /* Shorthands */
 #define MAX_TRIALS 1000000
-#define RUNS 1
-#define SPH_PERIOD 2
+#define RUNS 100000
+#define SPH_PERIOD 3
 #define SPH_TLIM 180.0
 #define TLIM 30.0
 #define RUN_TLIM 30.0
@@ -80,7 +80,7 @@ void SetDefaultParameters() {
     SubsequentPatching = 1;
     TimeLimit = TLIM;
     RunTimeLimit = RUN_TLIM;
-    TraceLevel = 0;
+    TraceLevel = 1;
     SphPeriod = SPH_PERIOD;
     SphTimeLimit = SPH_TLIM;
 }

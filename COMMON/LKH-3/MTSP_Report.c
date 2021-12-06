@@ -7,7 +7,6 @@ void MTSP_Report(GainType Penalty, GainType Cost)
     int MinSize = INT_MAX, MaxSize = 0;
     Node *N = Depot, *NextN;
     int Forward = SUCC(Depot)->Id != Depot->Id + DimensionSaved;
-    int SalesmenUsed = 0;
 
     do {
         GainType Cost = 0;

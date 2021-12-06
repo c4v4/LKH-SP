@@ -65,8 +65,8 @@ static int was_empty_route(Node *, Node *); /* Used to test *only once* if a rem
 GainType Penalty_(void);
 GainType Penalty(void) {
     assert(CurrentPenalty >= 0);
-    GainType P1 = Penalty_(void);
-    GainType P2 = Penalty_Old(void);
+    GainType P1 = Penalty_();
+    GainType P2 = Penalty_Old();
     int accepted1 = P1 < CurrentPenalty || (P1 == CurrentPenalty && CurrentGain > 0);
     int accepted2 = P2 < CurrentPenalty || (P2 == CurrentPenalty && CurrentGain > 0);
     assert(accepted1 == accepted2);
@@ -187,10 +187,11 @@ static int was_empty_route(Node *N1, Node *N2) {
 }
 
 static int setup_Node(Node *N) {
-    if (!N->PetalId->flag) {
+    if (!N->PetalId->flag && (N->PetalId != cava_PetalsData)) {
         oldPenaltySum += N->PetalId->OldPenalty;
+        assert(oldPenaltySum <= CurrentPenalty);
         N->PetalId->flag = 1;
-        return (N->PetalId != cava_PetalsData);  // Depots have PetalId_index == 0
+        return 1;  // Depots have PetalId_index == 0
     }
     return 0;
 }

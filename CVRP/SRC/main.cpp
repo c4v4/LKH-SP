@@ -11,7 +11,7 @@ extern "C" {
 #include <vector>
 
 #define VERBOSE
-#define VERBOSE_LEVEL 3
+#define VERBOSE_LEVEL 1
 
 #define NDEBUG
 #include "SPH.hpp"
@@ -50,11 +50,21 @@ int main(int argc, char *argv[]) {
     if (argc > 1)
         ProblemFileName = argv[1];
     if (argc > 2)
-        TimeLimit = atoi(argv[2]);
+        if (argv[2][0] == '0')
+            Scale = 1000;
     if (argc > 3)
-        Seed = atoi(argv[3]);
+        TimeLimit = atoi(argv[3]);
     if (argc > 4)
-        SAFactor = atof(argv[4]);
+        Seed = atoi(argv[4]);
+    if (argc > 5)
+        Salesmen = atoi(argv[5]);
+    if (argc > 6)
+        SAFactor = atof(argv[6]);
+
+    if (Salesmen == -1) {
+        Runs = 1;
+        MTSPMinSize = 0;
+    }
 
     for (i = 0; i < argc; i++)
         printff("%s ", argv[i]);
@@ -88,10 +98,9 @@ int main(int argc, char *argv[]) {
             SalesmenUsed += Size > 0;
         } while (N != Depot);
         *ws++ = MTSPDepot;
-        /* Add some more vehicles */
-        for (int i = 0; i < 20; ++i) {
-            ++SalesmenUsed;
+        while (SalesmenUsed < Salesmen) {
             *ws++ = MTSPDepot;
+            ++SalesmenUsed;
         }
         if (SalesmenUsed < Salesmen) {
             int diff = Salesmen - SalesmenUsed;
@@ -281,5 +290,9 @@ int main(int argc, char *argv[]) {
     printff("\n");
 
     FreeStructures();
+    free(warmstart);
+    if (Runs == 1)
+        return SalesmenUsed;
+
     return EXIT_SUCCESS;
 }

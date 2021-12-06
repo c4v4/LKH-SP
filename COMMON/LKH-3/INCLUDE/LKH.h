@@ -468,8 +468,8 @@ extern char *Name, *Type, *EdgeWeightType, *EdgeWeightFormat, *EdgeDataFormat, *
 extern int CandidateSetSymmetric, CandidateSetType, Capacity, CoordType, DelaunayPartitioning, DelaunayPure, ExternalSalesmen,
     ExtraCandidateSetSymmetric, ExtraCandidateSetType, InitialTourAlgorithm, KarpPartitioning, KCenterPartitioning, KMeansPartitioning,
     MTSPDepot, MTSPMinSize, MTSPMaxSize, MTSPObjective, MoorePartitioning, PatchingAExtended, PatchingARestricted, PatchingCExtended,
-    PatchingCRestricted, RiskThreshold, RohePartitioning, Salesmen, SierpinskiPartitioning, SubproblemBorders, SubproblemsCompressed,
-    WeightType, WeightFormat;
+    PatchingCRestricted, RiskThreshold, RohePartitioning, Salesmen, SalesmenUsed, SierpinskiPartitioning, SubproblemBorders,
+    SubproblemsCompressed, WeightType, WeightFormat;
 
 extern FILE *ParameterFile, *ProblemFile, *PiFile, *InputTourFile, *InitialTourFile, *SubproblemTourFile, **MergeTourFile, *OutputSolFile;
 extern CostFunction Distance, D, c, OldDistance, OriginalDistance;
