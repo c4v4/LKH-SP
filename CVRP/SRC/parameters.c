@@ -72,6 +72,7 @@ void SetDefaultParameters() {
     RestrictedSearch = 1;
     Runs = RUNS;
     Salesmen = 1;
+    SAFactor = 1.0;
     Scale = -1;
     Seed = 1;
     StopAtOptimum = 1;

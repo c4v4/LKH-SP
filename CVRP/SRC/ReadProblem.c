@@ -527,7 +527,7 @@ void ReadProblem()
             if (Salesmen > Dimension)
                 eprintf("CVRP: SALESMEN larger than DIMENSION");
         } else if (Salesmen == -1) {  // probe Salesmen
-            Salesmen = 1.1 * MinSalesmen > Dimension? Dimension : 1.1 * MinSalesmen;
+            Salesmen = 1.2 * MinSalesmen > Dimension? Dimension : 1.1 * MinSalesmen;
         } else if (Salesmen < MinSalesmen)
             eprintf("CVRP: SALESMEN too small to meet demand");
         assert(Salesmen >= 1 && Salesmen <= Dimension);
@@ -706,7 +706,10 @@ void ReadProblem()
 
     if (Dim > 2000){
         InitialPeriod = 1000;
-        POPMUSIC_Solutions = 100;
+	if(Dim > 10000)
+            POPMUSIC_Solutions = 200;
+	else 
+	    POPMUSIC_Solutions = 100;
     }
     
     free(LastLine);

@@ -223,7 +223,7 @@ GainType Penalty_Old() {
     GainType DemandSum, DistanceSum, P = 0;
     int Size;
 
-    if (!StartRoute)
+    if (!StartRoute || StartRoute <= NodeSet || StartRoute > NodeSet + Dimension)
         StartRoute = Depot;
     if (StartRoute->Id > DimensionSaved)
         StartRoute -= DimensionSaved;

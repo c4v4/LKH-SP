@@ -33,6 +33,24 @@ void print_sol(sph::Instance &inst, sph::GlobalSolution &sol) {
     fflush(stdout);
 }
 
+void restart() {
+    Node *N = Depot;
+    SalesmenUsed = 0;
+    do {
+        int Size = 0;
+        while ((N = N->Suc)->DepotId == 0)
+            Size++;
+        SalesmenUsed += Size > 0;
+    } while (N != Depot);
+    Salesmen = SalesmenUsed;
+    Trial = 0;
+    MTSPMinSize = 1;
+    ReadProblem();
+    AllocateStructures();
+    CreateCandidateSet();
+    InitializeStatistics();
+}
+
 
 int main(int argc, char *argv[]) {
     unsigned long long EntryClock = __rdtsc();
@@ -62,7 +80,6 @@ int main(int argc, char *argv[]) {
         SAFactor = atof(argv[6]);
 
     if (Salesmen == -1) {
-        Runs = 1;
         MTSPMinSize = 0;
     }
 
@@ -77,53 +94,7 @@ int main(int argc, char *argv[]) {
 
     int *warmstart = (int *)malloc((DimensionSaved + 1) * sizeof(int));
     assert(warmstart);
-    if (MTSPMinSize == 0) {
-        assert(ProblemType == CVRP);
-        CVRP_InitialTour();
-
-        int SalesmenUsed = 0;
-        Node *N = Depot, *NextN = NULL;
-        int *ws = warmstart;
-        do {
-            int Size = -1;
-            do {
-                NextN = N->Suc;
-                if (NextN->Id >= DimensionSaved)
-                    NextN = NextN->Suc;
-                if (!(N->DepotId && NextN->DepotId)) {
-                    ++Size;
-                    *ws++ = N->DepotId ? MTSPDepot : N->Id;
-                }
-            } while ((N = NextN)->DepotId == 0);
-            SalesmenUsed += Size > 0;
-        } while (N != Depot);
-        *ws++ = MTSPDepot;
-        while (SalesmenUsed < Salesmen) {
-            *ws++ = MTSPDepot;
-            ++SalesmenUsed;
-        }
-        if (SalesmenUsed < Salesmen) {
-            int diff = Salesmen - SalesmenUsed;
-            Salesmen = SalesmenUsed;
-            DimensionSaved -= diff;
-            Dimension -= 2 * diff;
-            for (int i = 1; i <= DimensionSaved; ++i)
-                NodeSet[i].FixedTo1 -= diff;
-            for (int i = DimensionSaved + 1; i <= Dimension; ++i)
-                (NodeSet[i] = NodeSet[i + diff]).Id = i;
-            for (i = Dimension + 2 * diff; i > Dimension; --i) {
-                free(NodeSet[i].MergeSuc);
-                free(NodeSet[i].CandidateSet);
-                free(NodeSet[i].BackboneCandidateSet);
-                NodeSet[i].MergeSuc = NULL;
-                NodeSet[i].CandidateSet = NULL;
-                NodeSet[i].BackboneCandidateSet = NULL;
-                NodeSet[i].Id = 0;
-            }
-            SetInitialTour(warmstart);
-        }
-    }
-
+    
     AllocateStructures();
     CreateCandidateSet();
     InitializeStatistics();
@@ -246,7 +217,7 @@ int main(int argc, char *argv[]) {
                     *ws++ = MTSPDepot;
                     for (sph::idx_t &i : col) {
                         if (ws - warmstart > DimensionSaved + 1)
-                            eprintf("Error SPH: Solution too long!\n");
+                            eprintf("%s, Error SPH: Solution too long!\n", ProblemFileName);
                         *ws++ = i + 2;
                     }
                 }
@@ -258,6 +229,8 @@ int main(int argc, char *argv[]) {
             }
             RunTimeLimit *= 2;
         }
+        if (Run == 1 && MTSPMinSize == 0)
+            restart();
     }
     PrintStatistics();
     if (Salesmen > 1) {
