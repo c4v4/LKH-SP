@@ -482,83 +482,6 @@ void ReadParameters() {
     char *Line, *Keyword, *Token, *Name;
     unsigned int i;
 
-    ProblemFileName = PiFileName = InputTourFileName = OutputTourFileName = TourFileName = 0;
-    CandidateFiles = MergeTourFiles = 0;
-    AscentCandidates = 50;
-    BackboneTrials = 0;
-    Backtracking = 0;
-    BWTSP_B = 0;
-    BWTSP_Q = 0;
-    BWTSP_L = INT_MAX;
-    CandidateSetSymmetric = 0;
-    CandidateSetType = ALPHA;
-    Crossover = ERXT;
-    DelaunayPartitioning = 0;
-    DelaunayPure = 0;
-    DemandDimension = 1;
-    Excess = -1;
-    ExternalSalesmen = 0;
-    ExtraCandidates = 0;
-    ExtraCandidateSetSymmetric = 0;
-    ExtraCandidateSetType = QUADRANT;
-    Gain23Used = 1;
-    GainCriterionUsed = 1;
-    GridSize = 1000000.0;
-    InitialPeriod = -1;
-    InitialStepSize = 0;
-    InitialTourAlgorithm = WALK;
-    InitialTourFraction = 1.0;
-    KarpPartitioning = 0;
-    KCenterPartitioning = 0;
-    KMeansPartitioning = 0;
-    Kicks = 1;
-    KickType = 0;
-    MaxBreadth = INT_MAX;
-    MaxCandidates = 5;
-    MaxPopulationSize = 0;
-    MaxSwaps = -1;
-    MaxTrials = -1;
-    MoorePartitioning = 0;
-    // MoveType = 5;
-    // MoveTypeSpecial = 0;
-    MTSPDepot = 1;
-    MTSPMinSize = 1;
-    MTSPMaxSize = -1;
-    MTSPObjective = -1;
-    NonsequentialMoveType = -1;
-    Optimum = MINUS_INFINITY;
-    PatchingA = 1;
-    PatchingC = 0;
-    PatchingAExtended = 0;
-    PatchingARestricted = 0;
-    PatchingCExtended = 0;
-    PatchingCRestricted = 0;
-    Precision = 100;
-    POPMUSIC_InitialTour = 0;
-    POPMUSIC_MaxNeighbors = 5;
-    POPMUSIC_SampleSize = 10;
-    POPMUSIC_Solutions = 50;
-    POPMUSIC_Trials = 1;
-    Recombination = IPT;
-    RestrictedSearch = 1;
-    RohePartitioning = 0;
-    Runs = 0;
-    Salesmen = 1;
-    Scale = -1;
-    Seed = 1;
-    SierpinskiPartitioning = 0;
-    StopAtOptimum = 1;
-    Subgradient = 1;
-    SubproblemBorders = 0;
-    SubproblemsCompressed = 0;
-    SubproblemSize = 0;
-    // SubsequentMoveType = 0;
-    // SubsequentMoveTypeSpecial = 0;
-    SubsequentPatching = 1;
-    TimeLimit = DBL_MAX;
-    TraceLevel = 1;
-    TSPTW_Makespan = 0;
-
     if (ParameterFileName) {
         if (!(ParameterFile = fopen(ParameterFileName, "r")))
             eprintf("Cannot open PARAMETER_FILE: \"%s\"", ParameterFileName);
@@ -989,13 +912,13 @@ void ReadParameters() {
             if (Runs <= 0)
                 eprintf("RUNS: positive integer expected");
         } else if (!strcmp(Keyword, "SA_FACTOR")) {
-            if (!(Token = strtok(0, Delimiters)) || !sscanf(Token, "%f", &SAFactor))
+            if (!(Token = strtok(0, Delimiters)) || !sscanf(Token, "%lf", &SAFactor))
                 eprintf("SA_FACTOR: float expected");
         } else if (!strcmp(Keyword, "SALESMEN") || !strcmp(Keyword, "VEHICLES")) {
             if (!(Token = strtok(0, Delimiters)) || !sscanf(Token, "%d", &Salesmen))
                 eprintf("%s: integer expected", Keyword);
-            if (Salesmen <= 0)
-                eprintf("%s: positive integer expected", Keyword);
+            if (Salesmen < 0)
+                eprintf("%s: positive integer expected, or 0 for probing", Keyword);
         } else if (!strcmp(Keyword, "SCALE")) {
             if (!(Token = strtok(0, Delimiters)) || !sscanf(Token, "%d", &Scale))
                 eprintf("SCALE: integer expected");

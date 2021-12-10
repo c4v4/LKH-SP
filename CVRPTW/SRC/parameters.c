@@ -26,6 +26,9 @@ Node *BestMove(Node *t1, Node *t2, GainType *G0, GainType *Gain) { return BestSp
 Node *BestSubsequentMove(Node *t1, Node *t2, GainType *G0, GainType *Gain) { return BestSpecialOptMove(t1, t2, G0, Gain); }
 
 void SetDefaultParameters() {
+    ProblemFileName = PiFileName = InputTourFileName = OutputTourFileName = TourFileName = 0;
+    CandidateFiles = MergeTourFiles = 0;
+
     AscentCandidates = 50;
     BackboneTrials = 0;
     Backtracking = 0;
@@ -70,7 +73,7 @@ void SetDefaultParameters() {
     Recombination = IPT;
     RestrictedSearch = 1;
     Runs = RUNS;
-    // Salesmen = 250;
+    Salesmen = 1;
     SAFactor = 1.0;
     Scale = 10;
     Seed = 1;

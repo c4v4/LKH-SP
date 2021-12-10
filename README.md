@@ -35,6 +35,13 @@ If, instead, you want to update an already existing local repository cloned with
 
         $ git submodule update --init --recursive
 ## Run
-From the CVRP or CVRPTW folder, build with make and launch as:
+The executable can be found in they respective directories (CVRP and CVRPTW).
+The argument are compatible with the respective DIMACS controllers.
+        
+        $ CVRP/cvrp <instance-file-path> <rounded> <time-limit> [<param-file>]
+        $ CVRPTW/cvrptw <instance-file-path> <time-limit> [<param-file>]
 
-        $ ./cvrp <instance> [<sol-file>] [<seed>]
+Examples:
+ 
+        $ CVRP/cvrp CVRPController/InstancesRounded/X-n524-k153.vrp 1 7200 CVRP/default_params.txt
+        $ CVRPTW/cvrptw VRPTWController/Instances/Homberger/RC2_4_2.txt 3600 CVRPTW/default_params.txt

@@ -71,8 +71,12 @@ int main(int argc, char *argv[]) {
     Node *N;
     int i;
 
+    for (i = 0; i < argc; i++)
+        printff("%s ", argv[i]);
+    printff("\n");
+
     if (argc == 1) {
-        printff("Usage: ./cvrp <instance-file> [<time-limit>] [<random-seed>] [simulated-annealing-temperature-factor>]\n");
+        printff("Usage: ./cvrp <instance-file> [<time-limit>] [<param-file>]\n");
         return EXIT_FAILURE;
     }
 
@@ -86,18 +90,12 @@ int main(int argc, char *argv[]) {
         TimeLimit = atoi(argv[3]);
     if (argc > 4)
         ParameterFileName = argv[4];
-    else 
+    else
         ParameterFileName = default_params(argv[0]);
 
-    if (Salesmen == -1) {
-        MTSPMinSize = 0;
-    }
-
     ReadParameters();
-    
-    for (i = 0; i < argc; i++)
-        printff("%s ", argv[i]);
-    printff("\n");
+    if (Salesmen == 0)
+        MTSPMinSize = 0;
 
     StartTime = LastTime = GetTime();
     MergeWithTour = Recombination == IPT ? MergeWithTourIPT : MergeWithTourGPX2;

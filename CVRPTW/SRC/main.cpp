@@ -11,7 +11,7 @@ extern "C" {
 #include <vector>
 
 #define VERBOSE
-#define VERBOSE_LEVEL 3
+#define VERBOSE_LEVEL 1
 
 #define NDEBUG
 #include "SPH.hpp"
@@ -55,8 +55,12 @@ int main(int argc, char *argv[]) {
     Node *N;
     int i;
 
+    for (i = 0; i < argc; i++)
+        printff("%s ", argv[i]);
+    printff("\n");
+
     if (argc == 1) {
-        printff("Usage: ./cvrptw <instance-file> [<time-limit>] [<random-seed>] [simulated-annealing-temperature-factor>]\n");
+        printff("Usage: ./cvrptw <instance-file> [<time-limit>] [<param-file>]\n");
         return EXIT_FAILURE;
     }
 
@@ -70,9 +74,9 @@ int main(int argc, char *argv[]) {
     else
         ParameterFileName = default_params(argv[0]);
 
-    for (i = 0; i < argc; i++)
-        printff("%s ", argv[i]);
-    printff("\n");
+    ReadParameters();
+    if (Salesmen == 0)
+        eprintf("Salesmen probing not available for VRTPTW");
 
     StartTime = GetTime();
     MergeWithTour = Recombination == IPT ? MergeWithTourIPT : MergeWithTourGPX2;
