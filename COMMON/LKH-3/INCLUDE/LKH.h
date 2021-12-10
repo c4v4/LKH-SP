@@ -612,6 +612,7 @@ unsigned Random(void);
 char *ReadLine(FILE *InputFile);
 /* int ReadPenalties(void); */
 void ReadProblem(void);
+void ReadParameters(void);
 void ReadTour(char *FileName, FILE **File);
 void RecordBestTour(void);
 void RecordBetterTour(void);

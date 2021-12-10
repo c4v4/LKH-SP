@@ -17,6 +17,7 @@ extern "C" {
 #include "SPH.hpp"
 #undef NDEBUG
 
+#include <string>
 
 sph::SPHeuristic *sph_ptr;          /* SPHeuristc pointer */
 std::vector<sph::idx_t> BestRoutes; /* Vector containing routes indexes of BestTour */
@@ -51,6 +52,17 @@ void restart() {
     InitializeStatistics();
 }
 
+char *default_params(char *argv0) {
+    char *Buffer;
+
+    std::string bin_path(argv0);
+    while (bin_path.back() != '/')
+        bin_path.pop_back();
+    bin_path += "default_params.txt";
+    Buffer = (char *)malloc(bin_path.size() + 1);
+    strcpy(Buffer, bin_path.c_str());
+    return Buffer;
+}
 
 int main(int argc, char *argv[]) {
     unsigned long long EntryClock = __rdtsc();
@@ -73,16 +85,16 @@ int main(int argc, char *argv[]) {
     if (argc > 3)
         TimeLimit = atoi(argv[3]);
     if (argc > 4)
-        Seed = atoi(argv[4]);
-    if (argc > 5)
-        Salesmen = atoi(argv[5]);
-    if (argc > 6)
-        SAFactor = atof(argv[6]);
+        ParameterFileName = argv[4];
+    else 
+        ParameterFileName = default_params(argv[0]);
 
     if (Salesmen == -1) {
         MTSPMinSize = 0;
     }
 
+    ReadParameters();
+    
     for (i = 0; i < argc; i++)
         printff("%s ", argv[i]);
     printff("\n");
@@ -94,7 +106,7 @@ int main(int argc, char *argv[]) {
 
     int *warmstart = (int *)malloc((DimensionSaved + 1) * sizeof(int));
     assert(warmstart);
-    
+
     AllocateStructures();
     CreateCandidateSet();
     InitializeStatistics();

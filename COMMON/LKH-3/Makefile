@@ -69,7 +69,7 @@ _OBJ = Activate.o AddCandidate.o AddExtraCandidates.o                  \
        NormalizeNodeList.o NormalizeSegmentList.o                      \
        OrderCandidateSet.o PatchCycles.o                               \
        PDPTW_Reduce.o printff.o PrintParameters.o                      \
-       Random.o ReadLine.o RecordBestTour.o 						   \
+       Random.o ReadLine.o RecordBestTour.o ReadParameters.o		   \
        RecordBetterTour.o RemoveFirstActive.o                          \
        ResetCandidateSet.o RestoreTour.o                               \
        SegmentSize.o Sequence.o SetInitialTour.o SFCTour.o  		   \

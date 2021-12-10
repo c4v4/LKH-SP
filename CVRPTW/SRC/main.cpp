@@ -17,6 +17,8 @@ extern "C" {
 #include "SPH.hpp"
 #undef NDEBUG
 
+#include <string>
+
 #define EXTRA_SALESMEN 20
 
 sph::SPHeuristic *sph_ptr;          /* SPHeuristc pointer */
@@ -34,6 +36,17 @@ void print_sol(sph::Instance &inst, sph::GlobalSolution &sol) {
     fflush(stdout);
 }
 
+char *default_params(char *argv0) {
+    char *Buffer;
+
+    std::string bin_path(argv0);
+    while (bin_path.back() != '/')
+        bin_path.pop_back();
+    bin_path += "default_params.txt";
+    Buffer = (char *)malloc(bin_path.size() + 1);
+    strcpy(Buffer, bin_path.c_str());
+    return Buffer;
+}
 
 int main(int argc, char *argv[]) {
     unsigned long long EntryClock = __rdtsc();
@@ -52,10 +65,10 @@ int main(int argc, char *argv[]) {
         ProblemFileName = argv[1];
     if (argc > 2)
         TimeLimit = atoi(argv[2]);
-    if (argc > 3)
-        Seed = atoi(argv[3]);
     if (argc > 4)
-        SAFactor = atof(argv[4]);
+        ParameterFileName = argv[4];
+    else
+        ParameterFileName = default_params(argv[0]);
 
     for (i = 0; i < argc; i++)
         printff("%s ", argv[i]);
