@@ -32,7 +32,7 @@ void SA_setup(double EntryTime, double TimeLimit) {
 
 void SA_start() {
 
-    if (Dim <= 2000) {
+    if (Dim <= 10000) {
         T = (Run <= SphPeriod && !InitialTourFileName) ? SA_ZERO_SCALE : SA_WARM_SCALE;
         T *= SA_SCALE * SAFactor * (1 + (Run - 1) % SphPeriod);
         T_trials = T_time = T;

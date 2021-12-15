@@ -704,6 +704,9 @@ void ReadParameters() {
         } else if (!strcmp(Keyword, "INITIAL_TOUR_FILE")) {
             if (!(InitialTourFileName = GetFileName(0)))
                 eprintf("INITIAL_TOUR_FILE: string expected");
+        } else if (!strcmp(Keyword, "INITIAL_SOL_FILE")) {
+            if (!(InitialSolFileName = GetFileName(0)))
+                eprintf("INITIAL_SOL_FILE: string expected");
         } else if (!strcmp(Keyword, "INITIAL_TOUR_FRACTION")) {
             if (!(Token = strtok(0, Delimiters)) || !sscanf(Token, "%lf", &InitialTourFraction))
                 eprintf("INITIAL_TOUR_FRACTION: real expected");
@@ -1017,6 +1020,16 @@ void ReadParameters() {
                 eprintf("TIME_LIMIT: real expected");
             if (TimeLimit < 0)
                 eprintf("TIME_LIMIT: >= 0 expected");
+        } else if (!strcmp(Keyword, "RUN_TIME_LIMIT")) {
+            if (!(Token = strtok(0, Delimiters)) || !sscanf(Token, "%lf", &RunTimeLimit))
+                eprintf("RUN_TIME_LIMIT: real expected");
+            if (RunTimeLimit < 0)
+                eprintf("RUN_TIME_LIMIT: >= 0 expected");
+        } else if (!strcmp(Keyword, "SPH_TIME_LIMIT")) {
+            if (!(Token = strtok(0, Delimiters)) || !sscanf(Token, "%lf", &SphTimeLimit))
+                eprintf("SPH_TIME_LIMIT: real expected");
+            if (SphTimeLimit < 0)
+                eprintf("SPH_TIME_LIMIT: >= 0 expected");
         } else if (!strcmp(Keyword, "TOUR_FILE")) {
             if (!(TourFileName = GetFileName(0)))
                 eprintf("TOUR_FILE: string expected");

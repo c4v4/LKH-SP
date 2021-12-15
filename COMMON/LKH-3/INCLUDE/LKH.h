@@ -463,7 +463,8 @@ extern int TSPTW_Makespan;
    ReadProblem: */
 
 extern char *ParameterFileName, *ProblemFileName, *PiFileName, *TourFileName, *OutputTourFileName, *InputTourFileName, **CandidateFileName,
-    **EdgeFileName, *InitialTourFileName, *SubproblemTourFileName, **MergeTourFileName, *MTSPSolutionFileName, *SINTEFSolutionFileName;
+    **EdgeFileName, *InitialTourFileName, *InitialSolFileName, *SubproblemTourFileName, **MergeTourFileName, *MTSPSolutionFileName,
+    *SINTEFSolutionFileName;
 extern char *Name, *Type, *EdgeWeightType, *EdgeWeightFormat, *EdgeDataFormat, *NodeCoordType, *DisplayDataType;
 extern int CandidateSetSymmetric, CandidateSetType, Capacity, CoordType, DelaunayPartitioning, DelaunayPure, ExternalSalesmen,
     ExtraCandidateSetSymmetric, ExtraCandidateSetType, InitialTourAlgorithm, KarpPartitioning, KCenterPartitioning, KMeansPartitioning,
@@ -656,6 +657,7 @@ void WriteSolFile(int *tour, GainType Cost);
 void SetInitialTour(int *tour);
 void ValidateTour(int *tour);
 void Read_InitialTour_Sol(const char *FileName);
+int GetSalesmentFromSolFile(const char *FileName);
 
 #ifdef CAVA_CACHE
 

@@ -5,7 +5,7 @@
 /* Shorthands */
 #define MAX_TRIALS 1000000
 #define RUNS 100000
-#define SPH_PERIOD 3
+#define SPH_PERIOD 2
 #define SPH_TLIM 180.0
 #define TLIM 30.0
 #define RUN_TLIM 30.0

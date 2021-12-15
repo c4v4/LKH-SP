@@ -36,7 +36,7 @@ If, instead, you want to update an already existing local repository cloned with
         $ git submodule update --init --recursive
 ## Run
 The executable can be found in they respective directories (CVRP and CVRPTW).
-The argument are compatible with the respective DIMACS controllers.
+The arguments are compatible with the respective DIMACS controllers.
         
         $ CVRP/cvrp <instance-file-path> <rounded> <time-limit> [<param-file>]
         $ CVRPTW/cvrptw <instance-file-path> <time-limit> [<param-file>]
