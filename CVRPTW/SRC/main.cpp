@@ -34,6 +34,25 @@ void print_sol(sph::Instance &inst, sph::GlobalSolution &sol) {
     fflush(stdout);
 }
 
+void restart() {
+    Node *N = Depot;
+    SalesmenUsed = 0;
+    do {
+        int Size = 0;
+        while ((N = N->Suc)->DepotId == 0)
+            Size++;
+        SalesmenUsed += Size > 0;
+    } while (N != Depot);
+    Salesmen = SalesmenUsed;
+    Trial = 0;
+    MTSPMinSize = 1;
+    ReadProblem();
+    PrintParameters();
+    AllocateStructures();
+    CreateCandidateSet();
+    InitializeStatistics();
+}
+
 char *default_params(char *argv0) {
     char *Buffer;
 
@@ -275,6 +294,8 @@ int main(int argc, char *argv[]) {
             }
             RunTimeLimit *= 2;
         }
+        if (Run == 1 && MTSPMinSize == 0)
+            restart();
     }
     PrintStatistics();
     if (Salesmen > 1) {

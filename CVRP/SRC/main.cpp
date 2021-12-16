@@ -45,6 +45,7 @@ void restart() {
     Trial = 0;
     MTSPMinSize = 1;
     ReadProblem();
+    PrintParameters();
     AllocateStructures();
     CreateCandidateSet();
     InitializeStatistics();
