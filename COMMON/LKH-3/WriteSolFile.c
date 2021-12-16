@@ -52,12 +52,12 @@ int tour_file_name_with_length(char **dest, const char *src) {
     return 0;
 }
 
-void WriteSolFile(int *Tour, GainType Cost) {
+void WriteSolFile(int *Tour, GainType Cost, FILE* OutFile) {
     int i = 0;
     char *FullFileName = NULL;
     time_t Now;
 
-    if (OutputSolFile == NULL) {
+    if (OutFile == NULL) {
         char *tempFileName = NULL;
         tour_file_name_with_length(&tempFileName, ProblemFileName);
         FullFileName = FullName(tempFileName, Cost);
@@ -66,8 +66,8 @@ void WriteSolFile(int *Tour, GainType Cost) {
         if (TraceLevel >= 1)
             printff("Writing CVRPLIB solution file: \"%s\" ... ", FullFileName);
 
-        OutputSolFile = fopen(FullFileName, "w");
-        assert(OutputSolFile);
+        OutFile = fopen(FullFileName, "w");
+        assert(OutFile);
     }
 
     while (NodeSet[Tour[i]].DepotId == 0) /*Find first depot*/
@@ -78,21 +78,21 @@ void WriteSolFile(int *Tour, GainType Cost) {
         ++i;
     int Route = 1;
     while (i < end) {
-        fprintf(OutputSolFile, "Route #%d: ", Route++);
+        fprintf(OutFile, "Route #%d: ", Route++);
         int mod_i = i % DimensionSaved;
         while (NodeSet[Tour[mod_i]].DepotId == 0) {
-            fprintf(OutputSolFile, "%d ", Tour[mod_i] - 1);
+            fprintf(OutFile, "%d ", Tour[mod_i] - 1);
             mod_i = ++i % DimensionSaved;
         }
-        fprintf(OutputSolFile, "\n");
+        fprintf(OutFile, "\n");
         while (NodeSet[Tour[i % DimensionSaved]].DepotId != 0) /*Find first non-depot */
             ++i;
     }
 
-    fprintf(OutputSolFile, "Cost %.3f \n", (double)Cost / Scale);
-    fflush(OutputSolFile);
+    fprintf(OutFile, "Cost %.3f \n", (double)Cost / Scale);
+    fflush(OutFile);
     if (FullFileName)
-        fclose(OutputSolFile);
+        fclose(OutFile);
     if (TraceLevel >= 1)
         printff("done.\n");
 }

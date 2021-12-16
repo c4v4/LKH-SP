@@ -438,8 +438,11 @@ static void Read_NODE_SECTION() {
 
 static void Read_SALESMEN_and_CAPACITY() {
     char *Line;
-    while ((Line = ReadLine(ProblemFile)) && (sscanf(Line, "%d %d", &Salesmen, &Capacity) != 2))
+    int veh;
+    while ((Line = ReadLine(ProblemFile)) && (sscanf(Line, "%d %d", &veh, &Capacity) != 2))
         ;
+    if (InitialSolFileName == NULL)
+        Salesmen = veh;
 }
 
 static void Convert2FullMatrix() {

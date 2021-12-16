@@ -174,7 +174,7 @@ int main(int argc, char *argv[]) {
             RecordBetterTour();
             RecordBestTour();
             WriteTour(TourFileName, BestTour, BestCost);
-            // WriteSolFile(BestTour, BestCost);
+            WriteSolFile(BestTour, BestCost, NULL);
         }
         OldOptimum = Optimum;
         if (MTSPObjective != MINMAX && MTSPObjective != MINMAX_SIZE) {
@@ -237,7 +237,7 @@ int main(int argc, char *argv[]) {
                 for (sph::idx_t j = BestRoutes.size(); j < Salesmen; ++j)
                     *ws++ = MTSPDepot;
                 warmstart[0] = warmstart[DimensionSaved];
-                WriteSolFile(warmstart, Cost);
+                WriteSolFile(warmstart, Cost, NULL);
                 SetInitialTour(warmstart);
             }
             RunTimeLimit *= 2;

@@ -653,7 +653,7 @@ void VRPB_Reduce(void);
 void WriteCandidates(void);
 void WritePenalties(void);
 void WriteTour(char *FileName, int *Tour, GainType Cost);
-void WriteSolFile(int *tour, GainType Cost);
+void WriteSolFile(int *tour, GainType Cost, FILE* OutFile);
 void SetInitialTour(int *tour);
 void ValidateTour(int *tour);
 void Read_InitialTour_Sol(const char *FileName);

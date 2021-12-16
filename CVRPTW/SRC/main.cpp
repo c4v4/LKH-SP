@@ -6,8 +6,6 @@ extern "C" {
 #include "LKH.h"
 }
 
-#include <x86intrin.h>
-
 #include <vector>
 
 #define VERBOSE
@@ -49,7 +47,6 @@ char *default_params(char *argv0) {
 }
 
 int main(int argc, char *argv[]) {
-    unsigned long long EntryClock = __rdtsc();
     GainType Cost, OldOptimum;
     double Time, LastTime;
     Node *N;
@@ -69,69 +66,32 @@ int main(int argc, char *argv[]) {
         ProblemFileName = argv[1];
     if (argc > 2)
         TimeLimit = atoi(argv[2]);
-    if (argc > 4)
-        ParameterFileName = argv[4];
+    if (argc > 3)
+        ParameterFileName = argv[3];
     else
         ParameterFileName = default_params(argv[0]);
 
     ReadParameters();
-    if (Salesmen == 0)
+    if (InitialSolFileName)
+        Salesmen = GetSalesmentFromSolFile(InitialSolFileName);
+    else if (Salesmen == 0)
         eprintf("Salesmen probing not available for VRTPTW");
 
     StartTime = GetTime();
     MergeWithTour = Recombination == IPT ? MergeWithTourIPT : MergeWithTourGPX2;
     OutputSolFile = stdout;
     ReadProblem();
+    if (InitialSolFileName)
+        Read_InitialTour_Sol(InitialSolFileName);
 
     int *warmstart = (int *)malloc((DimensionSaved + 1 + EXTRA_SALESMEN) * sizeof(int));
     assert(warmstart);
-    if (MTSPMinSize == 0) {
-        assert(ProblemType == CVRPTW);
-        CVRPTW_InitialTour();
 
-        int SalesmenUsed = 0;
-        Node *N = Depot, *NextN = NULL;
-        int *ws = warmstart;
-        do {
-            int Size = -1;
-            do {
-                NextN = N->Suc;
-                if (NextN->Id >= DimensionSaved)
-                    NextN = NextN->Suc;
-                if (!(N->DepotId && NextN->DepotId)) {
-                    ++Size;
-                    *ws++ = N->DepotId ? MTSPDepot : N->Id;
-                }
-            } while ((N = NextN)->DepotId == 0);
-            SalesmenUsed += Size > 0;
-        } while (N != Depot);
-        *ws++ = MTSPDepot;
-        /* Add some more vehicles */
-        for (int i = 0; i < EXTRA_SALESMEN; ++i) {
-            ++SalesmenUsed;
-            *ws++ = MTSPDepot;
-        }
-        if (SalesmenUsed < Salesmen) {
-            int diff = Salesmen - SalesmenUsed;
-            Salesmen = SalesmenUsed;
-            DimensionSaved -= diff;
-            Dimension -= 2 * diff;
-            for (int i = 1; i <= DimensionSaved; ++i)
-                NodeSet[i].FixedTo1 -= diff;
-            for (int i = DimensionSaved + 1; i <= Dimension; ++i)
-                (NodeSet[i] = NodeSet[i + diff]).Id = i;
-            for (i = Dimension + 2 * diff; i > Dimension; --i) {
-                free(NodeSet[i].MergeSuc);
-                free(NodeSet[i].CandidateSet);
-                free(NodeSet[i].BackboneCandidateSet);
-                NodeSet[i].MergeSuc = NULL;
-                NodeSet[i].CandidateSet = NULL;
-                NodeSet[i].BackboneCandidateSet = NULL;
-                NodeSet[i].Id = 0;
-            }
-            SetInitialTour(warmstart);
-        }
-    }
+    if (TraceLevel >= 1) {
+        printff("done\n");
+        PrintParameters();
+    } else
+        printff("PROBLEM_FILE = %s\n", ProblemFileName ? ProblemFileName : "");
 
     AllocateStructures();
     CreateCandidateSet();
@@ -199,7 +159,7 @@ int main(int argc, char *argv[]) {
             RecordBetterTour();
             RecordBestTour();
             WriteTour(TourFileName, BestTour, BestCost);
-            // WriteSolFile(BestTour, BestCost);
+            WriteSolFile(BestTour, BestCost, NULL);
         }
         OldOptimum = Optimum;
         if (MTSPObjective != MINMAX && MTSPObjective != MINMAX_SIZE) {
@@ -262,7 +222,7 @@ int main(int argc, char *argv[]) {
                 for (sph::idx_t j = BestRoutes.size(); j < Salesmen; ++j)
                     *ws++ = MTSPDepot;
                 warmstart[0] = warmstart[DimensionSaved];
-                WriteSolFile(warmstart, Cost);
+                WriteSolFile(warmstart, Cost, NULL);
                 SetInitialTour(warmstart);
             }
             RunTimeLimit *= 2;
@@ -293,7 +253,6 @@ int main(int argc, char *argv[]) {
     }
 
     printff("Best %s solution:\n", Type);
-    printff("Total cpu cycles: %lld\n", __rdtsc() - EntryClock);
     CurrentPenalty = BestPenalty;
     SOP_Report(BestCost);
     printff("\n");
