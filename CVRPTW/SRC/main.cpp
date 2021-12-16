@@ -72,16 +72,27 @@ int main(int argc, char *argv[]) {
         ParameterFileName = default_params(argv[0]);
 
     ReadParameters();
-    if (Salesmen == 0)
-        eprintf("Salesmen probing not available for VRTPTW");
+    if (InitialSolFileName)
+        Salesmen = GetSalesmentFromSolFile(InitialSolFileName);
+    else if (Salesmen == 0)
+        MTSPMinSize = 0;
 
     StartTime = GetTime();
     MergeWithTour = Recombination == IPT ? MergeWithTourIPT : MergeWithTourGPX2;
     OutputSolFile = stdout;
     ReadProblem();
+    if (InitialSolFileName)
+        Read_InitialTour_Sol(InitialSolFileName);
 
     int *warmstart = (int *)malloc((DimensionSaved + 1 + EXTRA_SALESMEN) * sizeof(int));
     assert(warmstart);
+
+    if (TraceLevel >= 1) {
+        printff("done\n");
+        PrintParameters();
+    } else
+        printff("PROBLEM_FILE = %s\n", ProblemFileName ? ProblemFileName : "");
+
     if (MTSPMinSize == 0) {
         assert(ProblemType == CVRPTW);
         CVRPTW_InitialTour();
@@ -196,7 +207,7 @@ int main(int argc, char *argv[]) {
             RecordBetterTour();
             RecordBestTour();
             WriteTour(TourFileName, BestTour, BestCost);
-            // WriteSolFile(BestTour, BestCost);
+            WriteSolFile(BestTour, BestCost, NULL);
         }
         OldOptimum = Optimum;
         if (MTSPObjective != MINMAX && MTSPObjective != MINMAX_SIZE) {
@@ -259,7 +270,7 @@ int main(int argc, char *argv[]) {
                 for (sph::idx_t j = BestRoutes.size(); j < Salesmen; ++j)
                     *ws++ = MTSPDepot;
                 warmstart[0] = warmstart[DimensionSaved];
-                WriteSolFile(warmstart, Cost);
+                WriteSolFile(warmstart, Cost, NULL);
                 SetInitialTour(warmstart);
             }
             RunTimeLimit *= 2;

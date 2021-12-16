@@ -1,13 +1,12 @@
-#include "LKH.h"
 #include "Genetic.h"
+#include "LKH.h"
 
 /*
  * The PrintParameters function prints the problem parameters to
  * standard output.
-*/
+ */
 
-void PrintParameters()
-{
+void PrintParameters() {
     int i;
 
     printff("ASCENT_CANDIDATES = %d\n", AscentCandidates);
@@ -23,11 +22,12 @@ void PrintParameters()
         for (i = 0; i < CandidateFiles; i++)
             printff("CANDIDATE_FILE = %s\n", CandidateFileName[i]);
     printff("CANDIDATE_SET_TYPE = %s%s\n",
-            CandidateSetType == ALPHA ? "ALPHA" :
-            CandidateSetType == DELAUNAY ? "DELAUNAY" :
-            CandidateSetType == NN ? "NEAREST-NEIGHBOR" :
-            CandidateSetType == POPMUSIC ? "POPMUSIC" :
-            CandidateSetType == QUADRANT ? "QUADRANT" : "",
+            CandidateSetType == ALPHA      ? "ALPHA"
+            : CandidateSetType == DELAUNAY ? "DELAUNAY"
+            : CandidateSetType == NN       ? "NEAREST-NEIGHBOR"
+            : CandidateSetType == POPMUSIC ? "POPMUSIC"
+            : CandidateSetType == QUADRANT ? "QUADRANT"
+                                           : "",
             DelaunayPure ? " PURE" : "");
     if (Salesmen > 1)
         printff("DEPOT = %d\n", MTSPDepot);
@@ -43,12 +43,10 @@ void PrintParameters()
     else
         printff("# EXCESS =\n");
     printff("EXTERNAL_SALESMEN = %d\n", ExternalSalesmen);
-    printff("EXTRA_CANDIDATES = %d %s\n",
-            ExtraCandidates,
-            ExtraCandidateSetSymmetric ? "SYMMETRIC" : "");
-    printff("EXTRA_CANDIDATE_SET_TYPE = %s\n",
-            ExtraCandidateSetType == NN ? "NEAREST-NEIGHBOR" :
-            ExtraCandidateSetType == QUADRANT ? "QUADRANT" : "");
+    printff("EXTRA_CANDIDATES = %d %s\n", ExtraCandidates, ExtraCandidateSetSymmetric ? "SYMMETRIC" : "");
+    printff("EXTRA_CANDIDATE_SET_TYPE = %s\n", ExtraCandidateSetType == NN         ? "NEAREST-NEIGHBOR"
+                                               : ExtraCandidateSetType == QUADRANT ? "QUADRANT"
+                                                                                   : "");
     printff("GAIN23 = %s\n", Gain23Used ? "YES" : "NO");
     printff("GAIN_CRITERION = %s\n", GainCriterionUsed ? "YES" : "NO");
     if (InitialPeriod >= 0)
@@ -56,26 +54,22 @@ void PrintParameters()
     else
         printff("# INITIAL_PERIOD =\n");
     printff("INITIAL_STEP_SIZE = %d\n", InitialStepSize);
-    printff("INITIAL_TOUR_ALGORITHM = %s\n",
-            InitialTourAlgorithm == BORUVKA ? "BORUVKA" :
-            InitialTourAlgorithm == CVRP_ALG ? "CVRP" :
-            InitialTourAlgorithm == CVRPTW_ALG ? "CVRPTW" :
-            InitialTourAlgorithm == GREEDY ? "GREEDY" :
-            InitialTourAlgorithm == MOORE ? "MOORE" :
-            InitialTourAlgorithm == MTSP_ALG ? "MTSP" :
-            InitialTourAlgorithm == NEAREST_NEIGHBOR ? "NEAREST-NEIGHBOR" :
-            InitialTourAlgorithm ==
-            QUICK_BORUVKA ? "QUICK-BORUVKA" :
-            InitialTourAlgorithm == SIERPINSKI ? "SIERPINSKI" :
-            InitialTourAlgorithm == SOP_ALG ? "SOP" :
-            InitialTourAlgorithm == TSPDL_ALG ? "TSPDL" : "WALK");
-    printff("%sINITIAL_TOUR_FILE = %s\n",
-            InitialTourFileName ? "" : "# ",
-            InitialTourFileName ? InitialTourFileName : "");
+    printff("INITIAL_TOUR_ALGORITHM = %s\n", InitialTourAlgorithm == BORUVKA            ? "BORUVKA"
+                                             : InitialTourAlgorithm == CVRP_ALG         ? "CVRP"
+                                             : InitialTourAlgorithm == CVRPTW_ALG       ? "CVRPTW"
+                                             : InitialTourAlgorithm == GREEDY           ? "GREEDY"
+                                             : InitialTourAlgorithm == MOORE            ? "MOORE"
+                                             : InitialTourAlgorithm == MTSP_ALG         ? "MTSP"
+                                             : InitialTourAlgorithm == NEAREST_NEIGHBOR ? "NEAREST-NEIGHBOR"
+                                             : InitialTourAlgorithm == QUICK_BORUVKA    ? "QUICK-BORUVKA"
+                                             : InitialTourAlgorithm == SIERPINSKI       ? "SIERPINSKI"
+                                             : InitialTourAlgorithm == SOP_ALG          ? "SOP"
+                                             : InitialTourAlgorithm == TSPDL_ALG        ? "TSPDL"
+                                                                                        : "WALK");
+    printff("%sINITIAL_TOUR_FILE = %s\n", InitialTourFileName ? "" : "# ", InitialTourFileName ? InitialTourFileName : "");
+    printff("%sINITIAL_SOL_FILE = %s\n", InitialSolFileName ? "" : "# ", InitialSolFileName ? InitialSolFileName : "");
     printff("INITIAL_TOUR_FRACTION = %0.3f\n", InitialTourFraction);
-    printff("%sINPUT_TOUR_FILE = %s\n",
-            InputTourFileName ? "" : "# ",
-            InputTourFileName ? InputTourFileName : "");
+    printff("%sINPUT_TOUR_FILE = %s\n", InputTourFileName ? "" : "# ", InputTourFileName ? InputTourFileName : "");
     printff("KICK_TYPE = %d\n", KickType);
     printff("KICKS = %d\n", Kicks);
     if (MaxBreadth == INT_MAX)
@@ -83,8 +77,7 @@ void PrintParameters()
     else
         printff("MAX_BREADTH = %d\n", MaxBreadth);
     printff("MAKESPAN = %s\n", TSPTW_Makespan ? "YES" : "NO");
-    printff("MAX_CANDIDATES = %d %s\n",
-            MaxCandidates, CandidateSetSymmetric ? "SYMMETRIC" : "");
+    printff("MAX_CANDIDATES = %d %s\n", MaxCandidates, CandidateSetSymmetric ? "SYMMETRIC" : "");
     if (MaxSwaps >= 0)
         printff("MAX_SWAPS = %d\n", MaxSwaps);
     else
@@ -98,8 +91,7 @@ void PrintParameters()
     else
         for (i = 0; i < MergeTourFiles; i++)
             printff("MERGE_TOUR_FILE = %s\n", MergeTourFileName[i]);
-    printff("MOVE_TYPE = %d %s\n", MoveType,
-            MoveTypeSpecial ? "SPECIAL" : "");
+    printff("MOVE_TYPE = %d %s\n", MoveType, MoveTypeSpecial ? "SPECIAL" : "");
     if (Salesmen > 1) {
         printff("MTSP_MIN_SIZE = %d\n", MTSPMinSize);
         printff("MTSP_MAX_SIZE = %d\n", MTSPMaxSize);
@@ -114,28 +106,17 @@ void PrintParameters()
         printff("# MTSP_MAX_SIZE =\n");
         printff("# MTSP_OBJECTIVE =\n");
     }
-    printff("%sMTSP_SOLUTION_FILE = %s\n",
-            MTSPSolutionFileName ? "" : "# ",
-            MTSPSolutionFileName ? MTSPSolutionFileName : "");
-    printff("%sNONSEQUENTIAL_MOVE_TYPE = %d\n",
-            PatchingA > 1 ? "" : "# ", NonsequentialMoveType);
+    printff("%sMTSP_SOLUTION_FILE = %s\n", MTSPSolutionFileName ? "" : "# ", MTSPSolutionFileName ? MTSPSolutionFileName : "");
+    printff("%sNONSEQUENTIAL_MOVE_TYPE = %d\n", PatchingA > 1 ? "" : "# ", NonsequentialMoveType);
     if (Optimum == MINUS_INFINITY)
         printff("# OPTIMUM =\n");
     else
         printff("OPTIMUM = " GainFormat "\n", Optimum);
-    printff("%sOUTPUT_TOUR_FILE = %s\n",
-            OutputTourFileName ? "" : "# ",
-            OutputTourFileName ? OutputTourFileName : "");
-    printff("PATCHING_A = %d %s\n", PatchingA,
-            PatchingARestricted ? "RESTRICTED" :
-            PatchingAExtended ? "EXTENDED" : "");
-    printff("PATCHING_C = %d %s\n", PatchingC,
-            PatchingCRestricted ? "RESTRICTED" :
-            PatchingCExtended ? "EXTENDED" : "");
-    printff("%sPI_FILE = %s\n",
-            PiFileName ? "" : "# ", PiFileName ? PiFileName : "");
-    printff("POPMUSIC_INITIAL_TOUR = %s\n",
-            POPMUSIC_InitialTour ? "YES" : "NO");
+    printff("%sOUTPUT_TOUR_FILE = %s\n", OutputTourFileName ? "" : "# ", OutputTourFileName ? OutputTourFileName : "");
+    printff("PATCHING_A = %d %s\n", PatchingA, PatchingARestricted ? "RESTRICTED" : PatchingAExtended ? "EXTENDED" : "");
+    printff("PATCHING_C = %d %s\n", PatchingC, PatchingCRestricted ? "RESTRICTED" : PatchingCExtended ? "EXTENDED" : "");
+    printff("%sPI_FILE = %s\n", PiFileName ? "" : "# ", PiFileName ? PiFileName : "");
+    printff("POPMUSIC_INITIAL_TOUR = %s\n", POPMUSIC_InitialTour ? "YES" : "NO");
     printff("POPMUSIC_MAX_NEIGHBORS = %d\n", POPMUSIC_MaxNeighbors);
     printff("POPMUSIC_SAMPLE_SIZE = %d\n", POPMUSIC_SampleSize);
     printff("POPMUSIC_SOLUTIONS = %d\n", POPMUSIC_Solutions);
@@ -144,43 +125,35 @@ void PrintParameters()
         printff("# ");
     printff("POPULATION_SIZE = %d\n", MaxPopulationSize);
     printff("PRECISION = %d\n", Precision);
-    printff("%sPROBLEM_FILE = %s\n",
-            ProblemFileName ? "" : "# ",
-            ProblemFileName ? ProblemFileName : "");
-    printff("RECOMBINATION = %s\n", Recombination == IPT ? "IPT" :
-            Recombination == GPX2 ? "GPX2" : "UNKNOWN");
+    printff("%sPROBLEM_FILE = %s\n", ProblemFileName ? "" : "# ", ProblemFileName ? ProblemFileName : "");
+    printff("RECOMBINATION = %s\n", Recombination == IPT ? "IPT" : Recombination == GPX2 ? "GPX2" : "UNKNOWN");
     printff("RESTRICTED_SEARCH = %s\n", RestrictedSearch ? "YES" : "NO");
     printff("RUNS = %d\n", Runs);
     printff("SALESMEN = %d\n", Salesmen);
+    printff("SA_FACTOR = %f\n", SAFactor);
     printff("SCALE = %d\n", Scale);
     printff("SEED = %u\n", Seed);
     if (Salesmen > 1)
-        printff("%sSINTEF_SOLUTION_FILE = %s\n",
-                SINTEFSolutionFileName ? "" : "# ",
-                SINTEFSolutionFileName ? SINTEFSolutionFileName : "");
+        printff("%sSINTEF_SOLUTION_FILE = %s\n", SINTEFSolutionFileName ? "" : "# ", SINTEFSolutionFileName ? SINTEFSolutionFileName : "");
     printff("STOP_AT_OPTIMUM = %s\n", StopAtOptimum ? "YES" : "NO");
     printff("SUBGRADIENT = %s\n", Subgradient ? "YES" : "NO");
     if (SubproblemSize == 0)
         printff("# SUBPROBLEM_SIZE =\n");
     else
         printff("SUBPROBLEM_SIZE = %d%s%s%s\n", SubproblemSize,
-                DelaunayPartitioning ? " DELAUNAY" :
-                KarpPartitioning ? " KARP" :
-                KCenterPartitioning ? " K-CENTER" :
-                KMeansPartitioning ? " K-MEANS" :
-                MoorePartitioning ? " MOORE" :
-                RohePartitioning ? " ROHE" :
-                SierpinskiPartitioning ? " SIERPINSKI" : "",
-                SubproblemBorders ? " BORDERS" : "",
-                SubproblemsCompressed ? " COMPRESSED" : "");
-    printff("%sSUBPROBLEM_TOUR_FILE = %s\n",
-            SubproblemTourFileName ? "" : "# ",
-            SubproblemTourFileName ? SubproblemTourFileName : "");
-    printff("SUBSEQUENT_MOVE_TYPE = %d %s\n",
-            SubsequentMoveType == 0 ? MoveType : SubsequentMoveType,
+                DelaunayPartitioning     ? " DELAUNAY"
+                : KarpPartitioning       ? " KARP"
+                : KCenterPartitioning    ? " K-CENTER"
+                : KMeansPartitioning     ? " K-MEANS"
+                : MoorePartitioning      ? " MOORE"
+                : RohePartitioning       ? " ROHE"
+                : SierpinskiPartitioning ? " SIERPINSKI"
+                                         : "",
+                SubproblemBorders ? " BORDERS" : "", SubproblemsCompressed ? " COMPRESSED" : "");
+    printff("%sSUBPROBLEM_TOUR_FILE = %s\n", SubproblemTourFileName ? "" : "# ", SubproblemTourFileName ? SubproblemTourFileName : "");
+    printff("SUBSEQUENT_MOVE_TYPE = %d %s\n", SubsequentMoveType == 0 ? MoveType : SubsequentMoveType,
             SubsequentMoveTypeSpecial ? "SPECIAL" : "");
-    printff("SUBSEQUENT_PATCHING = %s\n",
-            SubsequentPatching ? "YES" : "NO");
+    printff("SUBSEQUENT_PATCHING = %s\n", SubsequentPatching ? "YES" : "NO");
     if (TimeLimit == DBL_MAX)
         printff("# TIME_LIMIT =\n");
     else
@@ -189,8 +162,11 @@ void PrintParameters()
         printff("# RUN_TIME_LIMIT =\n");
     else
         printff("RUN_TIME_LIMIT = %0.1f\n", RunTimeLimit);
-    printff("%sTOUR_FILE = %s\n",
-            TourFileName ? "" : "# ", TourFileName ? TourFileName : "");
+    if (SphTimeLimit == DBL_MAX)
+        printff("# SPH_TIME_LIMIT =\n");
+    else
+        printff("SPH_TIME_LIMIT = %0.1f\n", SphTimeLimit);
+    printff("%sTOUR_FILE = %s\n", TourFileName ? "" : "# ", TourFileName ? TourFileName : "");
     printff("TRACE_LEVEL = %d\n", TraceLevel);
     printff("VEHICLES = %d\n\n", Salesmen);
 }

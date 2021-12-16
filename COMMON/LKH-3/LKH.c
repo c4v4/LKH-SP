@@ -151,7 +151,7 @@ Node *KickNode;
 /* The following variables are read by the function ReadProblem: */
 
 char *ParameterFileName, *ProblemFileName, *PiFileName, *TourFileName, *OutputTourFileName, *InputTourFileName, **CandidateFileName,
-    **EdgeFileName, *InitialTourFileName, *SubproblemTourFileName, **MergeTourFileName, *MTSPSolutionFileName, *SINTEFSolutionFileName;
+    **EdgeFileName, *InitialTourFileName, *InitialSolFileName, *SubproblemTourFileName, **MergeTourFileName, *MTSPSolutionFileName, *SINTEFSolutionFileName;
 char *Name, *Type, *EdgeWeightType, *EdgeWeightFormat, *EdgeDataFormat, *NodeCoordType, *DisplayDataType;
 int CandidateSetSymmetric, CandidateSetType, Capacity, CoordType, DelaunayPartitioning, DelaunayPure, ExternalSalesmen,
     ExtraCandidateSetSymmetric, ExtraCandidateSetType, InitialTourAlgorithm, KarpPartitioning, KCenterPartitioning, KMeansPartitioning,

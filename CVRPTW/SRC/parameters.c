@@ -5,7 +5,7 @@
 #define MAX_TRIALS 10000000
 #define RUNS 10000000
 #define SPH_PERIOD 3
-#define SPH_TLIM 120.0
+#define SPH_TLIM DBL_MAX
 #define TLIM DBL_MAX
 #define RUN_TLIM DBL_MAX
 

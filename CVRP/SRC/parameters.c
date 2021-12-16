@@ -5,10 +5,10 @@
 /* Shorthands */
 #define MAX_TRIALS 1000000
 #define RUNS 100000
-#define SPH_PERIOD 3
-#define SPH_TLIM 180.0
-#define TLIM 30.0
-#define RUN_TLIM 30.0
+#define SPH_PERIOD 2
+#define SPH_TLIM DBL_MAX
+#define TLIM DBL_MAX
+#define RUN_TLIM DBL_MAX
 
 /**
  * To help linking-time optimizations (with -flto), some of the variables and functions that
@@ -29,7 +29,7 @@ Node *BestSubsequentMove(Node *t1, Node *t2, GainType *G0, GainType *Gain) { ret
 void SetDefaultParameters() {
     ProblemFileName = PiFileName = InputTourFileName = OutputTourFileName = TourFileName = 0;
     CandidateFiles = MergeTourFiles = 0;
-    
+
     AscentCandidates = 50;
     BackboneTrials = 0;
     Backtracking = 0;

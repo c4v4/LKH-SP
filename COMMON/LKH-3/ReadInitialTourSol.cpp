@@ -9,6 +9,7 @@ extern "C" {
 /* TODO: convert it to C code */
 extern "C" void Read_InitialTour_Sol(const char *FileName) {
     assert(NodeSet);
+    printff("Reading %s...\n", FileName);
 
     std::vector<int> tour;
     std::ifstream rfile;
@@ -58,4 +59,35 @@ extern "C" void Read_InitialTour_Sol(const char *FileName) {
         tour.push_back(tour[0]);
         SetInitialTour(tour.data());
     }
+}
+
+extern "C" int GetSalesmentFromSolFile(const char *FileName) {
+    printff("Reading Salesmen from %s...\n", FileName);
+
+    std::ifstream rfile;
+    std::string line;
+    int SalesmenUsed = 0;
+
+    rfile.open(FileName);
+    std::string delimiter = ":";
+    std::string delimiter_num = " ";
+    int file_type = 0;
+    if (rfile.is_open()) {
+        if (!getline(rfile, line).eof()) {
+            if (line.find("Route") != std::string::npos) {
+                ++SalesmenUsed;
+            } else if (line.find("Instance ") == std::string::npos) {
+                file_type = 1;
+                getline(rfile, line);  // nvehicles
+                getline(rfile, line);  //?
+                getline(rfile, line);  //?
+            }
+
+            while (!getline(rfile, line).eof()) {
+                if (line.find("Route") != std::string::npos || file_type)
+                    ++SalesmenUsed;
+            }
+        }
+    }
+    return SalesmenUsed;
 }

@@ -6,8 +6,6 @@ extern "C" {
 #include "LKH.h"
 }
 
-#include <x86intrin.h>
-
 #include <vector>
 
 #define VERBOSE
@@ -65,7 +63,6 @@ char *default_params(char *argv0) {
 }
 
 int main(int argc, char *argv[]) {
-    unsigned long long EntryClock = __rdtsc();
     GainType Cost, OldOptimum;
     double Time, LastTime;
     Node *N;
@@ -94,16 +91,26 @@ int main(int argc, char *argv[]) {
         ParameterFileName = default_params(argv[0]);
 
     ReadParameters();
-    if (Salesmen == 0)
+    if (InitialSolFileName)
+        Salesmen = GetSalesmentFromSolFile(InitialSolFileName);
+    else if (Salesmen == 0)
         MTSPMinSize = 0;
 
     StartTime = LastTime = GetTime();
     MergeWithTour = Recombination == IPT ? MergeWithTourIPT : MergeWithTourGPX2;
     OutputSolFile = stdout;
     ReadProblem();
+    if (InitialSolFileName)
+        Read_InitialTour_Sol(InitialSolFileName);
 
     int *warmstart = (int *)malloc((DimensionSaved + 1) * sizeof(int));
     assert(warmstart);
+
+    if (TraceLevel >= 1) {
+        printff("done\n");
+        PrintParameters();
+    } else
+        printff("PROBLEM_FILE = %s\n", ProblemFileName ? ProblemFileName : "");
 
     AllocateStructures();
     CreateCandidateSet();
@@ -120,8 +127,10 @@ int main(int argc, char *argv[]) {
     sph_ptr = &sph;
 
     double Tlim = (TimeLimit - GetTime() + StartTime); /* Remaining time */
-    SphTimeLimit = Tlim / 30;
-    RunTimeLimit = Tlim / 10;
+    if (SphTimeLimit == DBL_MAX)
+        SphTimeLimit = Tlim / 30;
+    if (RunTimeLimit == DBL_MAX)
+        RunTimeLimit = Tlim / 10;
 
     /* Find a specified number (Runs) of local optima */
     for (Run = 1; Run <= Runs; Run++) {
@@ -171,7 +180,7 @@ int main(int argc, char *argv[]) {
             RecordBetterTour();
             RecordBestTour();
             WriteTour(TourFileName, BestTour, BestCost);
-            // WriteSolFile(BestTour, BestCost);
+            WriteSolFile(BestTour, BestCost, NULL);
         }
         OldOptimum = Optimum;
         if (MTSPObjective != MINMAX && MTSPObjective != MINMAX_SIZE) {
@@ -267,7 +276,6 @@ int main(int argc, char *argv[]) {
     }
 
     printff("Best %s solution:\n", Type);
-    printff("Total cpu cycles: %lld\n", __rdtsc() - EntryClock);
     CurrentPenalty = BestPenalty;
     SOP_Report(BestCost);
     printff("\n");
