@@ -114,7 +114,7 @@ int extract_routes_tmlp(GainType Cost) {
         assert(BestTourIter == BestTour + DimensionSaved);
         *BestTourIter = BestTour[0];
         BestCost = CostCheck;
-        WriteSolFile(BestTour, BestCost);
+        WriteSolFile(BestTour, BestCost, stdout);
     }
     if (store_best && TraceLevel >= 0) {
         printff("** ");

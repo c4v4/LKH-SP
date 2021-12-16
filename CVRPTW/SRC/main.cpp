@@ -6,8 +6,6 @@ extern "C" {
 #include "LKH.h"
 }
 
-#include <x86intrin.h>
-
 #include <vector>
 
 #define VERBOSE
@@ -49,7 +47,6 @@ char *default_params(char *argv0) {
 }
 
 int main(int argc, char *argv[]) {
-    unsigned long long EntryClock = __rdtsc();
     GainType Cost, OldOptimum;
     double Time, LastTime;
     Node *N;
@@ -69,8 +66,8 @@ int main(int argc, char *argv[]) {
         ProblemFileName = argv[1];
     if (argc > 2)
         TimeLimit = atoi(argv[2]);
-    if (argc > 4)
-        ParameterFileName = argv[4];
+    if (argc > 3)
+        ParameterFileName = argv[3];
     else
         ParameterFileName = default_params(argv[0]);
 
@@ -293,7 +290,6 @@ int main(int argc, char *argv[]) {
     }
 
     printff("Best %s solution:\n", Type);
-    printff("Total cpu cycles: %lld\n", __rdtsc() - EntryClock);
     CurrentPenalty = BestPenalty;
     SOP_Report(BestCost);
     printff("\n");
