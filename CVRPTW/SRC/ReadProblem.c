@@ -441,7 +441,7 @@ static void Read_SALESMEN_and_CAPACITY() {
     int veh;
     while ((Line = ReadLine(ProblemFile)) && (sscanf(Line, "%d %d", &veh, &Capacity) != 2))
         ;
-    if (InitialSolFileName == NULL)
+    if (InitialSolFileName == NULL && Salesmen <= 1)
         Salesmen = veh;
 }
 
