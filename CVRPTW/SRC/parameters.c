@@ -33,7 +33,7 @@ void SetDefaultParameters() {
     BackboneTrials = 0;
     Backtracking = 0;
     CandidateSetSymmetric = 0;
-    CandidateSetType = POPMUSIC;
+    CandidateSetType = ALPHA;
     Crossover = ERXT;
     DemandDimension = 1;
     Excess = -1;
