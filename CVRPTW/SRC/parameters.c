@@ -57,7 +57,7 @@ void SetDefaultParameters() {
     MaxSwaps = 0;
     MaxTrials = MAX_TRIALS;
     MTSPDepot = 1;
-    MTSPMinSize = 0;
+    MTSPMinSize = 1;
     MTSPMaxSize = -1;
     MTSPObjective = -1;
     NonsequentialMoveType = -1;

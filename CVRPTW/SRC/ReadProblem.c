@@ -244,11 +244,6 @@ void ReadProblem() {
         BestSubsequentMove = BestSpecialOptMove; */
     if (ProblemType == HCP || ProblemType == HPP)
         MaxCandidates = 0;
-    if (TraceLevel >= 1) {
-        printff("done\n");
-        PrintParameters();
-    } else
-        printff("PROBLEM_FILE = %s\n", ProblemFileName ? ProblemFileName : "");
     fclose(ProblemFile);
     if (InitialTourFileName)
         ReadTour(InitialTourFileName, &InitialTourFile);
