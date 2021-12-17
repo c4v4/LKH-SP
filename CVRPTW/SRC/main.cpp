@@ -156,8 +156,10 @@ int main(int argc, char *argv[]) {
     sph_ptr = &sph;
 
     double Tlim = (TimeLimit - GetTime() + StartTime); /* Remaining time */
-    SphTimeLimit = Tlim / 30;
-    RunTimeLimit = Tlim / 10;
+    if (SphTimeLimit == DBL_MAX)
+        SphTimeLimit = Tlim / 30;
+    if (RunTimeLimit == DBL_MAX)
+        RunTimeLimit = Tlim / 10;
 
     /* Find a specified number (Runs) of local optima */
     for (Run = 1; Run <= Runs; Run++) {
