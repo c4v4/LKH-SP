@@ -8,8 +8,12 @@ The authors are not responsible for broken machines, corrupted OS, thermonuclear
 war, the current economic crisis or anything that might be caused by using this 
 program. 
 
-LKH-3 base version [here](https://github.com/c4v4/LKH3).
-SPH repository [here](https://github.com/c4v4/sph).
+``LKH + SPH`` or ``LKH-SP`` comes from the union of the improved version of Helsgaun's [LKH-3](https://github.com/c4v4/LKH3) algorithm with the CFT inspired [Set-Partitioning Heuristic](https://github.com/c4v4/sph).
+With this algorithm, we took part to DIMASC 12th Implmentation Challenge on Vehicle Routing Problems:
+- Team name: _Vavavuma!_
+- Team memebers: _F. Cavaliere, M. Fischetti, K. Helsgaun_
+- Algorithm name: _LKHSP_
+
 
 ## Project structure
 For each variant, some of the originally dynamic variables and function pointers are now defined at compile time to help compiler optimizations.
