@@ -1,8 +1,15 @@
 # LKH + SPH
 
+## Disclaimer
 !! NOTE: Work in progress !!
+The project is provided as it is, as we used it during DIMACS competition. 
+There are many rough corners and little aspects to polish, so be aware of that.
+The authors are not responsible for broken machines, corrupted OS, thermonuclear 
+war, the current economic crisis or anything that might be caused by using this 
+program. 
 
 LKH-3 base version [here](https://github.com/c4v4/LKH3).
+SPH repository [here](https://github.com/c4v4/sph).
 
 ## Project structure
 For each variant, some of the originally dynamic variables and function pointers are now defined at compile time to help compiler optimizations.
@@ -14,7 +21,6 @@ For each variant, some of the originally dynamic variables and function pointers
 - CVRPTW: Files specific for the CVRPTW variant
  
 Both CVRP and CVRPTW contain:
-- INSTACES: Relative VRP variant instances
 - SRC: Specialized code
   - ExtractRoutes.cpp: Constraint checker
   - Forbidden.c: LKH-3 variant-specialized Forbidden function 
